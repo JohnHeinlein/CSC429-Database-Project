@@ -2,26 +2,22 @@ package userinterface;
 
 import impresario.IModel;
 
+import java.lang.reflect.Constructor;
+import Utilities.Utilities;
+import userinterface.*;
+
 //==============================================================================
 public class ViewFactory {
 
-	public static View createView(String viewName, IModel model)
-	{
-		//TODO: Call constructor for class based on viewName
-		return null;
-	}
-
-
-	/*
-	public static Vector createVectorView(String viewName, IModel model)
-	{
-		if(viewName.equals("SOME VIEW NAME") == true)
-		{
-			//return [A NEW VECTOR VIEW OF THAT NAME TYPE]
-		}
-		else
-			return null;
-	}
-	*/
-
+    public static View createView(String viewName, IModel model) {
+        try{
+            return (View) Class.forName("userinterface."+viewName)
+                    .getConstructor(IModel.class)
+                    .newInstance(model);
+        }catch(Exception ex){
+            Utilities.logErr("No view found for " + viewName);
+            ex.printStackTrace();
+        }
+        return null;
+    }
 }

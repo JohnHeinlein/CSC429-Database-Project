@@ -18,8 +18,10 @@
 //
 //*************************************************************
 
-/** @author		$Author: smitra $ */
-/** @version	$Revision: 1.1 $ */
+/**
+ * @author $Author: smitra $  @version	$Revision: 1.1 $
+ */
+/** @version $Revision: 1.1 $ */
 
 // specify the package
 package exception;
@@ -28,24 +30,21 @@ package exception;
 
 // local imports
 
-/** 
+/**
  * This class indicates an exception that is thrown if the primary
  * key is not properly supplied to the data access model object as
  * it seeks to retrieve a record from the database
- * 
+ *
  */
 //--------------------------------------------------------------
 public class InvalidPrimaryKeyException
-	extends Exception
-{
-	//--------------------------------------------------------
-	public InvalidPrimaryKeyException(String message)
-	{
-		super(message);
-	}
+        extends Exception {
+    //--------------------------------------------------------
+    public InvalidPrimaryKeyException(String message) {
+        super(message);
+    }
 }
 
-		
 
 //**************************************************************
 //	Revision History:
