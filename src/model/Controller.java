@@ -89,9 +89,28 @@ public class Controller implements IView, IModel {
     @Override
     public void stateChangeRequest(String key, Object value) {
         switch (key) {
+            case "shiftOpen":
+            case "shiftClose":
+            case "treeSell":
+            case "treeTypeUpdate:":
+            case "treeTypeAdd":
+            case "treeUpdate":
+            case "scoutUpdate":
+            case "scoutRegister":
+
+
+            //Recursively call stateChangeRequest with this key, followed by break,
+                // to fall through to generating the view after some pre-processing.
+            case "generic":
+                createAndShowView(key + "View");
+                break;
+
             case "Cancel":
                 createAndShowView("ControllerView");
-            default: break;
+                break;
+            default:
+                Utilities.logErr("Invalid key " + key);
+                break;
         }
     }
 }

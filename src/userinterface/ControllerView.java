@@ -25,8 +25,6 @@ public class ControllerView extends View{
         grid.setVgap(10);
         grid.setHgap(10);
 
-
-
         /** UI Elements */
         String[] sections = {"Scout","Tree","TreeType","Shift","Sales"};
         HashMap<String,Label> labels = new HashMap<String,Label>();
