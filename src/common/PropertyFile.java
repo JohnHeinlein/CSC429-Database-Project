@@ -39,6 +39,7 @@ import event.Event;
 /** Layer a file onto a Properties object */
 //==============================================================
 public class PropertyFile extends Properties {
+    // data members
     private String myFilename;
     private static boolean allowWrites = true;
 
@@ -59,16 +60,16 @@ public class PropertyFile extends Properties {
         }
     }
 
-    /**
-     * Copy Constructor
-     * Set up our properties as copies of the original
-     */
+    /** Copy constructor */
+    //----------------------------------------------------------
     public PropertyFile(PropertyFile props) {
+        // setup our properties as copies of the original
         putAll(props);
     }
 
 
-    /** Dfault constructor */
+    /** default constructor */
+    //----------------------------------------------------------
     protected PropertyFile() {
         // create an empty propertyfile
     }
@@ -131,7 +132,6 @@ public class PropertyFile extends Properties {
             } else {
 //				System.err.println("PropertyFile:store: Invalid filename!");
                 new Event(Event.getLeafLevelClassName(this), "store", "Invalid filename to store!", Event.WARNING);
-
             }
         }
     }
@@ -140,15 +140,3 @@ public class PropertyFile extends Properties {
 	{
 	  System.out.println("I'm gonna kill somebody.");	}*/
 }
-
-
-//**************************************************************
-//	Revision History:
-//
-//	$Log: PropertyFile.java,v $
-//	Revision 1.1  2004/06/17 04:29:36  smitra
-//	First check in
-//
-
-//
-//

@@ -16,8 +16,10 @@
 //
 //*************************************************************
 
-/** @author		$Author: smitra $ */
-/** @version	$Revision: 1.1 $ */
+/**
+ * @author $Author: smitra $  @version	$Revision: 1.1 $
+ */
+/** @version $Revision: 1.1 $ */
 
 // specify the package
 package exception;
@@ -26,23 +28,20 @@ package exception;
 
 // local imports
 
-/** 
+/**
  * This class indicates an exception that is thrown if passwords
  * don't match
- * 
+ *
  */
 //--------------------------------------------------------------
 public class PasswordMismatchException
-	extends Exception
-{
-	//--------------------------------------------------------
-	public PasswordMismatchException(String message)
-	{
-		super(message);
-	}
+        extends Exception {
+    //--------------------------------------------------------
+    public PasswordMismatchException(String message) {
+        super(message);
+    }
 }
 
-		
 
 //**************************************************************
 //	Revision History:
