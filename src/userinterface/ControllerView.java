@@ -15,26 +15,16 @@ import javafx.scene.text.Font;
 
 import java.util.HashMap;
 
-public class ControllerView extends View{
+public class ControllerView extends GenericView{
     public ControllerView(IModel model) {
         super(model, "ControllerView");
 
-        GridPane grid = new GridPane();
-        grid.setPadding(new Insets(15,15,15,15));
-        grid.setAlignment(Pos.CENTER);
-        grid.setVgap(10);
-        grid.setHgap(10);
+        GridPane grid = content();
 
         /** UI Elements */
         String[] sections = {"Scout","Tree","TreeType","Shift","Sales"};
         HashMap<String,Label> labels = new HashMap<String,Label>();
         HashMap<String,HBox> buttons = new HashMap<String,HBox>();
-
-        // --------------------
-        // Header
-        Label header = new Label("TREE SALES SYSTEM");
-        header.setAlignment(Pos.CENTER);
-        header.setFont(new Font("Arial",24));
 
         // --------------------
         // Shift section
@@ -87,7 +77,8 @@ public class ControllerView extends View{
         HBox scoutButtons = new HBox(scoutUpdate,scoutRegister);
         buttons.put("Scout",scoutButtons);
 
-        /** Final setup */
+        /** Content configuration */
+        //TODO: Port this pattern to GenericView
         for(int i = 0; i < sections.length;i++){
             // --------------------
             // Buttons
@@ -108,18 +99,10 @@ public class ControllerView extends View{
             labels.put(sections[i],newLabel);
             grid.add(newLabel,0,i);
             grid.setHalignment(newLabel, HPos.RIGHT);
-
         }
-        VBox mainContainer = new VBox();
-        mainContainer.setAlignment(Pos.CENTER);
-        mainContainer.getChildren().addAll(
-                header,
-                new Separator(),
-                grid,
-                new Separator()
-        );
 
-        getChildren().add(mainContainer);
+        setTitle("Tree Sales System");
+
     }
 
     @Override
