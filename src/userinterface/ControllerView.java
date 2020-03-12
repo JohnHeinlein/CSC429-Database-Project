@@ -28,6 +28,7 @@ public class ControllerView extends View{
 
         // --------------------
         // Final configuration
+
         setTitle("Tree Sales System");
 
     }

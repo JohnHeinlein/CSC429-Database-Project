@@ -47,7 +47,7 @@ public class Controller implements IView, IModel {
             }
             currentScene = new Scene(newView);
             myViews.put(viewName, currentScene);
-        }
+        };
         swapToView(currentScene);
     }
 
