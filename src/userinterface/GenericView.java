@@ -1,19 +1,12 @@
 package userinterface;
 
 import impresario.IModel;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
-
-import java.util.HashMap;
 
 public class GenericView extends View{
     private BorderPane container;

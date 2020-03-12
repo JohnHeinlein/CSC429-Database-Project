@@ -1,8 +1,6 @@
 package userinterface;
 
 import impresario.IModel;
-import javafx.scene.control.Button;
-import javafx.scene.layout.GridPane;
 
 public class ControllerView extends GenericView{
     public ControllerView(IModel model) {
