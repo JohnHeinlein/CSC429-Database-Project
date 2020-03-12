@@ -7,18 +7,34 @@ public class scoutRegisterView extends View{
         super(model, "scoutRegisterView");
 
         setTitle("Register a scout");
-        addContent("Fuck you",
-                makeButt("Big penis", e -> System.out.println("OH LAWD")));
 
-        addContent("Notes",
-                makeNotesField("Notes", 100));
+        addContent("Name",
+                makeField("First Name"),
+                makeField("Last Name"));
 
-        addContent("Text Field",
-                makeField("boobies!"));
+        addContent("Address",
+                makeField("Address"));
+        addContent("",
+                makeField("City"),
+                makeField("State"),
+                makeField("Zip"));
 
-        addContent("Combo example",
-                makeComboBox("foo", "bar", "foobar"));
+        addContent("Date of Birth",
+                makeDatePicker());
 
+        addContent("Phone Number",
+                makeField("Phone Number"));
+
+        addContent("Email",
+                makeField("Email Address"));
+
+        addContent("Troop ID",
+                makeField("Troop ID"));
+
+        addContent("Status",
+                makeComboBox("Active", "Inactive"));
+
+        footButt(makeButt("Submit", "scoutRegisterSubmit", null));
         cancelButton();
     }
     @Override

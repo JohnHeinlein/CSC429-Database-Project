@@ -17,7 +17,6 @@ import impresario.IControl;
 import impresario.IModel;
 import impresario.IView;
 import Utilities.Utilities;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
@@ -28,8 +27,10 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
+import javafx.util.StringConverter;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 //==============================================================
 public abstract class View
@@ -106,7 +107,7 @@ public abstract class View
      * @param name     Name of section to appear alongside Nodes
      * @param controls Node(s) appearing in section. Region is source of setPrefWidth
      */
-    public void addContent(String name, Region... controls) {
+    public void addContent(String name, Region ... controls) {
         // Label
         Label label = new Label(name);
         label.setFont(LABEL_FONT);
@@ -129,9 +130,9 @@ public abstract class View
 
         pane.setPrefWidth(FIELD_WIDTH);
 
-        content.addColumn(0,label);
-        GridPane.setHalignment(label,HPos.RIGHT);
-        content.addColumn(1,pane);
+        content.addColumn(0, label);
+        GridPane.setHalignment(label, HPos.RIGHT);
+        content.addColumn(1, pane);
     }
 
     // ***************
@@ -161,7 +162,7 @@ public abstract class View
                  && GridPane.getColumnIndex(box) == 1)
             {
                 // For every node contained in that box...
-                for(Node node : ((Pane)box).getChildren()) {
+                for(Node node : ((Pane) box).getChildren()) {
                     // Cast the node to Region (ComboBox, etc.)
                     Region control = (Region)node;
 
@@ -237,7 +238,7 @@ public abstract class View
     }
 
     // Give any number of string options. The first will be the default.
-    public ComboBox<String> makeComboBox(String... choices) {
+    public ComboBox<String> makeComboBox(String ... choices){
         ComboBox<String> combo = new ComboBox<>();
         combo.getItems().addAll(choices);
         combo.getSelectionModel().selectFirst();
@@ -247,6 +248,29 @@ public abstract class View
 
     public DatePicker makeDatePicker() {
         DatePicker picker = new DatePicker();
+
+        picker.setConverter(new StringConverter<>() {
+            private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+
+            @Override
+            public String toString(LocalDate localDate) {
+                if (localDate == null) {
+                    return "";
+                }
+
+                return dateTimeFormatter.format(localDate);
+            }
+
+            @Override
+            public LocalDate fromString(String dateString) {
+                if (dateString == null || dateString.trim().isEmpty()) {
+                    return null;
+                }
+
+                return LocalDate.parse(dateString, dateTimeFormatter);
+            }
+        });
+
         picker.setOnAction(e -> {
             LocalDate date = picker.getValue();
             Utilities.logErr("Selected date: " + date);
