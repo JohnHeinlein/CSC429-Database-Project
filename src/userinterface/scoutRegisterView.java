@@ -11,13 +11,16 @@ public class scoutRegisterView extends GenericView{
                 makeButt("Big penis", e -> System.out.println("OH LAWD")));
 
         addContent("Notes",
-                makeNotesField("Notes",100));
+                makeNotesField("Notes", 100));
 
         addContent("Text Field",
                 makeField("boobies!"));
+
+        addContent("Combo example",
+                makeComboBox("foo", "bar", "foobar"));
+
         cancelButton();
     }
-
     @Override
     public void updateState(String key, Object value) {
 

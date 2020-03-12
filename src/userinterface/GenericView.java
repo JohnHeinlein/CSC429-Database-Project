@@ -1,6 +1,7 @@
 package userinterface;
 
 import impresario.IModel;
+import javafx.beans.DefaultProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -22,7 +23,8 @@ public class GenericView extends View{
     private VBox header;
     private HBox footer;
     private GridPane content;
-    private final Font LABEL_FONT = new Font("Arial",18);
+    private final String DEFAULT_FONT = "Comic Sans";
+    private final Font LABEL_FONT = new Font(DEFAULT_FONT,18);
     private final double FIELD_WIDTH = 300.0;
 
     public GenericView(IModel model, String classname){
@@ -134,7 +136,7 @@ public class GenericView extends View{
         field.setPrefColumnCount(80);
         field.setPrefRowCount((int)Math.ceil(maxLength / 80.0));
         field.setWrapText(true);
-        field.setFont(new Font("Courier New",12));
+        field.setFont(new Font(DEFAULT_FONT,12));
 
         field.textProperty().addListener(new ChangeListener<String>() {
             @Override
@@ -149,6 +151,15 @@ public class GenericView extends View{
         box.setAlignment(Pos.CENTER_LEFT);
 
         return box;
+    }
+
+    // Give any number of string options. The first will be the default.
+    public ComboBox<String> makeComboBox(String... choices){
+      ComboBox<String> combo = new ComboBox<String>();
+      combo.getItems().addAll(choices);
+      combo.getSelectionModel().selectFirst();
+
+      return combo;
     }
 
     // ***************
