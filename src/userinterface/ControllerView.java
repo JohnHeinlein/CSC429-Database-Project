@@ -2,7 +2,7 @@ package userinterface;
 
 import impresario.IModel;
 
-public class ControllerView extends GenericView{
+public class ControllerView extends View{
     public ControllerView(IModel model) {
         super(model, "ControllerView");
 

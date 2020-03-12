@@ -2,7 +2,7 @@ package userinterface;
 
 import impresario.IModel;
 
-public class scoutRegisterView extends GenericView{
+public class scoutRegisterView extends View{
     public scoutRegisterView(IModel model) {
         super(model, "scoutRegisterView");
 
