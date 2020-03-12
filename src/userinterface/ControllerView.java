@@ -18,11 +18,14 @@ public class ControllerView extends View{
                 makeButt("Add","treeTypeAdd",null));
 
         addContent("Tree",
-                makeButt("Update/Delete","treeUpdate",null));
+                makeButt("Update/Delete","treeUpdate",null),
+                makeButt( "Add", "treeAdd", null));
 
         addContent("Scout",
                 makeButt("Update/Delete","scoutUpdate",null),
                 makeButt("Register","scoutRegister",null));
+
+
         // --------------------
         // Final configuration
         setTitle("Tree Sales System");
