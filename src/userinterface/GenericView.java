@@ -1,15 +1,17 @@
 package userinterface;
 
 import impresario.IModel;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 
 import java.util.HashMap;
 
@@ -18,6 +20,8 @@ public class GenericView extends View{
     private VBox header;
     private HBox footer;
     private GridPane content;
+    private final Font LABEL_FONT = new Font("Arial",18);
+    private final double FIELD_WIDTH = 300.0;
 
     public GenericView(IModel model, String classname){
         super(model, classname);
@@ -38,7 +42,7 @@ public class GenericView extends View{
         //GridPane
         content.setPadding(new Insets(15,15,15,15));
         content.setVgap(10);
-        content.setHgap(10);
+        content.setHgap(5);
 
         // This can be implemented and tidied with CSS to get a better separator appearance
         // content.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
@@ -73,7 +77,7 @@ public class GenericView extends View{
      */
     public void setTitle(String title){
         Label titleLabel = new Label(title);
-        titleLabel.setFont(new Font("Arial",18));
+        titleLabel.setFont(LABEL_FONT);
 
         header.getChildren().add(new Separator());
         header.getChildren().add(titleLabel);
@@ -85,23 +89,30 @@ public class GenericView extends View{
      * Names will be right-aligned, and controls will be sized appropriately
      *  based on their type.
      * @param name  Name of section to appear alongside Nodes
-     * @param control Node to apear in section. Can be
+     * @param controls Node(s) appearing in section
      */
-    public void addContent(String name, Node control){
-        //TODO: Populate with expected datatypes
-        //TODO: Classes can be evaluated to their simple names and used in switch
-        if(control instanceof Button){
-            Button butt = (Button)control;
+    public void addContent(String name, Control... controls){
+        // Label
+        Label label = new Label(name);
+        label.setFont(LABEL_FONT);
 
+        // Controls/Fields
+        HBox controlBox = new HBox();
+        for(Control control : controls){
+            control.setPrefWidth(FIELD_WIDTH/controls.length); //Scale width to fill space
+            controlBox.getChildren().add(control);
         }
-    }
-    /**
-     * Populates the GridPane with whatever content has been generated added via addContent
-     */
-    public void populateContent(){
 
+        content.addColumn(0,label);
+        content.setHalignment(label, HPos.RIGHT);
+        content.addColumn(1,controlBox);
     }
 
+    public Button makeButt(String text, String state, Object prop){
+        Button butt = new Button(text);
+        butt.setOnAction(e -> myModel.stateChangeRequest(state,prop));
+        return butt;
+    }
     public HBox footer(){ return footer; }
     public VBox header(){ return header; }
     public GridPane content(){return content;}

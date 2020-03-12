@@ -41,7 +41,7 @@ public abstract class View extends Group
         myRegistry = registry;
     }
 
-    // Allow models to register for state updates
+    // Allow models to register for state updaytes
     //----------------------------------------------------------
     public void subscribe(String key, IModel subscriber) {
         myRegistry.subscribe(key, subscriber);
