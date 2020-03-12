@@ -9,6 +9,12 @@ public class scoutRegisterView extends GenericView{
         setTitle("Register a scout");
         addContent("Fuck you",
                 makeButt("Big penis", e -> System.out.println("OH LAWD")));
+
+        addContent("Notes",
+                makeNotesField("Notes",100));
+
+        addContent("Text Field",
+                makeField("boobies!"));
         cancelButton();
     }
 

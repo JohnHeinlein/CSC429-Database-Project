@@ -1,15 +1,22 @@
 package userinterface;
 
 import impresario.IModel;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 
+/**
+ * Handles the construction of Views
+ * Allows easy access to methods adhering to the pattern present in the State Diagram Project Artifact
+ */
 public class GenericView extends View{
     private BorderPane container;
     private VBox header;
@@ -47,24 +54,8 @@ public class GenericView extends View{
         getChildren().add(container);
     }
 
-    /**
-     * Adds a cancel button to return to ControllerView
-     */
-    public void cancelButton(){
-        Button cancelButton = new Button("Cancel");
-        cancelButton.setOnAction(e -> myModel.stateChangeRequest("Cancel",null));
-        footer.getChildren().add(
-                footer.getChildren().size(), //Add to rightmost side
-                cancelButton);
-    }
-
-    /**
-     * Adds button to leftmost of footer
-     **/
-    public void addButton(Button butt){
-        footer.getChildren().add(0,butt);
-    }
-
+    // ***************
+    // Header methods
     /**
      * Adds a title label to the header
      * @param title Text for title of window
@@ -78,6 +69,8 @@ public class GenericView extends View{
 
     }
 
+    // ***************
+    // Content methods
     /**
      * Given Adds a control and its name to the content GridPane.
      * Names will be right-aligned, and controls will be sized appropriately
@@ -85,14 +78,14 @@ public class GenericView extends View{
      * @param name  Name of section to appear alongside Nodes
      * @param controls Node(s) appearing in section
      */
-    public void addContent(String name, Control... controls){
+    public void addContent(String name, Region... controls){
         // Label
         Label label = new Label(name);
         label.setFont(LABEL_FONT);
 
         // Controls/Fields
         HBox controlBox = new HBox();
-        for(Control control : controls){
+        for(Region control : controls){
             control.setPrefWidth(FIELD_WIDTH/controls.length); //Scale width to fill space
             controlBox.getChildren().add(control);
         }
@@ -102,6 +95,22 @@ public class GenericView extends View{
         content.addColumn(1,controlBox);
     }
 
+    // ***************
+    // Footer methods
+    /** Adds a cancel button to rightmost of footer to return to ControllerView */
+    public void cancelButton(){
+        Button cancelButton = new Button("Cancel");
+        cancelButton.setOnAction(e -> myModel.stateChangeRequest("Cancel",null));
+        footer.getChildren().add(
+                footer.getChildren().size(), //Add to rightmost side
+                cancelButton);
+    }
+
+    /** Adds button to leftmost of footer */
+    public void footButt(Button butt){ footer.getChildren().add(0,butt); }
+
+    // ***************
+    // Control creation
     public Button makeButt(String text, String state, Object prop){
         return makeButt(text, e -> myModel.stateChangeRequest(state, prop));
     }
@@ -110,13 +119,44 @@ public class GenericView extends View{
         butt.setOnAction(event);
         return butt;
     }
+
+    public TextField makeField(String prompt){
+        TextField field = new TextField();
+        field.setPromptText(prompt);
+        return field;
+    }
+    public VBox makeNotesField(String prompt, int maxLength){
+        VBox box = new VBox();
+        Label count = new Label("0/"+maxLength);
+
+        TextArea field = new TextArea();
+        field.setPromptText(prompt);
+        field.setPrefColumnCount(80);
+        field.setPrefRowCount((int)Math.ceil(maxLength / 80.0));
+        field.setWrapText(true);
+        field.setFont(new Font("Courier New",12));
+
+        field.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
+                if(field.getText().length() >= maxLength)
+                    field.setText(field.getText().substring(0,maxLength));
+                count.setText(field.getText().length() + "/" + maxLength);
+            }
+        });
+
+        box.getChildren().addAll(field,count);
+        box.setAlignment(Pos.CENTER_LEFT);
+
+        return box;
+    }
+
+    // ***************
+    // Public-facing region getters
     public HBox footer(){ return footer; }
     public VBox header(){ return header; }
     public GridPane content(){return content;}
 
-
     @Override
-    public void updateState(String key, Object value) {
-
-    }
+    public void updateState(String key, Object value) { }
 }
