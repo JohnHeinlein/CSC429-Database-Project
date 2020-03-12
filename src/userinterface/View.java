@@ -18,6 +18,7 @@ import impresario.ControlRegistry;
 import impresario.IControl;
 import impresario.IModel;
 import impresario.IView;
+import Utilities.Utilities;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
@@ -27,6 +28,8 @@ import javafx.scene.Group;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
+
+import java.time.LocalDate;
 
 // project imports
 
@@ -179,6 +182,15 @@ public abstract class View extends Group
         combo.getSelectionModel().selectFirst();
 
         return combo;
+    }
+
+    public DatePicker makeDatePicker(){
+        DatePicker picker = new DatePicker();
+        picker.setOnAction(e -> {
+            LocalDate date = picker.getValue();
+            Utilities.logErr("Selected date: " + date);
+        });
+        return picker;
     }
 
     // ***************
