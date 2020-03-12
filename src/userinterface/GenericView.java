@@ -1,7 +1,6 @@
 package userinterface;
 
 import impresario.IModel;
-import javafx.beans.DefaultProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -10,7 +9,6 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 
@@ -23,6 +21,7 @@ public class GenericView extends View{
     private VBox header;
     private HBox footer;
     private GridPane content;
+
     private final String DEFAULT_FONT = "Comic Sans";
     private final Font LABEL_FONT = new Font(DEFAULT_FONT,18);
     private final double FIELD_WIDTH = 300.0;
@@ -37,18 +36,17 @@ public class GenericView extends View{
 
         //Header
         header.setAlignment(Pos.CENTER);
-        header.setSpacing(25);
+        header.setPadding(new Insets(5,5,5,5));
 
         //Footer
         footer.setAlignment(Pos.CENTER);
         footer.setSpacing(25);
 
         //GridPane
-        content.setPadding(new Insets(15,15,15,15));
+        content.setPadding(new Insets(5,15,15,15));
         content.setVgap(10);
         content.setHgap(5);
-
-        //TODO: Add separator via CSS on a Border
+        System.out.println(content.styleProperty());
 
         container.setTop(header);
         container.setCenter(content);
@@ -66,9 +64,10 @@ public class GenericView extends View{
         Label titleLabel = new Label(title);
         titleLabel.setFont(LABEL_FONT);
 
-        header.getChildren().add(new Separator());
         header.getChildren().add(titleLabel);
-
+        Separator sep = new Separator();
+        sep.setStyle("-fx-border-width: 2 0 0 0; -fx-border-color: gray");
+        header.getChildren().add(sep);
     }
 
     // ***************
@@ -93,7 +92,7 @@ public class GenericView extends View{
         }
 
         content.addColumn(0,label);
-        content.setHalignment(label, HPos.RIGHT);
+        GridPane.setHalignment(label, HPos.RIGHT);
         content.addColumn(1,controlBox);
     }
 
@@ -138,13 +137,10 @@ public class GenericView extends View{
         field.setWrapText(true);
         field.setFont(new Font(DEFAULT_FONT,12));
 
-        field.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
-                if(field.getText().length() >= maxLength)
-                    field.setText(field.getText().substring(0,maxLength));
-                count.setText(field.getText().length() + "/" + maxLength);
-            }
+        field.textProperty().addListener((observableValue, s, t1) -> {
+            if(field.getText().length() >= maxLength)
+                field.setText(field.getText().substring(0,maxLength));
+            count.setText(field.getText().length() + "/" + maxLength);
         });
 
         box.getChildren().addAll(field,count);
@@ -155,7 +151,7 @@ public class GenericView extends View{
 
     // Give any number of string options. The first will be the default.
     public ComboBox<String> makeComboBox(String... choices){
-      ComboBox<String> combo = new ComboBox<String>();
+      ComboBox<String> combo = new ComboBox<>();
       combo.getItems().addAll(choices);
       combo.getSelectionModel().selectFirst();
 

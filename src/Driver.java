@@ -1,11 +1,8 @@
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import model.Controller;
 import userinterface.MainStageContainer;
-import userinterface.WindowPosition;
 import Utilities.Utilities;
 
 public class Driver{
@@ -16,7 +13,7 @@ public class Driver{
     public static class App extends Application {
         public void start(Stage primaryStage) {
             System.out.println("CSC429 Project 1.00");
-            System.out.println(Font.getFamilies());
+            System.out.println("Available fonts: " + Font.getFamilies());
 
             MainStageContainer.setStage(primaryStage, "Christmas Tree Sales System");
 
