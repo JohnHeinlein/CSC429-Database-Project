@@ -98,9 +98,7 @@ public class Controller implements IView, IModel {
             case "scoutUpdate":
             case "scoutRegister":
 
-
-            //Recursively call stateChangeRequest with this key, followed by break,
-                // to fall through to generating the view after some pre-processing.
+                // Case when no other processing is needed
             case "generic":
                 createAndShowView(key + "View");
                 break;

@@ -1,6 +1,8 @@
 package userinterface;
 
 import impresario.IModel;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -37,8 +39,7 @@ public class GenericView extends View{
         content.setVgap(10);
         content.setHgap(5);
 
-        // This can be implemented and tidied with CSS to get a better separator appearance
-        // content.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+        //TODO: Add separator via CSS on a Border
 
         container.setTop(header);
         container.setCenter(content);
@@ -65,7 +66,7 @@ public class GenericView extends View{
     }
 
     /**
-     * Adds a title label and separator to the header
+     * Adds a title label to the header
      * @param title Text for title of window
      */
     public void setTitle(String title){
@@ -102,8 +103,11 @@ public class GenericView extends View{
     }
 
     public Button makeButt(String text, String state, Object prop){
+        return makeButt(text, e -> myModel.stateChangeRequest(state, prop));
+    }
+    public Button makeButt(String text, EventHandler<ActionEvent> event){
         Button butt = new Button(text);
-        butt.setOnAction(e -> myModel.stateChangeRequest(state,prop));
+        butt.setOnAction(event);
         return butt;
     }
     public HBox footer(){ return footer; }

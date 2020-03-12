@@ -22,7 +22,7 @@ public class ControllerView extends GenericView{
 
         addContent("Scout",
                 makeButt("Update/Delete","scoutUpdate",null),
-                makeButt("RegisteR","scoutRegister",null));
+                makeButt("Register","scoutRegister",null));
         // --------------------
         // Final configuration
         setTitle("Tree Sales System");
