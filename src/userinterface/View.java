@@ -235,7 +235,12 @@ public abstract class View
     }
 
     public TextFieldWrapper makeField(String prompt) {
-        return new TextFieldWrapper(prompt);
+        return makeField(prompt,true);
+    }
+    public TextFieldWrapper makeField(String prompt, boolean editable) {
+        TextFieldWrapper field = new TextFieldWrapper(prompt);
+        field.setEditable(editable);
+        return field;
     }
     protected class TextFieldWrapper extends VBox{
         private TextField field;
@@ -260,13 +265,16 @@ public abstract class View
         public void message(String text){ message.displayMessage(text); }
         public void error(String err){ message.displayErrorMessage(err); }
 
+        //Pass to field for convenience
+        public void setEditable(Boolean flag){ field.setEditable(flag); }
+        public String getText(){ return field.getText(); }
+
         public void clear(){
             message.clearErrorMessage();
             message.setText("");
 
             field.clear();
         }
-
     }
 
     public VBox makeNotesField(String prompt, int maxLength) {
