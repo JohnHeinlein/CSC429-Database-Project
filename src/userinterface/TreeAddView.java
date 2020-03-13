@@ -8,7 +8,7 @@ public class TreeAddView extends View {
     public TreeAddView(IModel model) {
         super (model, "TreeAddView");
 
-        //TreeType types = new TreeType;
+        TreeType types = new TreeType();
 
         setTitle("Add a Tree");
 

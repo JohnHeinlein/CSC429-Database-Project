@@ -48,15 +48,16 @@ public class SQLSelectStatement extends SQLStatement {
         theSQLStatement = "SELECT ";
 
         // add the fields from the schema, skip the tablename
-        Enumeration fields = schema.propertyNames();
+        Enumeration<?> fields = schema.propertyNames();
         while (fields.hasMoreElements()) {
             String field = (String) fields.nextElement();
-            if (!field.equals("TableName")) {
-                // skip the leading comma if we're at the beginning
-                theSQLStatement += (theSQLStatement.length() > 7)?
-                        ", ":"" + field;
-            }
+
+            System.out.println("Field: " + field);
+
+            if (!field.equals("TableName")) // skip the leading comma if we're at the beginning
+                theSQLStatement += ((theSQLStatement.length() > 7)? ", " : "") + field;
         }
+        System.out.println("Enumeration parse result: " + theSQLStatement);
 
         // add the tablename
         theSQLStatement += " FROM " + schema.getProperty("TableName");
@@ -91,8 +92,8 @@ public class SQLSelectStatement extends SQLStatement {
                 }
             }
         }
-
         theSQLStatement += theWhereString + ";";
+        System.out.println("SQL Select statement: " + theSQLStatement);
     }
 
 }

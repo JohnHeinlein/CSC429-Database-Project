@@ -116,10 +116,9 @@ abstract public class Persistable {
         try {
             // connect to the database
             theDBConnection = myBroker.getConnection();
-
             // verify the connection
             if (theDBConnection == null) {
-                System.err.println("Persistable.getPersistentState - Could not connect to database!");
+                Utilities.Utilities.logErr("Could not connect to database!");
                 return null;
             }
 
@@ -132,7 +131,7 @@ abstract public class Persistable {
             Statement theStatement = theDBConnection.createStatement();
 
             // Stop Runaway Queries
-            theStatement.setMaxRows(MAX_ROWS);
+            //theStatement.setMaxRows(MAX_ROWS);
 
             // The method executeQuery executes a query on the database. The
             // return result is of type ResultSet which is one or more rows in
@@ -174,9 +173,8 @@ abstract public class Persistable {
             theResultSet.close();
             return resultSetToReturn;
         } catch (SQLException sqle) {
-//			DEBUG: System.err.println( "An SQL Error Occurred:" + sqle + "\n" + sqle.getErrorCode() + "\n" + sqle.getMessage() + "\n" + sqle);
-
-            new Event(Event.getLeafLevelClassName(this), "getPersistentState", "SQL Exception: " + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
+            sqle.printStackTrace();
+            //new Event(Event.getLeafLevelClassName(this), "getPersistentState", "SQL Exception: " + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
             return null;
         } finally {
             closeStatement();
