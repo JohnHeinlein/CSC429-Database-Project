@@ -65,7 +65,8 @@ public abstract class View
 
         //Footer
         footer.setAlignment(Pos.CENTER);
-        footer.setPadding(new Insets(5, 5, 5, 5));
+        footer.setPadding(new Insets(0, 5, 5, 5));
+        footer.setSpacing(25);
 
         //GridPane
         content.setPadding(new Insets(5, 15, 15, 15));
