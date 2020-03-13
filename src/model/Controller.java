@@ -89,14 +89,15 @@ public class Controller implements IView, IModel {
     @Override
     public void stateChangeRequest(String key, Object value) {
         switch (key) {
-            case "ShiftOpen":
-            case "ShiftClose":
-            case "TreeSell":
-            case "TreeTypeUpdate:":
-            case "TreeTypeAdd":
-            case "TreeUpdate":
-            case "ScoutUpdate":
-            case "ScoutRegister":
+            case "shiftOpen":
+            case "shiftClose":
+            case "treeSell":
+            case "treeTypeUpdate:":
+            case "treeTypeAdd":
+            case "treeUpdate":
+            case "treeAdd":
+            case "scoutUpdate":
+            case "scoutRegister":
 
                 // Case when no other processing is needed
             case "Generic":

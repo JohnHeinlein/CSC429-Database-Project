@@ -35,7 +35,6 @@ import java.util.Properties;
 //---------------------------------------------------------------------------------------------------------
 public class SQLSelectStatement extends SQLStatement {
     /**
-     *
      * This handles only equality in the WHERE clause. This also 
      * expects that for numeric types in the WHERE clause, a separate
      * Properties object containing the column name and numeric type
@@ -54,10 +53,8 @@ public class SQLSelectStatement extends SQLStatement {
             String field = (String) fields.nextElement();
             if (!field.equals("TableName")) {
                 // skip the leading comma if we're at the beginning
-                if (theSQLStatement.length() > 7)
-                    theSQLStatement += ", " + field;
-                else
-                    theSQLStatement += field;
+                theSQLStatement += (theSQLStatement.length() > 7)?
+                        ", ":"" + field;
             }
         }
 
@@ -65,46 +62,46 @@ public class SQLSelectStatement extends SQLStatement {
         theSQLStatement += " FROM " + schema.getProperty("TableName");
 
         // Construct the WHERE part of the SQL statement
-        StringBuilder theWhereString = new StringBuilder();
+        String theWhereString = "";
 
         // Now, traverse the WHERE clause Properties object
         if (whereValues != null) {
             Enumeration theWhereFields = whereValues.propertyNames();
             while (theWhereFields.hasMoreElements()) {
-
                 String theFieldName = (String) theWhereFields.nextElement();
                 String theFieldValue = insertEscapes(whereValues.getProperty(theFieldName));
 
-                if (theFieldValue.length() > 0)        // Exclude empty strings
-                {
-                    String theConjunctionClause = "";
-
-                    if (theWhereString.toString().equals("")) {
-                        theConjunctionClause += " WHERE ";
-                    } else {
-                        theConjunctionClause += " AND ";
-                    }
+                    if (theFieldValue.length() > 0){        // Exclude empty strings
+                    String theConjunctionClause = (theWhereString.equals(""))?
+                            " WHERE ":
+                            " AND ";
 
                     if (theFieldValue.equals("NULL")) {
-                        theWhereString.append(theConjunctionClause).append(theFieldName).append(" IS NULL");
+                        theWhereString += theConjunctionClause + theFieldName + " IS NULL";
                     } else {
                         // extract the type from the schema
                         String actualType = schema.getProperty(theFieldName);
 
                         // if the type is numeric, do NOT include quotes.
-                        if ((actualType != null) && (actualType.equals("numeric"))) {
-                            theWhereString.append(theConjunctionClause).append(theFieldName).append(" = ").append(theFieldValue);
-                        } else {
-                            // must the a text type, include the quotes.
-                            theWhereString.append(theConjunctionClause).append(theFieldName).append(" = '").append(theFieldValue).append("'");
-                        }
+//                        if ((actualType != null) && (actualType.equals("numeric"))) {
+//                            theWhereString += theConjunctionClause + theFieldName + " = " + theFieldValue;
+//                        } else {
+//                            // must the a text type, include the quotes.
+//                            theWhereString += theConjunctionClause + theFieldName + " = '" + theFieldValue + "'";
+//                        }
+                        theWhereString += theConjunctionClause + theFieldName + " = " +
+                                ((actualType != null && actualType.equals("numeric"))?
+                                    theFieldValue:
+                                    "'" + theFieldValue + "'");
                     }
+
                 }
             }
         }
 
         theSQLStatement += theWhereString + ";";
     }
+
 }
 
 

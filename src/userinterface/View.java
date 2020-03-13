@@ -17,6 +17,8 @@ import impresario.IControl;
 import impresario.IModel;
 import impresario.IView;
 import Utilities.Utilities;
+import javafx.beans.value.ChangeListener;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
@@ -107,7 +109,7 @@ public abstract class View
      * @param name     Name of section to appear alongside Nodes
      * @param controls Node(s) appearing in section. Region is source of setPrefWidth
      */
-    public void addContent(String name, Region ... controls) {
+    public void addContent(String name, Region... controls) {
         // Label
         Label label = new Label(name);
         label.setFont(LABEL_FONT);
@@ -130,9 +132,9 @@ public abstract class View
 
         pane.setPrefWidth(FIELD_WIDTH);
 
-        content.addColumn(0, label);
-        GridPane.setHalignment(label, HPos.RIGHT);
-        content.addColumn(1, pane);
+        content.addColumn(0,label);
+        GridPane.setHalignment(label,HPos.RIGHT);
+        content.addColumn(1,pane);
     }
 
     // ***************
@@ -162,7 +164,7 @@ public abstract class View
                  && GridPane.getColumnIndex(box) == 1)
             {
                 // For every node contained in that box...
-                for(Node node : ((Pane) box).getChildren()) {
+                for(Node node : ((Pane)box).getChildren()) {
                     // Cast the node to Region (ComboBox, etc.)
                     Region control = (Region)node;
 
@@ -208,10 +210,18 @@ public abstract class View
         return butt;
     }
 
-    public TextField makeField(String prompt) {
+    public VBox makeField(String prompt) {
+        VBox box = new VBox();
+
         TextField field = new TextField();
         field.setPromptText(prompt);
-        return field;
+
+        MessageView message = new MessageView("");
+
+        box.getChildren().addAll(field,message);
+        box.setAlignment(Pos.CENTER_LEFT);
+
+        return box;
     }
 
     public VBox makeNotesField(String prompt, int maxLength) {

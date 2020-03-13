@@ -44,6 +44,7 @@ import java.util.Vector;
  * This class is used to instantiate the object that is encapsulated
  * by every EasyObserver client in order to keep track of which control
  * subscribes to which key and which keys depend on which other keys.
+ *
  * After the client updates its state on the basis of a posted state change,
  * this class' methods are used to update the GUI controls that subscribe to
  * the keys that depend on the key on which the state change is posted.
@@ -55,11 +56,11 @@ public class ModelRegistry extends Registry {
     /** A list of keys that are dependant on other keys */
     private Properties myDependencies;
 
-    // Class constructor
-    //----------------------------------------------------------
-    public ModelRegistry(String classname,            // the name of the class that contains this Registry, debug only
-                         Properties dependencies)    // the dependency information for keys
-    {
+    /**
+     * @param classname the name of the class that contains this Registry, debug only
+     * @param dependencies the dependency information for keys
+     */
+    public ModelRegistry(String classname,Properties dependencies){
         super(classname);    // build our base class
 
         // save our dependencies
@@ -67,30 +68,30 @@ public class ModelRegistry extends Registry {
     }
 
 
-    // Class constructor
-    //----------------------------------------------------------
-    public ModelRegistry(String classname,            // the name of the class that contains this Registry, debug only
-                         String dependencyFile)        // filename that contains the dependency information for keys
-    {
+    /**
+     * @param classname the name of the class that contains this Registry, debug only
+     * @param dependencyFile filename that contains the dependency information for keys
+     */
+    public ModelRegistry(String classname,String dependencyFile) {
         super(classname);    // build our base class
 
         // save our dependencies
         myDependencies = new PropertyFile(dependencyFile);
     }
 
-    // Class constructor
-    //----------------------------------------------------------
-    public ModelRegistry(String classname)        // filename that contains the dependency information for keys
-    {
-        super(classname);                    // build our base class
-        myDependencies = new Properties();    // may be replaced later
-
+    /**
+     * @param classname filename that contains the dependency information for keys
+     */
+    public ModelRegistry(String classname){
+        super(classname);
+        myDependencies = new Properties();  // may be replaced later
     }
 
 
-    //----------------------------------------------------------
-    public void setDependencies(Properties dependencies)        // filename that contains the dependency information for keys
-    {
+    /**
+     * @param dependencies filename that contains the dependency information for keys
+     */
+    public void setDependencies(Properties dependencies){
         myDependencies = dependencies;
     }
 
@@ -121,6 +122,7 @@ public class ModelRegistry extends Registry {
             if (tempObj == null) {
                 continue;
             }
+            if (tempObj == null) continue;
 
             // see if we have multiple subscribers
             if (tempObj instanceof Vector) {
