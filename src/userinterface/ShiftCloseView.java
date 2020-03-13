@@ -5,6 +5,14 @@ import impresario.IModel;
 public class ShiftCloseView extends View{
     public ShiftCloseView(IModel model) {
         super(model, "ShiftCloseView");
+
+        setTitle("Close a Shift");
+
+        addContent("",
+                makeScrollPane("", ""));
+
+        submitButton("ShiftCloseSubmit", null);
+        cancelButton();
     }
 
     @Override

@@ -6,7 +6,7 @@ public class ScoutRegisterView extends View{
     public ScoutRegisterView(IModel model) {
         super(model, "ScoutRegisterView");
 
-        setTitle("Register a scout");
+        setTitle("Register a Scout");
 
         addContent("Name",
                 makeField("First Name"),
