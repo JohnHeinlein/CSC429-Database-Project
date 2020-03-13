@@ -142,16 +142,25 @@ public abstract class View
     /**
      * Adds a cancel button to rightmost of footer to return to ControllerView
      */
+    public void submitButton(String state, Object prop) {
+        Button submitButton = new Button("Submit");
+        submitButton.setOnAction(e -> {
+            myModel.stateChangeRequest(state, prop);
+            clear();
+        });
+        footButt(submitButton);
+    }
+
+    /**
+     * Adds a cancel button to rightmost of footer to return to ControllerView
+     */
     public void cancelButton() {
         Button cancelButton = new Button("Cancel");
         cancelButton.setOnAction(e -> {
             myModel.stateChangeRequest("Cancel", null);
             clear();
         });
-        footer.getChildren().add(
-                footer.getChildren().size(), //Add to rightmost side
-                cancelButton);
-
+        footButt(cancelButton);
     }
 
     private void clear() {
@@ -192,7 +201,7 @@ public abstract class View
      * Adds button to leftmost of footer
      */
     public void footButt(Button butt) {
-        footer.getChildren().add(0, butt);
+        footer.getChildren().add(footer.getChildren().size(), butt);
     }
 
     // ***************
