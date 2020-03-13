@@ -30,6 +30,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.util.StringConverter;
 
 import java.time.LocalDate;
@@ -162,11 +163,11 @@ public abstract class View
      * Adds a submit button to footer to return to ControllerView
      */
     public void submitButton(String state, Object prop) {
-        Button submitButton = new Button("Submit");
-        submitButton.setOnAction(e -> {
+        Button submitButton = makeButt("Submit",e -> {
             myModel.stateChangeRequest(state, prop);
             clear();
         });
+        submitButton.setStyle("-fx-background-color: lightgreen");
         footButt(submitButton);
     }
 
@@ -174,11 +175,11 @@ public abstract class View
      * Adds a cancel button to footer to return to ControllerView
      */
     public void cancelButton() {
-        Button cancelButton = new Button("Cancel");
-        cancelButton.setOnAction(e -> {
-            myModel.stateChangeRequest("Cancel", null);
+        Button cancelButton = makeButt("Cancel", e ->{
+            myModel.stateChangeRequest("Cancel",null);
             clear();
         });
+        cancelButton.setStyle("-fx-background-color: indianred");
         footButt(cancelButton);
     }
 
@@ -186,14 +187,18 @@ public abstract class View
         for (Node box : content.getChildren()) {
 
             // If the node is an HBox or a VBox in the right column...
-            if ((box instanceof HBox || box instanceof VBox)
-                 && GridPane.getColumnIndex(box) == 1)
-            {
+            if ((box instanceof HBox || box instanceof VBox) && GridPane.getColumnIndex(box) == 1) {
+
                 // For every node contained in that box...
                 for(Node node : ((Pane)box).getChildren()) {
                     // Cast the node to Region (ComboBox, etc.)
-                    Region control = (Region)node;
+                    if(node instanceof MessageView){
+                        ((MessageView)node).setText("");
+                        ((MessageView)node).clearErrorMessage();
+                        continue;
+                    }
 
+                    Region control = (Region)node;
                     // Clear text input fields
                     if (control instanceof TextInputControl)
                         ((TextInputControl) control).clear();
@@ -205,10 +210,6 @@ public abstract class View
                     // Clear datepicker
                     else if (control instanceof DatePicker)
                         ((DatePicker) control).setValue(null);
-
-                    //Clear text field
-                    else if(control instanceof TextFieldWrapper)
-                        ((TextFieldWrapper)control).clear();
                 }
             }
         }
