@@ -141,7 +141,19 @@ public abstract class View
     // ***************
 
     /**
-     * Adds a cancel button to rightmost of footer to return to ControllerView
+     * Adds a misc button to footer to return to ControllerView
+     */
+    public void miscButton(String name, String state, Object prop) {
+        Button miscButton = new Button(name);
+        miscButton.setOnAction(e -> {
+            myModel.stateChangeRequest(state, prop);
+            clear();
+        });
+        footButt(miscButton);
+    }
+
+    /**
+     * Adds a submit button to footer to return to ControllerView
      */
     public void submitButton(String state, Object prop) {
         Button submitButton = new Button("Submit");
@@ -153,7 +165,7 @@ public abstract class View
     }
 
     /**
-     * Adds a cancel button to rightmost of footer to return to ControllerView
+     * Adds a cancel button to footer to return to ControllerView
      */
     public void cancelButton() {
         Button cancelButton = new Button("Cancel");
@@ -278,6 +290,15 @@ public abstract class View
             Utilities.logErr("Selected date: " + date);
         });
         return picker;
+    }
+
+    // TODO: Fill the ScrollPane with something.
+    public ScrollPane makeScrollPane(String modelState, String collectionState) {
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setPrefHeight(200);
+        scrollPane.setFitToWidth(true);
+
+        return scrollPane;
     }
 
     // ***************
