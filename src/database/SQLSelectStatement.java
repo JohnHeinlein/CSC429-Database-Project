@@ -82,13 +82,6 @@ public class SQLSelectStatement extends SQLStatement {
                         // extract the type from the schema
                         String actualType = schema.getProperty(theFieldName);
 
-                        // if the type is numeric, do NOT include quotes.
-//                        if ((actualType != null) && (actualType.equals("numeric"))) {
-//                            theWhereString += theConjunctionClause + theFieldName + " = " + theFieldValue;
-//                        } else {
-//                            // must the a text type, include the quotes.
-//                            theWhereString += theConjunctionClause + theFieldName + " = '" + theFieldValue + "'";
-//                        }
                         theWhereString += theConjunctionClause + theFieldName + " = " +
                                 ((actualType != null && actualType.equals("numeric"))?
                                     theFieldValue:
@@ -99,7 +92,7 @@ public class SQLSelectStatement extends SQLStatement {
             }
         }
 
-        theSQLStatement += theWhereString.append(";");
+        theSQLStatement += theWhereString + ";";
     }
 
 }
