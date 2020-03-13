@@ -13,7 +13,6 @@ public class Driver{
     public static class App extends Application {
         public void start(Stage primaryStage) {
             System.out.println("CSC429 Project 1.00");
-            System.out.println("Available fonts: " + Font.getFamilies());
 
             MainStageContainer.setStage(primaryStage, "Christmas Tree Sales System");
 
