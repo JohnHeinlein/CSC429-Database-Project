@@ -11,6 +11,9 @@ public class TreeType extends EntityBase implements IModel {
 
     public TreeType(){
         super(myTableName);
+
+        // Testing getting database schema
+        // When functional, likely to move schema info to static method.
         Vector<Object> idk = getPersistentState(
                 getSchemaInfo(myTableName),
                 null);
