@@ -39,7 +39,6 @@ import java.sql.DatabaseMetaData;
 // project imports
 import event.Event;
 
-
 // Beginning of DatabaseManipulator class
 //---------------------------------------------------------------------------------------------------------
 abstract public class Persistable {
@@ -217,7 +216,7 @@ abstract public class Persistable {
             Statement theStatement = theDBConnection.createStatement();
 
             // Stop Runaway Queries
-            theStatement.setMaxRows(20000);
+            theStatement.setMaxRows(MAX_ROWS);
 
             // The method executeQuery executes a query on the database. The
             // return result is of type ResultSet which is one or more rows in
@@ -303,7 +302,7 @@ abstract public class Persistable {
             Statement theStatement = theDBConnection.createStatement();
 
             // Stop Runaway Queries
-            theStatement.setMaxRows(20000);
+            theStatement.setMaxRows(MAX_ROWS);
 
             // The method executeQuery executes a query on the database. The
             // return result is of type ResultSet which is one or more rows in
@@ -471,7 +470,7 @@ abstract public class Persistable {
             Statement theStatement = theDBConnection.createStatement();
 
             // Stop Runaway Queries
-            theStatement.setMaxRows(20000);
+            theStatement.setMaxRows(MAX_ROWS);
 
 
             // The method executeUpdate executes a query on the database. The
@@ -518,7 +517,7 @@ abstract public class Persistable {
             Statement theStatement = theDBConnection.createStatement();
 
             // Stop Runaway Queries
-            theStatement.setMaxRows(20000);
+            theStatement.setMaxRows(MAX_ROWS);
 
             // The method executeUpdate executes a query on the database. The
             // return result is of type integer which indicates the number of rows updated
@@ -575,7 +574,7 @@ abstract public class Persistable {
             Statement theStatement = theDBConnection.createStatement();
 
             // Stop Runaway Queries
-            theStatement.setMaxRows(20000);
+            theStatement.setMaxRows(MAX_ROWS);
 
             // The method executeUpdate executes a query on the database. The
             // return result is of type integer which indicates the number of rows updated
@@ -617,7 +616,7 @@ abstract public class Persistable {
             Statement theStatement = theDBConnection.createStatement();
 
             // Stop Runaway Queries
-            theStatement.setMaxRows(20000);
+            theStatement.setMaxRows(MAX_ROWS);
 
             // The method executeQuery executes a query on the database. The
             // return result is of type integer which indicates the number of rows updated

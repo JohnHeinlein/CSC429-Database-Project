@@ -108,7 +108,7 @@ public class SQLUpdateStatement extends SQLStatement {
             }
         }
 
-        theSQLStatement += theWhereString + ";";
+        theSQLStatement += theWhereString.append(";");
     }
 }
 

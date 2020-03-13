@@ -103,7 +103,7 @@ public class SQLSelectStatement extends SQLStatement {
             }
         }
 
-        theSQLStatement += theWhereString + ";";
+        theSQLStatement += theWhereString.append(";");
     }
 }
 
