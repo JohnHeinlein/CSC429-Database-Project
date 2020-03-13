@@ -24,6 +24,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -130,12 +131,15 @@ public abstract class View
     public void addContent(String name, Pane pane){
         Label label = new Label(name);
         label.setFont(LABEL_FONT);
+        label.setPrefHeight(pane.prefHeight(0));
 
         pane.setPrefWidth(FIELD_WIDTH);
 
         content.addColumn(0,label);
-        GridPane.setHalignment(label,HPos.RIGHT);
         content.addColumn(1,pane);
+
+        GridPane.setHalignment(label,HPos.RIGHT);
+        GridPane.setValignment(label, VPos.TOP);
     }
 
     // ***************
@@ -188,29 +192,23 @@ public abstract class View
                 // For every node contained in that box...
                 for(Node node : ((Pane)box).getChildren()) {
                     // Cast the node to Region (ComboBox, etc.)
-                    if(node instanceof MessageView) {
-                        ((MessageView) node).setText("");
-                        continue;
-                    }
-
                     Region control = (Region)node;
 
                     // Clear text input fields
-                    if (control instanceof TextInputControl) {
+                    if (control instanceof TextInputControl)
                         ((TextInputControl) control).clear();
-                    }
 
                     // Set combobox to default value
-                    else if (control instanceof ComboBox) {
-                        ((ComboBox) control)
-                                .getSelectionModel()
-                                .selectFirst();
-                    }
+                    else if (control instanceof ComboBox)
+                        ((ComboBox) control).getSelectionModel().selectFirst();
 
                     // Clear datepicker
-                    else if (control instanceof DatePicker) {
+                    else if (control instanceof DatePicker)
                         ((DatePicker) control).setValue(null);
-                    }
+
+                    //Clear text field
+                    else if(control instanceof TextFieldWrapper)
+                        ((TextFieldWrapper)control).clear();
                 }
             }
         }
@@ -236,18 +234,39 @@ public abstract class View
         return butt;
     }
 
-    public VBox makeField(String prompt) {
-        VBox box = new VBox();
+    public TextFieldWrapper makeField(String prompt) {
+        return new TextFieldWrapper(prompt);
+    }
+    protected class TextFieldWrapper extends VBox{
+        private TextField field;
+        private MessageView message;
 
-        TextField field = new TextField();
-        field.setPromptText(prompt);
+        public TextFieldWrapper(String prompt){
+            field = new TextField();
+            field.setPromptText(prompt);
 
-        MessageView message = new MessageView("");
+            message = new MessageView("");
 
-        box.getChildren().addAll(field,message);
-        box.setAlignment(Pos.CENTER_LEFT);
+            getChildren().addAll(field,message);
+            setAlignment(Pos.CENTER_LEFT);
+        }
 
-        return box;
+        public void setListener(ChangeListener<? super String> listener){
+            field.textProperty().addListener(listener);
+        }
+
+        public TextField getField(){ return field; }
+
+        public void message(String text){ message.displayMessage(text); }
+        public void error(String err){ message.displayErrorMessage(err); }
+
+        public void clear(){
+            message.clearErrorMessage();
+            message.setText("");
+
+            field.clear();
+        }
+
     }
 
     public VBox makeNotesField(String prompt, int maxLength) {
@@ -260,7 +279,6 @@ public abstract class View
         field.setPrefRowCount((int) Math.ceil(maxLength / 80.0));
         field.setWrapText(true);
         field.setFont(new Font(DEFAULT_FONT, 12));
-
         field.textProperty().addListener((observableValue, s, t1) -> {
             if (field.getText().length() >= maxLength)
                 field.setText(field.getText().substring(0, maxLength));

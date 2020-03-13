@@ -1,6 +1,7 @@
 package userinterface;
 
 import impresario.IModel;
+import javafx.scene.layout.VBox;
 
 public class TreeAddView extends View {
     public TreeAddView(IModel model) {
@@ -10,6 +11,13 @@ public class TreeAddView extends View {
 
         addContent("Barcode",
                 makeField("Barcode"));
+
+
+        TextFieldWrapper typeField = makeField("(Type determined by barcode");
+
+        addContent("Type",
+                typeField);
+
 
         addContent("Status",
                 makeComboBox("Active", "Inactive"));
