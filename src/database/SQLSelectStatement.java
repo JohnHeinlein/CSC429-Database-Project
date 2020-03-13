@@ -26,13 +26,10 @@
 package database;
 
 // system imports
-
 import java.util.Enumeration;
 import java.util.Properties;
 
-
 // project imports
-
 
 // Beginning of DatabaseManipulator class
 //---------------------------------------------------------------------------------------------------------
@@ -53,9 +50,9 @@ public class SQLSelectStatement extends SQLStatement {
 
         // add the fields from the schema, skip the tablename
         Enumeration fields = schema.propertyNames();
-        while (fields.hasMoreElements() == true) {
+        while (fields.hasMoreElements()) {
             String field = (String) fields.nextElement();
-            if (field.equals("TableName") != true) {
+            if (!field.equals("TableName")) {
                 // skip the leading comma if we're at the beginning
                 if (theSQLStatement.length() > 7)
                     theSQLStatement += ", " + field;
@@ -68,54 +65,46 @@ public class SQLSelectStatement extends SQLStatement {
         theSQLStatement += " FROM " + schema.getProperty("TableName");
 
         // Construct the WHERE part of the SQL statement
-        String theWhereString = "";
+        StringBuilder theWhereString = new StringBuilder();
 
         // Now, traverse the WHERE clause Properties object
         if (whereValues != null) {
             Enumeration theWhereFields = whereValues.propertyNames();
-            while (theWhereFields.hasMoreElements() == true) {
+            while (theWhereFields.hasMoreElements()) {
 
                 String theFieldName = (String) theWhereFields.nextElement();
                 String theFieldValue = insertEscapes(whereValues.getProperty(theFieldName));
 
                 if (theFieldValue.length() > 0)        // Exclude empty strings
                 {
-
                     String theConjunctionClause = "";
 
-                    if (theWhereString.equals("")) {
+                    if (theWhereString.toString().equals("")) {
                         theConjunctionClause += " WHERE ";
                     } else {
                         theConjunctionClause += " AND ";
                     }
 
                     if (theFieldValue.equals("NULL")) {
-                        theWhereString += theConjunctionClause + theFieldName + " IS NULL";
+                        theWhereString.append(theConjunctionClause).append(theFieldName).append(" IS NULL");
                     } else {
                         // extract the type from the schema
                         String actualType = schema.getProperty(theFieldName);
 
                         // if the type is numeric, do NOT include quotes.
-                        if ((actualType != null) && (actualType.equals("numeric") == true)) {
-                            theWhereString += theConjunctionClause + theFieldName + " = " + theFieldValue;
+                        if ((actualType != null) && (actualType.equals("numeric"))) {
+                            theWhereString.append(theConjunctionClause).append(theFieldName).append(" = ").append(theFieldValue);
                         } else {
                             // must the a text type, include the quotes.
-                            theWhereString += theConjunctionClause + theFieldName + " = '" + theFieldValue + "'";
+                            theWhereString.append(theConjunctionClause).append(theFieldName).append(" = '").append(theFieldValue).append("'");
                         }
                     }
-
                 }
             }
         }
 
-        theSQLStatement += theWhereString;
-
-        // DEBUG: System.out.println(theSQLStatement);
-
-        theSQLStatement += ";";
-
+        theSQLStatement += theWhereString + ";";
     }
-
 }
 
 

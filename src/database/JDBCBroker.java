@@ -42,13 +42,13 @@ public class JDBCBroker {
     private static JDBCBroker myInstance = null;
     private static Connection theDBConnection = null;
     public static Driver theDriver = null;
-    private PropertyFile props = null;
+    private PropertyFile props;
 
     // DB Access data
-    private String dbName = null;
-    private String username = null;
-    private String password = null;
-    private String server = null;
+    private String dbName;
+    private String username;
+    private String password;
+    private String server;
 
     // singleton constructor
     //----------------------------------------------------------
@@ -59,17 +59,6 @@ public class JDBCBroker {
             myInstance = new JDBCBroker();
         }
 
-		/* DEBUG
-     		Enumeration e = DriverManager.getDrivers();
-     		while (e.hasMoreElements())  
-     		{
-     			Driver d = (Driver)e.nextElement();
-     			//theDriver = (Driver)e.nextElement();
-     			System.out.println("Driver Major Version = " + 
-     			 d.getMajorVersion());
-     			//theDriver.getMajorVersion());   	
- 	        } */
-
         return myInstance;
     }
 
@@ -79,14 +68,12 @@ public class JDBCBroker {
     protected JDBCBroker() {
         // DEBUG: System.out.println("JDBCBroker.JDBCBroker()");
         props = new PropertyFile("dbConfig.ini");
-        if (props != null) {
-            dbName = props.getProperty("dbName");
-            username = props.getProperty("username");
-            password = props.getProperty("password");
-            server = props.getProperty("server");
-            if (server == null)
-                server = "localhost";
-        }
+        dbName = props.getProperty("dbName");
+        username = props.getProperty("username");
+        password = props.getProperty("password");
+        server = props.getProperty("server");
+        if (server == null)
+            server = "localhost";
         String driverClassName = "com.mysql.jdbc.Driver";
         try {
             // load and register the JDBC driver classes
@@ -117,7 +104,6 @@ public class JDBCBroker {
                                 password, null);
                     } catch (SQLException exc) {
                         System.err.println("JDBCBroker.getConnection - Could not connect to database!" + "\n" + exc.getMessage());
-                        //new Event(Event.getLeafLevelClassName(this), "getConnection", "Could not connect to database", Event.ERROR);
                     }
                 }
             }

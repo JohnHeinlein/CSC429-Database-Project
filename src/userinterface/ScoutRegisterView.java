@@ -2,9 +2,9 @@ package userinterface;
 
 import impresario.IModel;
 
-public class scoutRegisterView extends View{
-    public scoutRegisterView(IModel model) {
-        super(model, "scoutRegisterView");
+public class ScoutRegisterView extends View{
+    public ScoutRegisterView(IModel model) {
+        super(model, "ScoutRegisterView");
 
         setTitle("Register a scout");
 

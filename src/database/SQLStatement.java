@@ -25,10 +25,6 @@
 // specify the package
 package database;
 
-// system imports
-
-// project imports
-
 // Beginning of DatabaseManipulator class
 //---------------------------------------------------------------------------------------------------------
 public abstract class SQLStatement {
@@ -47,17 +43,15 @@ public abstract class SQLStatement {
     //----------------------------------------------------------------------
     protected String insertEscapes(String inString) {
         // define our local data and constants
-        String outString = "";
+        StringBuilder outString = new StringBuilder();
         int inStringLen = inString.length();
         int indexOfEscapeChar = inString.indexOf(characterToEscape);
         boolean allDone = (indexOfEscapeChar == -1);
 
-        while (allDone == false) // in other words, there is still an escape char to handle
+        while (!allDone) // in other words, there is still an escape char to handle
         {
             String prefix = inString.substring(0, indexOfEscapeChar);
-            outString += prefix;
-            outString += escapeString;
-            outString += inString.charAt(indexOfEscapeChar);
+            outString.append(prefix).append(escapeString).append(inString.charAt(indexOfEscapeChar));
 
             if (indexOfEscapeChar + 1 >= inStringLen) {
                 allDone = true;
@@ -67,11 +61,11 @@ public abstract class SQLStatement {
                 indexOfEscapeChar = inString.indexOf(characterToEscape);
                 allDone = (indexOfEscapeChar == -1);
             }
-        } // while
+        }
 
-        outString += inString;
+        outString.append(inString);
 
-        return outString;
+        return outString.toString();
     }
 
 

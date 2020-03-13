@@ -52,7 +52,6 @@ public class PropertyFile extends Properties {
             FileInputStream propFile = new FileInputStream(myFilename);
             load(propFile);
             propFile.close();    // close file and flush the cache
-            propFile = null;
         } catch (FileNotFoundException exc) {
             new Event(Event.getLeafLevelClassName(this), "PropertyFile", "Could not open PropertyFile: " + myFilename, Event.WARNING);
         } catch (Exception e) {
@@ -67,13 +66,11 @@ public class PropertyFile extends Properties {
         putAll(props);
     }
 
-
     /** default constructor */
     //----------------------------------------------------------
     protected PropertyFile() {
         // create an empty propertyfile
     }
-
 
     //----------------------------------------------------------
     public void disallowStores() {
@@ -96,9 +93,7 @@ public class PropertyFile extends Properties {
                 FileOutputStream propFile = new FileOutputStream(filename);
                 super.store(propFile, comment);
                 propFile.close();
-                propFile = null;
             } catch (Exception e) {
-                // DEBUG: System.err.println("PropertyFile:store:");
                 new Event(Event.getLeafLevelClassName(this), "store(filename, comment)", "Could not store PropertyFile: " + filename, Event.WARNING);
                 e.printStackTrace();
             }
@@ -123,20 +118,13 @@ public class PropertyFile extends Properties {
                     FileOutputStream propFile = new FileOutputStream(myFilename);
                     super.store(propFile, "");
                     propFile.close();
-                    propFile = null;
                 } catch (Exception e) {
-//					System.err.println("PropertyFile:store:");
                     new Event(Event.getLeafLevelClassName(this), "store", "Could not store PropertyFile: " + myFilename, Event.WARNING);
                     e.printStackTrace();
                 }
             } else {
-//				System.err.println("PropertyFile:store: Invalid filename!");
                 new Event(Event.getLeafLevelClassName(this), "store", "Invalid filename to store!", Event.WARNING);
             }
         }
     }
-
-	/*public static void main(String args[])
-	{
-	  System.out.println("I'm gonna kill somebody.");	}*/
 }

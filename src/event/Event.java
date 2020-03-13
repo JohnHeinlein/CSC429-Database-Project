@@ -152,7 +152,7 @@ public class Event {
         myTag = tag;    // save the tag
 
         // add this event to the log
-        EventLog.Instance().addEvent(this);
+        EventLog.instance().addEvent(this);
     }
 
     /**
@@ -167,7 +167,7 @@ public class Event {
         // cruise through the list of severity descriptions
         // and see if we can find a match
         for (int cnt = 0; cnt < NUMBER_SEVERITY_LEVELS; cnt++)
-            if (level.equals(SeverityDescription[cnt]) == true)
+            if (level.equals(SeverityDescription[cnt]))
                 return (cnt);
 
         // no match, return lowest level - should never happen
@@ -306,7 +306,6 @@ public class Event {
         return SeverityDescription[mySeverity];
     }
 }
-
 
 //**************************************************************
 //	Revision History:

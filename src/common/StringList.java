@@ -40,11 +40,11 @@ public class StringList implements Enumeration {
     /** The delimeter for elements in the list */
     private char delimiter = ',';
     /** Reference to the string */
-    private String myString = null;
+    private String myString;
     /** The current token */
     private String myToken = null;
     /** Index bounds of current token */
-    private int start = 0, end = 0;
+    private int start, end;
 
     /** Construct a StringList from a comma-delimeted string
      *
@@ -55,7 +55,6 @@ public class StringList implements Enumeration {
         // assign the reference
         myString = str;
         // initialize the token indexes
-        //delimiter = ',';
         start = 0;
         end = 0;
     }
@@ -82,10 +81,7 @@ public class StringList implements Enumeration {
      */
     //----------------------------------------------------------
     public int length() {
-        if (myString == null)
-            return 0;
-        else
-            return myString.length();
+        return myString == null ? 0 : myString.length();
     }
 
 
@@ -101,10 +97,7 @@ public class StringList implements Enumeration {
      */
     //----------------------------------------------------------
     public boolean hasMoreElements() {
-        if (myString != null)
-            return (start < myString.length());
-
-        return false;
+        return myString != null && start < myString.length();
     }
 
 

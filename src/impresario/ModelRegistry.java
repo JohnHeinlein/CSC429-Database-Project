@@ -107,8 +107,6 @@ public class ModelRegistry extends Registry {
      */
     //----------------------------------------------------------
     public void updateSubscribers(String key, IModel client) {
-        // DEBUG:System.out.println("ModelRegistry.updateSubscribers - " + key);
-
         // now update all the subscribers to the changed key
         StringList propertyList = new StringList(key + "," + myDependencies.getProperty(key));
 
@@ -121,36 +119,26 @@ public class ModelRegistry extends Registry {
 
             // make sure we have subscribers
             if (tempObj == null) {
-                // DEBUG: System.out.println("ModelRegistry[" + myClassName + "].updateSubscribers - no subscribers found for dependency " + dependProperty);
                 continue;
             }
 
             // see if we have multiple subscribers
             if (tempObj instanceof Vector) {
                 // get the list of elements
-                Enumeration subscriberList = ((Vector) tempObj).elements();
-                while (subscriberList.hasMoreElements()) {
-                    // extract each subscriber
-                    Object subscriber = subscriberList.nextElement();
-                    // DEBUG: System.out.println("Vector Subscriber: " + subscriber.getClass());
-
+                ((Vector) tempObj).forEach(subscriber -> {
                     // update via a key-value pair
                     if (subscriber instanceof IView) {
-                        // DEBUG: System.out.println("Vector IView [" + key + "] " + dependProperty + ": " + client.getState(dependProperty));
                         ((IView) subscriber).updateState(dependProperty, client.getState(dependProperty));
                     } else {
                         new Event(Event.getLeafLevelClassName(this), "UpdateSubscribers", "EVT_InvalidSubscriber", "Vector Invalid Subscriber: " + subscriber.getClass(), Event.WARNING);
-                        // DEBUG: System.err.println("ModelRegistry.updateSubscribers - Invalid Subscriber type for key = " + key + " and depend property = " + dependProperty + "!");
                     }
-                }
+                });
             } else    // we must have a single subscriber
                 // If not, use the standard update via a key-value pair
                 if (tempObj instanceof IView) {
-                    // DEBUG: System.out.println("IView [" + key + "] " + dependProperty + ": " + client.getState(dependProperty));
                     ((IView) tempObj).updateState(dependProperty, client.getState(dependProperty));
                 } else {
                     new Event(Event.getLeafLevelClassName(this), "UpdateSubscribers", "EVT_InvalidSubscriber", "Invalid Subscriber: " + tempObj.getClass(), Event.WARNING);
-                    // DEBUG: System.err.println("Registry.updateSubscribers - Invalid Subscriber type for key = " + key + " and dependProperty = " + dependProperty + "!");
                 }
         }
     }

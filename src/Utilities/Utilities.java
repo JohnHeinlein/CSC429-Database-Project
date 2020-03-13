@@ -43,7 +43,7 @@ public class Utilities {
     protected static Date validateDateString(String str) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
 
-        Date theDate = null;
+        Date theDate;
 
         try {
             theDate = formatter.parse(str);
@@ -88,30 +88,31 @@ public class Utilities {
 
     //----------------------------------------------------------
     protected int mapMonthNameToIndex(String monthName) {
-        if (monthName.equals("January")) {
-            return Calendar.JANUARY;
-        } else if (monthName.equals("February")) {
-            return Calendar.FEBRUARY;
-        } else if (monthName.equals("March")) {
-            return Calendar.MARCH;
-        } else if (monthName.equals("April")) {
-            return Calendar.APRIL;
-        } else if (monthName.equals("May")) {
-            return Calendar.MAY;
-        } else if (monthName.equals("June")) {
-            return Calendar.JUNE;
-        } else if (monthName.equals("July")) {
-            return Calendar.JULY;
-        } else if (monthName.equals("August")) {
-            return Calendar.AUGUST;
-        } else if (monthName.equals("September")) {
-            return Calendar.SEPTEMBER;
-        } else if (monthName.equals("October")) {
-            return Calendar.OCTOBER;
-        } else if (monthName.equals("November")) {
-            return Calendar.NOVEMBER;
-        } else if (monthName.equals("December")) {
-            return Calendar.DECEMBER;
+        switch (monthName) {
+            case "January":
+                return Calendar.JANUARY;
+            case "February":
+                return Calendar.FEBRUARY;
+            case "March":
+                return Calendar.MARCH;
+            case "April":
+                return Calendar.APRIL;
+            case "May":
+                return Calendar.MAY;
+            case "June":
+                return Calendar.JUNE;
+            case "July":
+                return Calendar.JULY;
+            case "August":
+                return Calendar.AUGUST;
+            case "September":
+                return Calendar.SEPTEMBER;
+            case "October":
+                return Calendar.OCTOBER;
+            case "November":
+                return Calendar.NOVEMBER;
+            case "December":
+                return Calendar.DECEMBER;
         }
 
         return -1;
@@ -120,16 +121,15 @@ public class Utilities {
 
     //----------------------------------------------------
     protected boolean checkProperLetters(String value) {
-        for (int cnt = 0; cnt < value.length(); cnt++) {
-            char ch = value.charAt(cnt);
+        boolean[] valid = {true};
 
-            if ((ch >= 'A') && (ch <= 'Z') || (ch >= 'a') && (ch <= 'z')) {
-            } else if ((ch == '-') || (ch == ',') || (ch == '.') || (ch == ' ')) {
-            } else {
-                return false;
+        value.chars().forEachOrdered(ch -> {
+            if (((ch < 'A') || (ch > 'Z')) && ((ch < 'a') || (ch > 'z')) && (ch != '-') && (ch != ',') && (ch != '.') && (ch != ' ')) {
+                valid[0] = false;
             }
-        }
-        return true;
+        });
+
+        return valid[0];
     }
 
     //----------------------------------------------------
@@ -138,17 +138,15 @@ public class Utilities {
             return false;
         }
 
-        for (int cnt = 0; cnt < value.length(); cnt++) {
-            char ch = value.charAt(cnt);
+        boolean[] valid = {true};
 
-            if ((ch >= '0') && (ch <= '9')) {
-            } else if ((ch == '-') || (ch == '(') || (ch == ')') || (ch == ' ')) {
-            } else {
-                return false;
+        value.chars().forEachOrdered(ch -> {
+            if (((ch < '0') || (ch > '9')) && ((ch != '-') && (ch != '(') && (ch != ')') && (ch != ' '))) {
+                valid[0] = false;
             }
-        }
+        });
 
-        return true;
+        return valid[0];
     }
 
     public static void logErr(String msg){

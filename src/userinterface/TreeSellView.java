@@ -2,9 +2,9 @@ package userinterface;
 
 import impresario.IModel;
 
-public class treeTypeAddView extends View{
-    public treeTypeAddView(IModel model) {
-        super(model, "treeTypeAddView");
+public class TreeSellView extends View{
+    public TreeSellView(IModel model) {
+        super(model, "TreeSellView");
     }
 
     @Override

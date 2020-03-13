@@ -2,9 +2,9 @@ package userinterface;
 
 import impresario.IModel;
 
-public class shiftOpenView extends View{
-    public shiftOpenView(IModel model) {
-        super(model, "shiftOpenView");
+public class ShiftOpenView extends View{
+    public ShiftOpenView(IModel model) {
+        super(model, "ShiftOpenView");
     }
 
     @Override

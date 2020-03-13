@@ -7,23 +7,23 @@ public class ControllerView extends View{
         super(model, "ControllerView");
 
         addContent("Shift",
-                makeButt("Open","shiftOpen",null),
-                makeButt("Close","shiftClose",null));
+                makeButt("Open","ShiftOpen",null),
+                makeButt("Close","ShiftClose",null));
 
         addContent("Sales",
-                makeButt("Sell","treeSell",null));
+                makeButt("Sell","TreeSell",null));
 
         addContent("Tree Type",
-                makeButt("Update", "treeTypeUpdate",null),
-                makeButt("Add","treeTypeAdd",null));
+                makeButt("Update", "TreeTypeUpdate",null),
+                makeButt("Add","TreeTypeAdd",null));
 
         addContent("Tree",
-                makeButt("Update/Delete","treeUpdate",null),
-                makeButt( "Add", "treeAdd", null));
+                makeButt("Update/Delete","TreeUpdate",null),
+                makeButt( "Add", "TreeAdd", null));
 
         addContent("Scout",
-                makeButt("Update/Delete","scoutUpdate",null),
-                makeButt("Register","scoutRegister",null));
+                makeButt("Update/Delete","ScoutUpdate",null),
+                makeButt("Register","ScoutRegister",null));
 
 
         // --------------------

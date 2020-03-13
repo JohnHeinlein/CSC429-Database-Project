@@ -120,11 +120,11 @@ public class EventLog {
         if (logFile.length() > MAX_SIZE) {
             // since it's too big, delete the backup file (if it exists)
             File backupLog = new File(Backup);
-            if (backupLog.exists() == true)
+            if (backupLog.exists())
                 backupLog.delete();
 
             // move the log file to the backup file
-            if (logFile.renameTo(new File(Backup)) == false) {
+            if (!logFile.renameTo(new File(Backup))) {
                 new Event(Event.getLeafLevelClassName(this), "EventLog", "Could not backup log file ", Event.WARNING);
             }
         }
@@ -136,10 +136,11 @@ public class EventLog {
      * @return The single EventLog instance
      */
     //----------------------------------------------------------
-    public static EventLog Instance() {
+    public static EventLog instance() {
         if (instance == null) {
             instance = new EventLog();
         }
+
         return (instance);
     }
 
@@ -181,8 +182,7 @@ public class EventLog {
      *
      */
     //---------------------------------------------------------------
-    public static String replaceParameters(String source, String paramList, boolean
-            displaySubErrors) {
+    public static String replaceParameters(String source, String paramList, boolean displaySubErrors) {
         return replaceParameters(source, paramList, displaySubErrors, true);
     }
 
@@ -224,8 +224,7 @@ public class EventLog {
      * @param    checkFileLength        boolean indicating whether to check for long file names or not
      */
     //-------------------------------------------------------------
-    public static String replaceParameters(String source, String paramList, boolean displaySubErrors,
-                                           boolean checkFileLength) {
+    public static String replaceParameters(String source, String paramList, boolean displaySubErrors, boolean checkFileLength) {
         String[] params;
         int numOfParams = 0;
 
@@ -246,7 +245,7 @@ public class EventLog {
         // and go through it to extract its individual elements into the parameter array
         for (int cnt = 0; cnt < numOfParams; cnt++) {
             params[cnt] = (String) paramStringList.nextElement();
-            if (checkFileLength == true)
+            if (checkFileLength)
                 if (params[cnt].length() > MAX_PARAM_LENGTH) {
                     params[cnt] = "..." + params[cnt].substring(params[cnt].length() - MAX_PARAM_LENGTH);
                 }
@@ -254,7 +253,7 @@ public class EventLog {
 
 
         int strlen = source.length();
-        StringBuffer paramString = new StringBuffer();
+        StringBuilder paramString = new StringBuilder();
         boolean done = false;
         int currentStringPosition = 0;
 
@@ -303,7 +302,6 @@ public class EventLog {
                     // We need to check to see if the array index so included in the description string is a valid one or not
                     // If not, we display a parsing sub-error and append the rest of the description string - to return later
                     catch (ArrayIndexOutOfBoundsException ex) {
-
                         done = true;
                         if (displaySubErrors)
                             new Event("EventLog", "String replaceParameters", "No parameter provided to correspond to index " + paramIndex, Event.WARNING);
@@ -312,7 +310,7 @@ public class EventLog {
                     if (!done) {
                         // If all is OK, we append the description string till the beginning of the open placeholder position,
                         // followed by an append of the actual parameter retrieved
-                        paramString.append(source.substring(currentStringPosition, posOfPlaceHolder) + paramValue);
+                        paramString.append(source, currentStringPosition, posOfPlaceHolder).append(paramValue);
 
                         // And then we augment the pointer to the current string position - to consider in the next
                         // iteration of the loop - to point just past the position of the close placeholder
@@ -327,7 +325,6 @@ public class EventLog {
         }
 
         // Return the final generated string with substituted parameters
-
         return paramString.toString();
     }
 
@@ -378,27 +375,19 @@ public class EventLog {
     public void addEvent(Event event) {
 
         // decide if this event should be shown to the user
-        if ((event.getSeverityDesc().equals("Warning") == true) ||
-                (event.getSeverityDesc().equals("Information") == true) ||
-                (event.getSeverityDesc().equals("Error") == true) ||
-                (event.getSeverityDesc().equals("Fatal") == true)) {
-
-            if (allowPopupDisplay == true) {
-                // If we don't have translations, display the raw text
-                if (myMessages == null) {
+        switch (event.getSeverityDesc()) {
+            case "Warning":
+            case "Information":
+            case "Error":
+            case "Fatal":
+                if (allowPopupDisplay && myMessages == null) {
                     // The following statement puts up the popup
-                    JOptionPane.showMessageDialog(null, event.getSeverityDesc() + ": " + event.getDescription(), "Error",
+                    JOptionPane.showMessageDialog(null,
+                            event.getSeverityDesc() + ": " + event.getDescription(),
+                            "Error",
                             JOptionPane.ERROR_MESSAGE);
-                } else
-                    // if there are translations available, but this event doesn't support them, use raw text
-                    if (event.getTag().equals("NOTAG") == true) {
-                        // TBD
-                    } else {
-                        // use the translated text
-                        // TBD
-
-                    }
-            }
+                }
+                break;
         }
 
         // see if we need to write this to the log file
@@ -414,16 +403,12 @@ public class EventLog {
                     outstream.close();
                     filestream.close();
                 } catch (Exception e) {
-                    System.out.println(e);
                     e.printStackTrace();
                 }
             }
         }
     }
-
-
 }
-
 
 //**************************************************************
 //	Revision History:

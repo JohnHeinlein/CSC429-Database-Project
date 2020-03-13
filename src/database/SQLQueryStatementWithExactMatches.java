@@ -49,25 +49,14 @@ public class SQLQueryStatementWithExactMatches extends SQLStatement {
     public SQLQueryStatementWithExactMatches(Properties selSchema,
                                              Properties projectionSchema,
                                              Properties selectionValues) {
-    	
-    	/* DEBUG
-    	// Display the selection schema
-    	Enumeration typeVals = selSchema.propertyNames();
-    	while (typeVals.hasMoreElements() == true)
-    	{
-    		String field = (String)typeVals.nextElement();
-    		System.out.println("SQLQueryStatementWithExactMatches: key = " + field + " ; value = " + selSchema.getProperty(field));
-    	}
-    	*/
-
         // Begin construction of the actual SQL statement
         theSQLStatement = "SELECT ";
 
         // add the fields from the schema, skip the tablename
         Enumeration fields = projectionSchema.propertyNames();
-        while (fields.hasMoreElements() == true) {
+        while (fields.hasMoreElements()) {
             String field = (String) fields.nextElement();
-            if (field.equals("TableName") != true) {
+            if (!field.equals("TableName")) {
                 // skip the leading comma if we're at the beginning
                 if (theSQLStatement.length() > 7)
                     theSQLStatement += ", " + field;
@@ -80,15 +69,15 @@ public class SQLQueryStatementWithExactMatches extends SQLStatement {
         theSQLStatement += " FROM " + selSchema.getProperty("TableName");
 
         // Construct the WHERE part of the SQL statement
-        String theWhereString = "";
+        StringBuilder theWhereString = new StringBuilder();
 
         // Now, traverse the WHERE clause Properties object
         if (selectionValues != null) {
             Enumeration theWhereFields = selectionValues.propertyNames();
-            while (theWhereFields.hasMoreElements() == true) {
+            while (theWhereFields.hasMoreElements()) {
                 String theConjunctionClause = "";
 
-                if (theWhereString.equals("")) {
+                if (theWhereString.toString().equals("")) {
                     theConjunctionClause += " WHERE ";
                 } else {
                     theConjunctionClause += " AND ";
@@ -98,46 +87,37 @@ public class SQLQueryStatementWithExactMatches extends SQLStatement {
                 String theFieldValue = insertEscapes(selectionValues.getProperty(theFieldName));
 
                 if (theFieldValue.equals("NULL")) {
-                    theWhereString += theConjunctionClause + theFieldName + " IS NULL";
+                    theWhereString.append(theConjunctionClause).append(theFieldName).append(" IS NULL");
                 } else {
                     // extract the type from the schema
                     String actualType = selSchema.getProperty(theFieldName);
 
-                    // DEBUG: System.out.println("SQLQueryStatementWithExactMatches: field = " + theFieldName + " ; type = " + actualType);
-
                     // if the type is numeric, do NOT include quotes
                     if (actualType != null) {
-                        if (actualType.equals("numeric") == true) {
+                        if (actualType.equals("numeric")) {
                             if (theFieldValue.length() > 0)
-                                theWhereString += theConjunctionClause + theFieldName + " = " + theFieldValue;    // cannot partial match a numeric
+                                theWhereString.append(theConjunctionClause).append(theFieldName).append(" = ").append(theFieldValue);    // cannot partial match a numeric
                         } else {    // must the a text type
                             // first check if the value is a field name
-                            if (selSchema.containsKey(theFieldValue) == true) {
-                                theWhereString += theConjunctionClause + theFieldName + " = " + theFieldValue;    // two SQL variables are being compared
+                            if (selSchema.containsKey(theFieldValue)) {
+                                theWhereString.append(theConjunctionClause).append(theFieldName).append(" = ").append(theFieldValue);    // two SQL variables are being compared
                             } else
                                 // else, it is an actual value, include the quotes
                                 // if theFieldValue is zero length, leave the quotes out (search for blank field)
                                 if (theFieldValue.length() > 0) {
-                                    theWhereString += theConjunctionClause + theFieldName + " = '" + theFieldValue + "'";
+                                    theWhereString.append(theConjunctionClause).append(theFieldName).append(" = '").append(theFieldValue).append("'");
                                 }
                         }
                     } else {
-                        theWhereString += theConjunctionClause + theFieldName + " = " + theFieldValue;    // two SQL variables are being compared
+                        theWhereString.append(theConjunctionClause).append(theFieldName).append(" = ").append(theFieldValue);    // two SQL variables are being compared
                     }
 
                 }
             }
         }
 
-        theSQLStatement += theWhereString;
-
-        theSQLStatement += ";";
-
-        // DEBUG System.out.println("SQL Query With Exact Matches Statement = " + theSQLStatement);
-
-
+        theSQLStatement += theWhereString + ";";
     }
-
 }
 
 

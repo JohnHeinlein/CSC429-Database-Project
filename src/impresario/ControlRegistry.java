@@ -26,7 +26,6 @@
 package impresario;
 
 // system imports
-
 import event.Event;
 
 import java.util.Enumeration;
@@ -77,22 +76,15 @@ public class ControlRegistry extends Registry {
 
         // see if we have multiple subscribers
         if (tempObj instanceof Vector) {
-            // get the list of elements
-            Enumeration subscriberList = ((Vector) tempObj).elements();
-            while (subscriberList.hasMoreElements() == true) {
-                // extract each subscriber
-                Object subscriber = subscriberList.nextElement();
-                // DEBUG: System.out.println("Vector Subscriber: " + subscriber.getClass());
-
+            ((Vector) tempObj).forEach(subscriber -> {
                 // update via a key-value pair
                 if (subscriber instanceof IModel) {
-                    // DEBUG: System.out.println("Vector StateRepository [" + key + "] " + dependProperty + ": " + client.getValue(dependProperty));
                     ((IModel) subscriber).stateChangeRequest(key, value);
                 } else {
                     new Event(Event.getLeafLevelClassName(this), "UpdateSubscribers", "EVT_InvalidSubscriber", "Vector Invalid Subscriber: " + subscriber.getClass(), Event.WARNING);
                     System.err.println("ControlRegistry.updateSubscribers - Invalid Subscriber type!");
                 }
-            }
+            });
         } else    // we must have a single subscriber
             // If not, use the standard update via a key-value pair
             if (tempObj instanceof IModel) {

@@ -2,9 +2,9 @@ package userinterface;
 
 import impresario.IModel;
 
-public class treeSellView extends View{
-    public treeSellView(IModel model) {
-        super(model, "treeSellView");
+public class ShiftCloseView extends View{
+    public ShiftCloseView(IModel model) {
+        super(model, "ShiftCloseView");
     }
 
     @Override

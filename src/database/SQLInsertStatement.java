@@ -27,13 +27,10 @@
 package database;
 
 // system imports
-
 import java.util.Enumeration;
 import java.util.Properties;
 
-
 // project imports
-
 
 // Beginning of DatabaseManipulator class
 //---------------------------------------------------------------------------------------------------------
@@ -56,58 +53,42 @@ public class SQLInsertStatement extends SQLStatement {
         theSQLStatement = "INSERT INTO " + schema.getProperty("TableName");
 
         // Construct the column name list and values part of the SQL statement
-        String theColumnNamesList = "";
-        String theValuesString = "";
+        StringBuilder theColumnNamesList = new StringBuilder();
+        StringBuilder theValuesString = new StringBuilder();
 
         // Now, traverse the Properties object. In this case, this loop
         // must go at least one or we will get an error back from the db
         Enumeration theValuesColumns = insertValues.propertyNames();
 
-        while (theValuesColumns.hasMoreElements() == true) {
-
-            if ((theValuesString.equals("") == true) && (theColumnNamesList.equals("") == true)) {
-                theValuesString += " VALUES ( ";
-                theColumnNamesList += " ( ";
+        while (theValuesColumns.hasMoreElements()) {
+            if ((theValuesString.toString().equals("")) && (theColumnNamesList.toString().equals(""))) {
+                theValuesString.append(" VALUES ( ");
+                theColumnNamesList.append(" ( ");
             } else {
-                theValuesString += " , ";
-                theColumnNamesList += " , ";
+                theValuesString.append(" , ");
+                theColumnNamesList.append(" , ");
             }
-
 
             String theColumnName = (String) theValuesColumns.nextElement();
-            // System.out.println("The column name is " + theColumnName);
             String theColumnValue = insertEscapes(insertValues.getProperty(theColumnName));
-            // System.out.println("The column value is " + theColumnValue);
-            theColumnNamesList += theColumnName;
-            //	System.out.println("The list is " + theColumnNamesList);
-
-            //System.out.println("Checking insertType");
+            theColumnNamesList.append(theColumnName);
             String insertType = schema.getProperty(theColumnName);
-            //		System.out.println("InsertType = " + insertType);
-            //System.out.println("Schema is : " + schema);
 
-            if (insertType.equals("numeric") == true) {
-                theValuesString += theColumnValue;
-                //	System.out.println("Value string updated: " + theValuesString);
+            if (insertType.equals("numeric")) {
+                theValuesString.append(theColumnValue);
             } else {
-                theValuesString += "'" + theColumnValue + "'";
-                // System.out.println("2 - Value string updated: " + theValuesString);
+                theValuesString.append("'").append(theColumnValue).append("'");
             }
-
         } // end while
 
-        if ((theValuesString.equals("") == false) && (theColumnNamesList.equals("") == false))
+        if (!theValuesString.toString().equals("") && !theColumnNamesList.toString().equals(""))
         // this must be the case for an insert statement
         {
-            theValuesString += " ) ";
-            theColumnNamesList += " ) ";
+            theValuesString.append(" ) ");
+            theColumnNamesList.append(" ) ");
         }
 
-        theSQLStatement += theColumnNamesList;
-        theSQLStatement += theValuesString;
-
-        theSQLStatement += ";";
-
+        theSQLStatement += theColumnNamesList.append(theValuesString).append(";");
     }
 }
 

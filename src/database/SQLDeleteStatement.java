@@ -55,23 +55,23 @@ public class SQLDeleteStatement extends SQLStatement {
         theSQLStatement = "DELETE FROM " + schema.getProperty("TableName");
 
         // Construct the WHERE part of the SQL statement
-        String theWhereString = "";
+        StringBuilder theWhereString = new StringBuilder();
 
         // Now, traverse the WHERE clause Properties object
         if (whereValues != null) {
             Enumeration theWhereColumns = whereValues.propertyNames();
-            while (theWhereColumns.hasMoreElements() == true) {
-                if (theWhereString.equals("")) {
-                    theWhereString += " WHERE ";
+            while (theWhereColumns.hasMoreElements()) {
+                if (theWhereString.toString().equals("")) {
+                    theWhereString.append(" WHERE ");
                 } else {
-                    theWhereString += " AND ";
+                    theWhereString.append(" AND ");
                 }
 
                 String theColumnName = (String) theWhereColumns.nextElement();
                 String theColumnValue = insertEscapes(whereValues.getProperty(theColumnName));
 
                 if (theColumnValue.equals("NULL")) {
-                    theWhereString += theColumnName + " IS NULL";
+                    theWhereString.append(theColumnName).append(" IS NULL");
                 } else {
                     String actualType = "Text";
 
@@ -82,10 +82,10 @@ public class SQLDeleteStatement extends SQLStatement {
 
                     actualType = actualType.toLowerCase();
 
-                    if (actualType.equals("numeric") == true) {
-                        theWhereString += theColumnName + " = " + theColumnValue;
+                    if (actualType.equals("numeric")) {
+                        theWhereString.append(theColumnName).append(" = ").append(theColumnValue);
                     } else {
-                        theWhereString += theColumnName + " = '" + theColumnValue + "'";
+                        theWhereString.append(theColumnName).append(" = '").append(theColumnValue).append("'");
 
                     }
                 }

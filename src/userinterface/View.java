@@ -254,20 +254,12 @@ public abstract class View
 
             @Override
             public String toString(LocalDate localDate) {
-                if (localDate == null) {
-                    return "";
-                }
-
-                return dateTimeFormatter.format(localDate);
+                return localDate == null ? "" : dateTimeFormatter.format(localDate);
             }
 
             @Override
             public LocalDate fromString(String dateString) {
-                if (dateString == null || dateString.trim().isEmpty()) {
-                    return null;
-                }
-
-                return LocalDate.parse(dateString, dateTimeFormatter);
+                return (dateString == null || dateString.trim().isEmpty()) ? null : LocalDate.parse(dateString, dateTimeFormatter);
             }
         });
 
