@@ -90,11 +90,11 @@ public class Controller implements IView, IModel {
     public void stateChangeRequest(String key, Object value) {
         switch (key) {
             case "ScoutRegister":
-            case "ScoutUpdate":
+            case "ScoutUpdateDelete":
             case "TreeAdd":
-            case "TreeUpdate":
+            case "TreeUpdateDelete":
             case "TreeTypeAdd":
-            case "TreeTypeUpdate:":
+            case "TreeTypeUpdate":
             case "ShiftOpen":
             case "TreeSell":
             case "ShiftClose":
