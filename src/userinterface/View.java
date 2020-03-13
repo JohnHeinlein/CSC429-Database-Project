@@ -67,6 +67,7 @@ public abstract class View
 
         //Footer
         footer.setAlignment(Pos.CENTER);
+        footer.setPadding(new Insets(0, 5, 5, 5));
         footer.setSpacing(25);
 
         //GridPane
@@ -142,7 +143,31 @@ public abstract class View
     // ***************
 
     /**
-     * Adds a cancel button to rightmost of footer to return to ControllerView
+     * Adds a misc button to footer to return to ControllerView
+     */
+    public void miscButton(String name, String state, Object prop) {
+        Button miscButton = new Button(name);
+        miscButton.setOnAction(e -> {
+            myModel.stateChangeRequest(state, prop);
+            clear();
+        });
+        footButt(miscButton);
+    }
+
+    /**
+     * Adds a submit button to footer to return to ControllerView
+     */
+    public void submitButton(String state, Object prop) {
+        Button submitButton = new Button("Submit");
+        submitButton.setOnAction(e -> {
+            myModel.stateChangeRequest(state, prop);
+            clear();
+        });
+        footButt(submitButton);
+    }
+
+    /**
+     * Adds a cancel button to footer to return to ControllerView
      */
     public void cancelButton() {
         Button cancelButton = new Button("Cancel");
@@ -150,10 +175,7 @@ public abstract class View
             myModel.stateChangeRequest("Cancel", null);
             clear();
         });
-        footer.getChildren().add(
-                footer.getChildren().size(), //Add to rightmost side
-                cancelButton);
-
+        footButt(cancelButton);
     }
 
     private void clear() {
@@ -194,7 +216,7 @@ public abstract class View
      * Adds button to leftmost of footer
      */
     public void footButt(Button butt) {
-        footer.getChildren().add(0, butt);
+        footer.getChildren().add(footer.getChildren().size(), butt);
     }
 
     // ***************
@@ -278,6 +300,15 @@ public abstract class View
             Utilities.logErr("Selected date: " + date);
         });
         return picker;
+    }
+
+    // TODO: Fill the ScrollPane with something.
+    public ScrollPane makeScrollPane(String modelState, String collectionState) {
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setPrefHeight(200);
+        scrollPane.setFitToWidth(true);
+
+        return scrollPane;
     }
 
     // ***************

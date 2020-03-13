@@ -6,7 +6,7 @@ public class ScoutRegisterView extends View{
     public ScoutRegisterView(IModel model) {
         super(model, "ScoutRegisterView");
 
-        setTitle("Register a scout");
+        setTitle("Register a Scout");
 
         addContent("Name",
                 makeField("First Name"),
@@ -34,7 +34,7 @@ public class ScoutRegisterView extends View{
         addContent("Status",
                 makeComboBox("Active", "Inactive"));
 
-        footButt(makeButt("Submit", "scoutRegisterSubmit", null));
+        submitButton("ScoutRegisterSubmit", null);
         cancelButton();
     }
     @Override

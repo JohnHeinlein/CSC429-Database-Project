@@ -39,7 +39,6 @@ import java.sql.DatabaseMetaData;
 // project imports
 import event.Event;
 
-
 // Beginning of DatabaseManipulator class
 //---------------------------------------------------------------------------------------------------------
 abstract public class Persistable {
@@ -52,8 +51,6 @@ abstract public class Persistable {
 
     private Statement theStatement = null;
     private Connection theDBConnection = null;
-
-//    protected String persistableStatus;
 
     // class constructor
     //------------------------------------------------------------
@@ -70,14 +67,13 @@ abstract public class Persistable {
             // Create a connection to the database
             Connection theDBConnection = myBroker.getConnection();
 
-             System.out.println("Persistable.getSchemaInfo(..) connection = " + theDBConnection);
+            /* System.out.println("Persistable.getSchemaInfo(..) connection = " + theDBConnection); */
 
             // extract the metadata from the database
             DatabaseMetaData dbMetaData = theDBConnection.getMetaData();
 
             // create a place to hold our return information
             Properties valToReturn = new Properties();
-
             // add the name of our table to the return props
             valToReturn.setProperty("TableName", tableName);
 
@@ -88,12 +84,8 @@ abstract public class Persistable {
                 String typeValue = columnInfo.getString(6);
 
                 typeValue = typeValue.toLowerCase();
-                if ((typeValue.startsWith("smallint")) || (typeValue.startsWith("mediumint")) ||
-                        (typeValue.startsWith("int"))) {
-                    typeValue = "numeric";
-                } else {
-                    typeValue = "text";
-                }
+                typeValue = (typeValue.startsWith("smallint")) || (typeValue.startsWith("mediumint")) ||
+                        (typeValue.startsWith("int")) ? "numeric" : "text";
 
                 // add the column / field name and type to the return props
                 valToReturn.setProperty(columnInfo.getString(4), typeValue);
@@ -116,35 +108,31 @@ abstract public class Persistable {
      * containing the columnName=columnValue mappings
      */
     //------------------------------------------------------------
-    protected Vector getPersistentState(
-            Properties schema,
-            Properties where) {
-        int numRSColumns;       // number of columns in ResultSet
-        Vector namesRSColumns;  // names of columns in ResultSet
-        ResultSet theResultSet; // the resultset from the SQLStatement execution
+    protected Vector getPersistentState(Properties schema,
+                                        Properties where) {
+        int numRSColumns;            // number of columns in ResultSet
+        Vector namesRSColumns;    // names of columns in ResultSet
+        ResultSet theResultSet;            // the resultset from the SQLStatement execution
         try {
-            theDBConnection = myBroker.getConnection(); // connect to the database
+            // connect to the database
+            theDBConnection = myBroker.getConnection();
 
-            if (theDBConnection == null) { // verify the connection
-                System.err.println("Could not connect to database!");
+            // verify the connection
+            if (theDBConnection == null) {
+                System.err.println("Persistable.getPersistentState - Could not connect to database!");
                 return null;
             }
 
             // construct a SQL statement from the passed parameters
             SQLSelectStatement theSQLStatement = new SQLSelectStatement(schema, where);
 
-//            if (theSQLStatement == null) { // verify the construction (should be exception?)
-//                System.err.println("Persistable.getPersistentState - Could not create SQL Statement!");
-//                return null;
-//            }
-
             // Once a connection has been established we can create an instance
             // of Statement, through which we will send queries to the database.
             // Only the Global Pool connection should be used!
             Statement theStatement = theDBConnection.createStatement();
 
-            // Causes hang
-            //theStatement.setMaxRows(MAX_ROWS);// Stop Runaway Queries
+            // Stop Runaway Queries
+            theStatement.setMaxRows(MAX_ROWS);
 
             // The method executeQuery executes a query on the database. The
             // return result is of type ResultSet which is one or more rows in
@@ -183,8 +171,7 @@ abstract public class Persistable {
                 resultSetToReturn.addElement(thisRow);
             }
 
-            if (theResultSet != null)
-                theResultSet.close();
+            theResultSet.close();
             return resultSetToReturn;
         } catch (SQLException sqle) {
 //			DEBUG: System.err.println( "An SQL Error Occurred:" + sqle + "\n" + sqle.getErrorCode() + "\n" + sqle.getMessage() + "\n" + sqle);
@@ -223,21 +210,13 @@ abstract public class Persistable {
             // construct a SQL statement from the passed parameters
             SQLQueryStatement theSQLStatement = new SQLQueryStatement(selSchema, projectionSchema, where);
 
-            // DEBUG: System.out.println("SQLQueryStatement: " + theSQLStatement.toString());
-
-            // verify the construction (should be exception?)
-            if (theSQLStatement == null) {
-                System.err.println("Persistable.getQueriedState - Could not create SQL Statement!");
-                return null;
-            }
-
             // Once a connection has been established we can create an instance
             // of Statement, through which we will send queries to the database.
             // Only the Global Pool connection should be used!
             Statement theStatement = theDBConnection.createStatement();
 
-            // Causes hang
-            // theStatement.setMaxRows(20000);
+            // Stop Runaway Queries
+            theStatement.setMaxRows(MAX_ROWS);
 
             // The method executeQuery executes a query on the database. The
             // return result is of type ResultSet which is one or more rows in
@@ -277,8 +256,7 @@ abstract public class Persistable {
                 resultSetToReturn.addElement(thisRow);
             }
 
-            if (theResultSet != null)
-                theResultSet.close();
+            theResultSet.close();
             return resultSetToReturn;
         } catch (SQLException sqle) {
 //			DEBUG: 
@@ -318,21 +296,13 @@ abstract public class Persistable {
             SQLQueryStatementWithExactMatches theSQLStatement =
                     new SQLQueryStatementWithExactMatches(selSchema, projectionSchema, where);
 
-            // DEBUG: System.out.println("SQLQueryStatement: " + theSQLStatement.toString());
-
-            // verify the construction (should be exception?)
-            if (theSQLStatement == null) {
-                System.err.println("Persistable.getQueriedState - Could not create SQL Statement!");
-                return null;
-            }
-
             // Once a connection has been established we can create an instance
             // of Statement, through which we will send queries to the database.
             // Only the Global Pool connection should be used!
             Statement theStatement = theDBConnection.createStatement();
 
-            // Causes hang
-            //theStatement.setMaxRows(20000);
+            // Stop Runaway Queries
+            theStatement.setMaxRows(MAX_ROWS);
 
             // The method executeQuery executes a query on the database. The
             // return result is of type ResultSet which is one or more rows in
@@ -371,8 +341,7 @@ abstract public class Persistable {
                 resultSetToReturn.addElement(thisRow);
             }
 
-            if (theResultSet != null)
-                theResultSet.close();
+            theResultSet.close();
             return resultSetToReturn;
         } catch (SQLException sqle) {
 //			DEBUG: 
@@ -418,8 +387,8 @@ abstract public class Persistable {
             // Only the Global Pool connection should be used!
             Statement theStatement = theDBConnection.createStatement();
 
-            // Causes hang
-            //theStatement.setMaxRows(20000);
+            // Stop Runaway Queries
+            theStatement.setMaxRows(MAX_ROWS);
 
             // The method executeQuery executes a query on the database. The
             // return result is of type ResultSet which is one or more rows in
@@ -458,8 +427,7 @@ abstract public class Persistable {
                 resultSetToReturn.addElement(thisRow);
             }
 
-            if (theResultSet != null)
-                theResultSet.close();
+            theResultSet.close();
             return resultSetToReturn;
         } catch (SQLException sqle) {
 //			DEBUG: System.err.println( "An SQL Error Occurred:" + sqle + "\n" + sqle.getErrorCode() + "\n" + sqle.getMessage() + "\n" + sqle);
@@ -483,9 +451,6 @@ abstract public class Persistable {
                                             Properties whereValues)    // the where values
             throws SQLException {
 
-        int numRSColumns = 0;            // number of columns in ResultSet
-        Vector namesRSColumns = null;    // names of columns in ResultSet
-
         try {
             // connect to the database
             theDBConnection = myBroker.getConnection();
@@ -499,19 +464,13 @@ abstract public class Persistable {
             SQLUpdateStatement theSQLStatement = new SQLUpdateStatement(schema, updateValues, whereValues);
             // DEBUG System.out.println("SQL Statement: " + theSQLStatement.toString());
 
-            // verify the construction (should be exception?)
-            if (theSQLStatement == null) {
-                System.err.println("Persistable.updatePersistentState - Could not create SQL Statement!");
-                return null;
-            }
-
             // Once a connection has been established we can create an instance
             // of Statement, through which we will send queries to the database.
             // Only the Global Pool connection should be used!
             Statement theStatement = theDBConnection.createStatement();
 
-            // Causes hang
-            //theStatement.setMaxRows(20000);
+            // Stop Runaway Queries
+            theStatement.setMaxRows(MAX_ROWS);
 
 
             // The method executeUpdate executes a query on the database. The
@@ -557,8 +516,8 @@ abstract public class Persistable {
             // Only the Global Pool connection should be used!
             Statement theStatement = theDBConnection.createStatement();
 
-            // Causes hang
-            //theStatement.setMaxRows(20000);
+            // Stop Runaway Queries
+            theStatement.setMaxRows(MAX_ROWS);
 
             // The method executeUpdate executes a query on the database. The
             // return result is of type integer which indicates the number of rows updated
@@ -614,8 +573,8 @@ abstract public class Persistable {
             // Only the Global Pool connection should be used!
             Statement theStatement = theDBConnection.createStatement();
 
-            // Causes hang
-            //theStatement.setMaxRows(20000);
+            // Stop Runaway Queries
+            theStatement.setMaxRows(MAX_ROWS);
 
             // The method executeUpdate executes a query on the database. The
             // return result is of type integer which indicates the number of rows updated
@@ -639,9 +598,6 @@ abstract public class Persistable {
     protected Integer deletePersistentState(Properties schema,            // the table schema
                                             Properties whereValues)        // the values to use to identify the delete row
             throws SQLException {
-        int numRSColumns = 0;            // number of columns in ResultSet
-        Vector namesRSColumns = null;    // names of columns in ResultSet
-
         try {
             // connect to the database
             theDBConnection = myBroker.getConnection();
@@ -659,8 +615,8 @@ abstract public class Persistable {
             // Only the Global Pool connection should be used!
             Statement theStatement = theDBConnection.createStatement();
 
-            // Causes hang
-            //theStatement.setMaxRows(20000);
+            // Stop Runaway Queries
+            theStatement.setMaxRows(MAX_ROWS);
 
             // The method executeQuery executes a query on the database. The
             // return result is of type integer which indicates the number of rows updated

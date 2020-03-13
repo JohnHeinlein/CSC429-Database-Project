@@ -112,10 +112,9 @@ public class SQLQueryStatement extends SQLStatement {
             }
         }
 
-        theSQLStatement += theWhereString + ";";
+        theSQLStatement += theWhereString.append(";");
     }
 }
-
 
 //---------------------------------------------------------------
 //	Revision History:

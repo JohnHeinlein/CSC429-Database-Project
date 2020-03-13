@@ -18,11 +18,11 @@ public class ControllerView extends View{
                 makeButt("Add","TreeTypeAdd",null));
 
         addContent("Tree",
-                makeButt("Update/Delete","TreeUpdate",null),
+                makeButt("Update/Delete","TreeUpdateDelete",null),
                 makeButt( "Add", "TreeAdd", null));
 
         addContent("Scout",
-                makeButt("Update/Delete","ScoutUpdate",null),
+                makeButt("Update/Delete","ScoutUpdateDelete",null),
                 makeButt("Register","ScoutRegister",null));
 
 

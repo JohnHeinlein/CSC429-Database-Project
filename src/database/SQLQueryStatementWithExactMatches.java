@@ -26,13 +26,8 @@
 package database;
 
 // system imports
-
 import java.util.Enumeration;
 import java.util.Properties;
-
-
-// project imports
-
 
 // Beginning of DatabaseManipulator class
 //---------------------------------------------------------------------------------------------------------
@@ -116,7 +111,7 @@ public class SQLQueryStatementWithExactMatches extends SQLStatement {
             }
         }
 
-        theSQLStatement += theWhereString + ";";
+        theSQLStatement += theWhereString.append(";");
     }
 }
 

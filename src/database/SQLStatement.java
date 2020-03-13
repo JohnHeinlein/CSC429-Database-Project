@@ -74,9 +74,7 @@ public abstract class SQLStatement {
     public String toString() {
         return theSQLStatement;
     }
-
 }
-
 
 //---------------------------------------------------------------
 //	Revision History:

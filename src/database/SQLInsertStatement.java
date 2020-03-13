@@ -30,8 +30,6 @@ package database;
 import java.util.Enumeration;
 import java.util.Properties;
 
-// project imports
-
 // Beginning of DatabaseManipulator class
 //---------------------------------------------------------------------------------------------------------
 public class SQLInsertStatement extends SQLStatement {
@@ -47,8 +45,6 @@ public class SQLInsertStatement extends SQLStatement {
     public SQLInsertStatement(Properties schema,        // the name of the table to insert into
                               Properties insertValues)    // the values to insert
     {
-        super();    // implicit, doesn't do anything, but what the hell
-
         // Begin construction of the actual SQL statement
         theSQLStatement = "INSERT INTO " + schema.getProperty("TableName");
 
@@ -79,7 +75,7 @@ public class SQLInsertStatement extends SQLStatement {
             } else {
                 theValuesString.append("'").append(theColumnValue).append("'");
             }
-        } // end while
+        }
 
         if (!theValuesString.toString().equals("") && !theColumnNamesList.toString().equals(""))
         // this must be the case for an insert statement
