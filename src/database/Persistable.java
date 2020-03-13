@@ -108,10 +108,9 @@ abstract public class Persistable {
      * containing the columnName=columnValue mappings
      */
     //------------------------------------------------------------
-    protected Vector getPersistentState(Properties schema,
-                                        Properties where) {
+    protected Vector<Properties> getPersistentState(Properties schema, Properties where){
         int numRSColumns;            // number of columns in ResultSet
-        Vector namesRSColumns;    // names of columns in ResultSet
+        Vector<String> namesRSColumns;    // names of columns in ResultSet
         ResultSet theResultSet;            // the resultset from the SQLStatement execution
         try {
             // connect to the database
@@ -147,13 +146,13 @@ abstract public class Persistable {
             ResultSetMetaData rsMetaData = theResultSet.getMetaData();
 
             numRSColumns = rsMetaData.getColumnCount();
-            namesRSColumns = new Vector();
+            namesRSColumns = new Vector<String>();
             for (int cnt = 1; cnt <= numRSColumns; cnt++) {
                 String thisColumnName = rsMetaData.getColumnName(cnt);
                 namesRSColumns.addElement(thisColumnName);
             }
 
-            Vector resultSetToReturn = new Vector();
+            Vector<Properties> resultSetToReturn = new Vector<>();
 
             while (theResultSet.next()) {
                 Properties thisRow = new Properties();
