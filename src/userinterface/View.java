@@ -188,23 +188,27 @@ public abstract class View
                 // For every node contained in that box...
                 for(Node node : ((Pane)box).getChildren()) {
                     // Cast the node to Region (ComboBox, etc.)
+                    if(node instanceof MessageView) {
+                        ((MessageView) node).setText("");
+                        continue;
+                    }
+
                     Region control = (Region)node;
 
                     // Clear text input fields
                     if (control instanceof TextInputControl) {
-                        System.out.println("\t\tclearing text input");
                         ((TextInputControl) control).clear();
                     }
+
                     // Set combobox to default value
                     else if (control instanceof ComboBox) {
-                        System.out.println("\t\tclearing combo box");
                         ((ComboBox) control)
                                 .getSelectionModel()
                                 .selectFirst();
                     }
+
                     // Clear datepicker
                     else if (control instanceof DatePicker) {
-                        System.out.println("\t\tclearing text input");
                         ((DatePicker) control).setValue(null);
                     }
                 }
