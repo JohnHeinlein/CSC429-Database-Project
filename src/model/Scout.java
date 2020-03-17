@@ -1,23 +1,18 @@
-
 // specify the package
 package model;
 
 // system imports
+
+import exception.InvalidPrimaryKeyException;
+import impresario.IModel;
+import impresario.IView;
+
 import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Vector;
-import javax.swing.JFrame;
 
 // project imports
-import exception.InvalidPrimaryKeyException;
-import database.*;
-
-import impresario.IView;
-import impresario.IModel;
-
-import userinterface.View;
-import userinterface.ViewFactory;
 
 public class Scout extends EntityBase implements IView, IModel {
 
@@ -40,31 +35,25 @@ public class Scout extends EntityBase implements IView, IModel {
         Vector<Properties> allDataRetrieved = getSelectQueryResult(query);
 
         // You must get one account at least
-        if (allDataRetrieved != null)
-        {
+        if (allDataRetrieved != null) {
             int size = allDataRetrieved.size();
 
             // There should be EXACTLY one account. More than that is an error
-            if (size != 1)
-            {
+            if (size != 1) {
                 throw new InvalidPrimaryKeyException("Multiple accounts matching id : "
                         + ScoutId + " found.");
-            }
-            else
-            {
+            } else {
                 // copy all the retrieved data into persistent state
                 Properties retrievedScoutData = allDataRetrieved.elementAt(0);
                 persistentState = new Properties();
 
                 Enumeration allKeys = retrievedScoutData.propertyNames();
-                while (allKeys.hasMoreElements() == true)
-                {
-                    String nextKey = (String)allKeys.nextElement();
+                while (allKeys.hasMoreElements() == true) {
+                    String nextKey = (String) allKeys.nextElement();
                     String nextValue = retrievedScoutData.getProperty(nextKey);
                     // bookId = Integer.parseInt(retrievedBookData.getProperty("bookId"));
 
-                    if (nextValue != null)
-                    {
+                    if (nextValue != null) {
                         persistentState.setProperty(nextKey, nextValue);
                     }
                 }
@@ -80,8 +69,8 @@ public class Scout extends EntityBase implements IView, IModel {
 
     //-- NEW CONSTRUCTOR EMPTY PROPERTIES
     //---------------------------------------------------------------
-    public Scout () {
-        super (myTableName);
+    public Scout() {
+        super(myTableName);
 
         setDependencies();
         persistentState = new Properties();
@@ -100,9 +89,8 @@ public class Scout extends EntityBase implements IView, IModel {
 
     @Override
     public Object getState(String key) {
-        if (key.equals("UpdateStatusMessage") == true)
+        if (key.equals("UpdateStatusMessage"))
             return updateStatusMessage;
-
         return persistentState.getProperty(key);
     }
 
@@ -110,7 +98,7 @@ public class Scout extends EntityBase implements IView, IModel {
     public void stateChangeRequest(String key, Object value) {
         if (key.equals("InsertBook")) {
 
-            Properties data = (Properties)value;
+            Properties data = (Properties) value;
             persistentState.setProperty("firstName", data.getProperty("firstName"));
             persistentState.setProperty("lastName", data.getProperty("lastName"));
             persistentState.setProperty("middleName", data.getProperty("middleName"));
@@ -141,29 +129,22 @@ public class Scout extends EntityBase implements IView, IModel {
 
     //Updating Database State
     //-----------------------------------------------------------------------------------
-    private void updateStateInDatabase()
-    {
-        try
-        {
-            if (persistentState.getProperty("id") != null)
-            {
+    private void updateStateInDatabase() {
+        try {
+            if (persistentState.getProperty("id") != null) {
                 Properties whereClause = new Properties();
                 whereClause.setProperty("id",
                         persistentState.getProperty("id"));
                 updatePersistentState(mySchema, persistentState, whereClause);
                 updateStatusMessage = "Scout data for id number : " + persistentState.getProperty("id") + " updated successfully in database!";
-            }
-            else
-            {
+            } else {
                 Integer scoutId =
                         insertAutoIncrementalPersistentState(mySchema, persistentState);
                 persistentState.setProperty("id", "" + scoutId.intValue());
-                updateStatusMessage = "Account data for new account : " +  persistentState.getProperty("id")
+                updateStatusMessage = "Account data for new account : " + persistentState.getProperty("id")
                         + "installed successfully in database!";
             }
-        }
-        catch (SQLException ex)
-        {
+        } catch (SQLException ex) {
             updateStatusMessage = "Error in installing Scout data in database!";
         }
         //DEBUG System.out.println("updateStateInDatabase " + updateStatusMessage);
@@ -172,7 +153,7 @@ public class Scout extends EntityBase implements IView, IModel {
     //-Because we Deserve nice things
     //--------------------------------------------------------------
 
-    public void update () {
+    public void update() {
         updateStateInDatabase();
     }
 

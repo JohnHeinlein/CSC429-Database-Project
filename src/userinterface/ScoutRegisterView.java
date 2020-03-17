@@ -14,6 +14,7 @@ public class ScoutRegisterView extends View{
 
         addContent("Address",
                 makeField("Address"));
+
         addContent("",
                 makeField("City"),
                 makeField("State"),
