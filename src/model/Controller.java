@@ -10,6 +10,7 @@ import userinterface.MainStageContainer;
 import userinterface.View;
 import userinterface.ViewFactory;
 import userinterface.WindowPosition;
+import Utilities.Debug;
 
 import java.util.Hashtable;
 import java.util.Properties;
@@ -42,7 +43,7 @@ public class Controller implements IView, IModel {
             View newView = ViewFactory.createView(viewName, this);
 
             if (newView == null) {
-                Utilities.logErr("ViewFactory returned null view");
+                Debug.logErr("ViewFactory returned null view");
                 return;
             }
             currentScene = new Scene(newView);
@@ -108,7 +109,7 @@ public class Controller implements IView, IModel {
                 createAndShowView("ControllerView");
                 break;
             default:
-                Utilities.logErr("Invalid key " + key);
+                Debug.logErr("Invalid key " + key);
                 break;
         }
     }

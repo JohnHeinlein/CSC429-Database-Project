@@ -8,8 +8,9 @@ package Utilities;
 public class Debug {
     public static boolean debug;
 
-    public static void setDebug(Boolean val){
+    public static Boolean setDebug(Boolean val){
         debug = val;
+        return debug;
     }
 
     /**

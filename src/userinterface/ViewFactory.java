@@ -3,7 +3,7 @@ package userinterface;
 import impresario.IModel;
 
 import java.lang.reflect.Constructor;
-import Utilities.Utilities;
+import Utilities.Debug;
 import userinterface.*;
 
 //==============================================================================
@@ -15,7 +15,7 @@ public class ViewFactory {
                     .getConstructor(IModel.class)
                     .newInstance(model);
         }catch(Exception ex){
-            Utilities.logErr("No view found for " + viewName);
+            Debug.logErr("No view found for " + viewName);
             ex.printStackTrace();
         }
         return null;

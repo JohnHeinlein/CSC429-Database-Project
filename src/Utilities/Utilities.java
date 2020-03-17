@@ -148,13 +148,5 @@ public class Utilities {
 
         return valid[0];
     }
-
-    public static void logErr(String msg){
-    	StackTraceElement[] ex = new Exception().getStackTrace();
-    	System.err.printf("%s.%s: %s\n",
-				ex[1].getClassName(),
-				ex[1].getMethodName(),
-				msg);
-	}
 }
 

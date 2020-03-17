@@ -37,6 +37,7 @@ import java.sql.DatabaseMetaData;
 
 
 // project imports
+import Utilities.Debug;
 import event.Event;
 
 // Beginning of DatabaseManipulator class
@@ -97,6 +98,9 @@ abstract public class Persistable {
         } catch (SQLException sqle) {
             new Event(Event.getLeafLevelClassName(this), "getSchemaInfo", "SQL Exception: " + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
             return null;
+        } catch(NullPointerException npe){
+            Debug.logErr("No connection to database");
+            return null;
         }
     }
 
@@ -117,7 +121,7 @@ abstract public class Persistable {
             theDBConnection = myBroker.getConnection();
             // verify the connection
             if (theDBConnection == null) {
-                Utilities.Utilities.logErr("Could not connect to database!");
+                Debug.logErr("Could not connect to database!");
                 return null;
             }
 
