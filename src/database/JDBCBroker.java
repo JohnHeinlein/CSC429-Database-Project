@@ -17,6 +17,8 @@
 
 /**
  * @author $Author: tomb $  @version	$Revision: 168 $  @version	$Revision: timmullins,2008-02-20 $
+ * @version $Revision: 168 $  @version $Revision: timmullins,2008-02-20 $
+ * @version $Revision: 168 $  @version $Revision: timmullins,2008-02-20 $
  */
 /** @version $Revision: 168 $ */
 /** @version $Revision: timmullins,2008-02-20 $ */
@@ -26,22 +28,23 @@ package database;
 
 /// system imports
 
-import java.util.Enumeration;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.Connection;
-import java.sql.SQLException;
-
-// project imports
+import Utilities.Debug;
 import common.PropertyFile;
 import event.Event;
 
+import javax.swing.*;
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.SQLException;
+
+// project imports
+
 //==============================================================
 public class JDBCBroker {
+    public static Driver theDriver = null;
     // Single broker to be shared by all other Servlets
     private static JDBCBroker myInstance = null;
     private static Connection theDBConnection = null;
-    public static Driver theDriver = null;
     private PropertyFile props;
 
     // DB Access data
@@ -49,19 +52,6 @@ public class JDBCBroker {
     private String username;
     private String password;
     private String server;
-
-    // singleton constructor
-    //----------------------------------------------------------
-    static public JDBCBroker getInstance() {
-        // DEBUG: System.out.println("JDBCBroker.getInstance()");
-
-        if (myInstance == null) {
-            myInstance = new JDBCBroker();
-        }
-
-        return myInstance;
-    }
-
 
     // private constructor for singleton
     //----------------------------------------------------------
@@ -90,20 +80,31 @@ public class JDBCBroker {
         }
     }
 
+    // singleton constructor
+    //----------------------------------------------------------
+    static public JDBCBroker getInstance() {
+        // DEBUG: System.out.println("JDBCBroker.getInstance()");
+
+        if (myInstance == null) {
+            myInstance = new JDBCBroker();
+        }
+
+        return myInstance;
+    }
+
     /** Create a connection to the database */
     //--------------------------------------------------------
     public Connection getConnection() {
-        if (myInstance != null) {
-            if (theDBConnection == null) {
-                if ((dbName != null) & (username != null) && (password != null)) {
-                    try {
-                        theDBConnection = DriverManager.getConnection("jdbc:mysql://"+server+":3306/"+dbName,
-                                username,
-                                password);
-                    } catch (SQLException exc) {
-                        System.err.println("JDBCBroker.getConnection - Could not connect to database!" + "\n" + exc.getMessage());
-                    }
-                }
+        if (myInstance != null
+                && theDBConnection == null
+                && (dbName != null) && (username != null) && (password != null)) {
+            try {
+                //theDBConnection = DriverManager.getConnection("jdbc:mysql://dingusdong.us:3306/csc429_group_john","john","reallygoodpassword");
+                System.out.println("Connecting to database...");
+                theDBConnection = theDriver.connect("jdbc:mysql://192.168.1.97:3306/csc429_group_john?user=john&password=reallygoodpassword", null);
+                if (theDBConnection == null) Debug.logErr("No database connection");
+            } catch (SQLException exc) {
+                System.err.println("JDBCBroker.getConnection - Could not connect to database!" + "\n" + exc.getMessage());
             }
         }
         //System.out.println("JDBCBroker.getConnection() with connection " + theDBConnection);

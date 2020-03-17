@@ -1,3 +1,5 @@
+package Utilities;
+
 /**
  * Class containing static methods to aid in debug logs
  * call setDebug(true) in the main method to enable logErr calls
