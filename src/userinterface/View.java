@@ -16,7 +16,7 @@ import impresario.ControlRegistry;
 import impresario.IControl;
 import impresario.IModel;
 import impresario.IView;
-import Utilities.Utilities;
+import Utilities.Debug;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -125,28 +125,15 @@ public abstract class View
         }
 
         content.addColumn(0, label);
-        GridPane.setHalignment(label, HPos.RIGHT);
         content.addColumn(1, controlBox);
-    }
 
-    public void addContent(String name, Pane pane){
-        Label label = new Label(name);
-        label.setFont(LABEL_FONT);
-        label.setPrefHeight(pane.prefHeight(0));
-
-        pane.setPrefWidth(FIELD_WIDTH);
-
-        content.addColumn(0,label);
-        content.addColumn(1,pane);
-
-        GridPane.setHalignment(label,HPos.RIGHT);
+        GridPane.setHalignment(label, HPos.RIGHT);
         GridPane.setValignment(label, VPos.TOP);
     }
 
     // ***************
     // Footer methods
     // ***************
-
     /**
      * Adds a misc button to footer to return to ControllerView
      */
@@ -241,6 +228,7 @@ public abstract class View
     public TextFieldWrapper makeField(String prompt, boolean editable) {
         TextFieldWrapper field = new TextFieldWrapper(prompt);
         field.setEditable(editable);
+        field.setDisable(!editable);
         return field;
     }
     protected class TextFieldWrapper extends VBox{
@@ -328,7 +316,7 @@ public abstract class View
 
         picker.setOnAction(e -> {
             LocalDate date = picker.getValue();
-            Utilities.logErr("Selected date: " + date);
+            Debug.logErr("Selected date: " + date);
         });
         return picker;
     }
