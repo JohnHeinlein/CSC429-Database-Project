@@ -1,11 +1,11 @@
 // tabs=4
 //************************************************************
 //	COPYRIGHT 2009/2015 Sandeep Mitra and Michael Steves, The
-//    College at Brockport, State University of New York. - 
+//    College at Brockport, State University of New York. -
 //	  ALL RIGHTS RESERVED
 //
-// This file is the product of The College at Brockport and cannot 
-// be reproduced, copied, or used in any shape or form without 
+// This file is the product of The College at Brockport and cannot
+// be reproduced, copied, or used in any shape or form without
 // the express written consent of The College at Brockport.
 //************************************************************
 //
@@ -18,7 +18,6 @@ import impresario.IModel;
 import impresario.IView;
 import Utilities.Debug;
 import javafx.beans.value.ChangeListener;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
@@ -30,13 +29,13 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.util.StringConverter;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Properties;
 
-//==============================================================
 public abstract class View
         extends Group
         implements IView, IControl {
@@ -52,6 +51,10 @@ public abstract class View
     private final Font LABEL_FONT = new Font(DEFAULT_FONT, 18);
     private final double FIELD_WIDTH = 300.0;
 
+    private Properties props; //Collects information from input fields for submission
+    private HashMap<String,Control> controlList; //Keeps track of what content is a control
+    private String viewName; //Debugging purposes
+
     // Class constructor
     //----------------------------------------------------------
     public View(IModel model, String classname) {
@@ -62,6 +65,10 @@ public abstract class View
         header = new VBox();
         footer = new HBox();
         content = new GridPane();
+
+        controlList = new HashMap<String,Control>();
+        props = new Properties();
+        viewName = classname; //Debugging purposes
 
         //Header
         header.setAlignment(Pos.CENTER);
@@ -122,6 +129,20 @@ public abstract class View
         for (Region control : controls) {
             control.setPrefWidth(FIELD_WIDTH / controls.length); //Scale width to fill space
             controlBox.getChildren().add(control);
+
+            switch(control.getClass().toString()){
+                case "class javafx.scene.control.ComboBox":
+                case "class javafx.scene.control.DatePicker":
+                    controlList.put(name, (Control)control);
+                    break;
+                case "class userinterface.View$TextFieldWrapper":
+                    controlList.put(name, ((TextFieldWrapper)control).getField());
+                    break;
+                case "class userinterface.View$NotesFieldWrapper":
+                    controlList.put(name, ((NotesFieldWrapper)control).getField());
+                    break;
+            }
+            props.put(name,"");
         }
 
         content.addColumn(0, label);
@@ -129,6 +150,8 @@ public abstract class View
 
         GridPane.setHalignment(label, HPos.RIGHT);
         GridPane.setValignment(label, VPos.TOP);
+
+        Debug.logMsg("(" + viewName + ") Added \"" + name + "\". Controls: " + controlList.size());
     }
 
     // ***************
@@ -149,9 +172,33 @@ public abstract class View
     /**
      * Adds a submit button to footer to return to ControllerView
      */
-    public void submitButton(String state, Object prop) {
+    public void submitButton(String state) {
         Button submitButton = makeButt("Submit",e -> {
-            myModel.stateChangeRequest(state, prop);
+            for(String field : controlList.keySet()){
+                Control control = controlList.get(field);
+                Debug.logMsg("Extracting input from " + control.getClass().toString());
+                switch(control.getClass().toString()){
+                    case "class javafx.scene.control.ComboBox":
+                        props.put(field,((ComboBox<String>)control).getValue());
+                        break;
+                    case "class javafx.scene.control.DatePicker":
+                        props.put(field, ((DatePicker)control).getConverter().toString());
+                        break;
+                    case "class javafx.scene.control.TextField":
+                        props.put(field, ((TextField)control).getText());
+                        break;
+                    case "class javafx.scene.control.TextArea":
+                        props.put(field, ((TextArea)control).getText());
+                        break;
+                }
+            }
+            Debug.logMsg("\nFields queried:\n\t"
+                    + controlList.toString()
+                        .replaceAll(",",",\n\t")
+                        .replaceAll("@[^},]*","") //Exclude memory address (trust me)
+                    + "\nProperties retrieved:\n\t"
+                            + props.toString().replaceAll(",",",\n\t"));
+            myModel.stateChangeRequest(state, props);
             clear();
         });
         submitButton.setStyle("-fx-background-color: lightgreen");
@@ -266,26 +313,36 @@ public abstract class View
         }
     }
 
-    public VBox makeNotesField(String prompt, int maxLength) {
-        VBox box = new VBox();
-        Label count = new Label("0/" + maxLength);
+    public NotesFieldWrapper makeNotesField(String prompt, int maxLength) {
+        return new NotesFieldWrapper(prompt, maxLength);
+    }
+    protected class NotesFieldWrapper extends VBox{
+        private TextArea field;
+        private Label label;
 
-        TextArea field = new TextArea();
-        field.setPromptText(prompt);
-        field.setPrefColumnCount(80);
-        field.setPrefRowCount((int) Math.ceil(maxLength / 80.0));
-        field.setWrapText(true);
-        field.setFont(new Font(DEFAULT_FONT, 12));
-        field.textProperty().addListener((observableValue, s, t1) -> {
-            if (field.getText().length() >= maxLength)
-                field.setText(field.getText().substring(0, maxLength));
-            count.setText(field.getText().length() + "/" + maxLength);
-        });
+        public NotesFieldWrapper(String prompt, int maxLength){
+            label = new Label();
 
-        box.getChildren().addAll(field, count);
-        box.setAlignment(Pos.CENTER_LEFT);
+            field = new TextArea();
+            field.setPromptText(prompt);
+            field.setPrefColumnCount(80);
+            field.setPrefRowCount((int) Math.ceil(maxLength / 80.0));
+            field.setWrapText(true);
+            field.setFont(new Font(DEFAULT_FONT, 12));
+            field.textProperty().addListener((observableValue, s, t1) -> {
+                if (field.getText().length() >= maxLength)
+                    field.setText(field.getText().substring(0, maxLength));
+                label.setText(field.getText().length() + "/" + maxLength);
+            });
 
-        return box;
+
+            getChildren().addAll(field,label);
+            setAlignment(Pos.CENTER_LEFT);
+        }
+
+        public TextArea getField(){
+            return field;
+        }
     }
 
     // Give any number of string options. The first will be the default.
@@ -362,4 +419,3 @@ public abstract class View
         myRegistry.unSubscribe(key, subscriber);
     }
 }
-
