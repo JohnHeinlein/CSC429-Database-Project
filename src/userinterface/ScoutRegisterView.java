@@ -35,7 +35,7 @@ public class ScoutRegisterView extends View{
         addContent("Status",
                 makeComboBox("Active", "Inactive"));
 
-        submitButton("ScoutRegisterSubmit", null);
+        submitButton("ScoutRegisterSubmit");
         cancelButton();
     }
     @Override

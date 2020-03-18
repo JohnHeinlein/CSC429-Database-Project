@@ -8,7 +8,7 @@ public class TreeTypeUpdateView extends View{
 
         setTitle("Update a Tree Type");
 
-        submitButton("TreeTypeUpdateSubmit", null);
+        submitButton("TreeTypeUpdateSubmit");
         cancelButton();
     }
 

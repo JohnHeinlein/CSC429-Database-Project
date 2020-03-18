@@ -24,7 +24,7 @@ public class TreeSellView extends View{
         addContent("Customer Email",
                 makeField("Customer Email"));
 
-        submitButton("TreeSellSubmit", null);
+        submitButton("TreeSellSubmit");
         cancelButton();
     }
 

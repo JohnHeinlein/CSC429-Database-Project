@@ -11,7 +11,7 @@ public class ShiftCloseView extends View{
         addContent("",
                 makeScrollPane("", ""));
 
-        submitButton("ShiftCloseSubmit", null);
+        submitButton("ShiftCloseSubmit");
         cancelButton();
     }
 

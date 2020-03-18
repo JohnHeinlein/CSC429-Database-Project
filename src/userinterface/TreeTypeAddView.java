@@ -17,7 +17,7 @@ public class TreeTypeAddView extends View{
         addContent("Cost",
                 makeField("Cost"));
 
-        submitButton("TreeTypeAddSubmit", null);
+        submitButton("TreeTypeAddSubmit");
         cancelButton();
     }
 

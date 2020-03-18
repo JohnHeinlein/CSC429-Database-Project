@@ -7,7 +7,6 @@ import model.TreeType;
 public class TreeAddView extends View {
     public TreeAddView(IModel model) {
         super (model, "TreeAddView");
-        TreeType types = new TreeType();
 
         setTitle("Add a Tree");
 
@@ -16,9 +15,8 @@ public class TreeAddView extends View {
 
         barcodeField.setListener(((observableValue, oldVal, newVal) -> {
             if(newVal.length() == 2){
-                // I'm not sure how to get the table other than through an instance variable.
                 // TODO: This certainly breaks spec. Fix it later.
-                typeField.getField().setText(types.getType(newVal));
+                typeField.getField().setText(TreeType.getType(newVal));
             }else if(newVal.length() < 2){
                 typeField.getField().setText("");
             }
@@ -40,10 +38,13 @@ public class TreeAddView extends View {
         addContent("Type",
                 typeField);
 
+        addContent("Notes",
+                makeNotesField("Notes", 100)); //TODO: Get max length from schema
+
         addContent("Status",
                 makeComboBox("Active", "Inactive"));
 
-        submitButton("TreeAddSubmit", null);
+        submitButton("TreeAddSubmit");
         cancelButton();
     }
 
