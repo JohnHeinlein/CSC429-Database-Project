@@ -69,13 +69,13 @@ public class JDBCBroker {
             // load and register the JDBC driver classes
             theDriver = (Driver) Class.forName(driverClassName).newInstance();
         } catch (ClassNotFoundException exc) {
-            System.err.println("JDBCBroker.JDBCBroker - Could not load driver class: ClassNotFoundException");
+            Debug.logErr("Could not load driver class: ClassNotFoundException");
             new Event(Event.getLeafLevelClassName(this), "JDBCBroker", "Could not load driver class[" + driverClassName + "]", Event.ERROR);
         } catch (InstantiationException exc) {
-            System.err.println("JDBCBroker.JDBCBroker - Could not load driver class: InstantiationException");
+            Debug.logErr("Could not load driver class: InstantiationException");
             new Event(Event.getLeafLevelClassName(this), "JDBCBroker", "Could not load driver class[" + driverClassName + "]", Event.ERROR);
         } catch (IllegalAccessException exc) {
-            System.err.println("JDBCBroker.JDBCBroker - Could not load driver class: IllegalAccessException");
+            Debug.logErr("Could not load driver class: IllegalAccessException");
             new Event(Event.getLeafLevelClassName(this), "JDBCBroker", "Could not load driver class[" + driverClassName + "]", Event.ERROR);
         }
     }
@@ -100,14 +100,15 @@ public class JDBCBroker {
                 && (dbName != null) && (username != null) && (password != null)) {
             try {
                 //theDBConnection = DriverManager.getConnection("jdbc:mysql://dingusdong.us:3306/csc429_group_john","john","reallygoodpassword");
-                System.out.println("Connecting to database...");
+                Debug.logMsg("Connecting to database...");
                 theDBConnection = theDriver.connect("jdbc:mysql://192.168.1.97:3306/csc429_group_john?user=john&password=reallygoodpassword", null);
-                if (theDBConnection == null) Debug.logErr("No database connection");
+                if (theDBConnection == null)
+                    Debug.logErr("Could not connect to database!");
             } catch (SQLException exc) {
-                System.err.println("JDBCBroker.getConnection - Could not connect to database!" + "\n" + exc.getMessage());
+                Debug.logErr("Could not connect to database! (SQL Exception)" + "\n" + exc.getMessage());
             }
         }
-        //System.out.println("JDBCBroker.getConnection() with connection " + theDBConnection);
+        Debug.logMsg("Connection: " + theDBConnection);
         return theDBConnection;
     }
 

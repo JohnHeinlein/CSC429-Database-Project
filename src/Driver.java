@@ -14,7 +14,8 @@ public class Driver{
         public void start(Stage primaryStage) {
             System.out.println("CSC429 Project 1.00");
             if(Debug.setDebug(true)){
-                System.out.println("Debugging enabled");
+                //System.out.println("Debugging enabled");
+                Debug.logErr("Debugging enabled");
             }
 
             MainStageContainer.setStage(primaryStage, "Christmas Tree Sales System");

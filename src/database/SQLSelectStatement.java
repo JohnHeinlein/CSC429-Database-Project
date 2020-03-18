@@ -26,6 +26,8 @@
 package database;
 
 // system imports
+import Utilities.Debug;
+
 import java.util.Enumeration;
 import java.util.Properties;
 
@@ -51,14 +53,9 @@ public class SQLSelectStatement extends SQLStatement {
         Enumeration<?> fields = schema.propertyNames();
         while (fields.hasMoreElements()) {
             String field = (String) fields.nextElement();
-
-            System.out.println("Field: " + field);
-
             if (!field.equals("TableName")) // skip the leading comma if we're at the beginning
                 theSQLStatement += ((theSQLStatement.length() > 7)? ", " : "") + field;
         }
-        System.out.println("Enumeration parse result: " + theSQLStatement);
-
         // add the tablename
         theSQLStatement += " FROM " + schema.getProperty("TableName");
 
@@ -93,7 +90,7 @@ public class SQLSelectStatement extends SQLStatement {
             }
         }
         theSQLStatement += theWhereString + ";";
-        System.out.println("SQL Select statement: " + theSQLStatement);
+        Debug.logMsg("Generated SELECT statement: \"" + theSQLStatement + "\"");
     }
 
 }
