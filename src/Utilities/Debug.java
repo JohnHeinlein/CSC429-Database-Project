@@ -13,6 +13,10 @@ public class Debug {
         return debug;
     }
 
+    public static void logMsg(String messasge) {
+        System.out.println(messasge);
+    }
+
     /**
      * Prints the class and method name this function is called from, plus a message
      * @param msg Message to append to stack trace

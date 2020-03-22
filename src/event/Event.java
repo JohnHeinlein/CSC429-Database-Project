@@ -187,6 +187,7 @@ public class Event {
         int lastIndexOfPeriod = fullClassName.lastIndexOf('.');
         if (lastIndexOfPeriod >= 0) {
             int fullClassNameLen = fullClassName.length();
+
             if ((lastIndexOfPeriod + 1) >= fullClassNameLen)
                 return fullClassName;
             else
@@ -275,8 +276,7 @@ public class Event {
     public String getTime() {
         // create a timestamp
         Calendar rightNow = Calendar.getInstance(new Locale("en", "US"));
-        String timebuf = DateFormat.getDateInstance(DateFormat.SHORT, new Locale("en", "US")).format(rightNow.getTime());
-        return (timebuf);
+        return (DateFormat.getDateInstance(DateFormat.SHORT, new Locale("en", "US")).format(rightNow.getTime()));
 
     }
 

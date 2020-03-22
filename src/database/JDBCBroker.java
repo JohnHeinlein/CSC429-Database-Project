@@ -45,25 +45,20 @@ public class JDBCBroker {
     // Single broker to be shared by all other Servlets
     private static JDBCBroker myInstance = null;
     private static Connection theDBConnection = null;
-    private PropertyFile props;
 
     // DB Access data
     private String dbName;
     private String username;
     private String password;
-    private String server;
 
     // private constructor for singleton
     //----------------------------------------------------------
     protected JDBCBroker() {
         // DEBUG: System.out.println("JDBCBroker.JDBCBroker()");
-        props = new PropertyFile("dbConfig.ini");
+        PropertyFile props = new PropertyFile("dbConfig.ini");
         dbName = props.getProperty("dbName");
         username = props.getProperty("username");
         password = props.getProperty("password");
-        server = props.getProperty("server");
-        if (server == null)
-            server = "localhost";
         String driverClassName = "com.mysql.jdbc.Driver";
         try {
             // load and register the JDBC driver classes

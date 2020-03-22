@@ -60,7 +60,7 @@ public class SQLSelectStatement extends SQLStatement {
         theSQLStatement += " FROM " + schema.getProperty("TableName");
 
         // Construct the WHERE part of the SQL statement
-        String theWhereString = "";
+        StringBuilder theWhereString = new StringBuilder();
 
         // Now, traverse the WHERE clause Properties object
         if (whereValues != null) {
@@ -69,27 +69,27 @@ public class SQLSelectStatement extends SQLStatement {
                 String theFieldName = (String) theWhereFields.nextElement();
                 String theFieldValue = insertEscapes(whereValues.getProperty(theFieldName));
 
-                    if (theFieldValue.length() > 0){        // Exclude empty strings
-                    String theConjunctionClause = (theWhereString.equals(""))?
-                            " WHERE ":
-                            " AND ";
+                // Exclude empty strings
+                if (theFieldValue.length() > 0) {
+                    String theConjunctionClause = (theWhereString.toString().equals("")) ? " WHERE ": " AND ";
 
                     if (theFieldValue.equals("NULL")) {
-                        theWhereString += theConjunctionClause + theFieldName + " IS NULL";
+                        theWhereString.append(theConjunctionClause).append(theFieldName).append(" IS NULL");
                     } else {
                         // extract the type from the schema
                         String actualType = schema.getProperty(theFieldName);
 
-                        theWhereString += theConjunctionClause + theFieldName + " = " +
-                                ((actualType != null && actualType.equals("numeric"))?
-                                    theFieldValue:
-                                    "'" + theFieldValue + "'");
+                        theWhereString.append(theConjunctionClause)
+                                .append(theFieldName)
+                                .append(" = ")
+                                .append((actualType != null && actualType.equals("numeric"))
+                                        ? theFieldValue
+                                        : "'" + theFieldValue + "'");
                     }
-
                 }
             }
         }
-        theSQLStatement += theWhereString + ";";
+        theSQLStatement += theWhereString.append(";");
         Debug.logMsg("Generated SELECT statement: \"" + theSQLStatement + "\"");
     }
 

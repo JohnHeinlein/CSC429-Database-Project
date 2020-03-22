@@ -534,10 +534,8 @@ abstract public class Persistable {
 
             return autoIncKey;
         } catch (SQLException sqle) {
-//			DEBUG: System.err.println( "Persistable.insertAutoIncrementalPersistentState: An SQL Error Occurred: SQL State: " + sqle.getSQLState() + "; Error Code = " + sqle.getErrorCode() + "; Message: " + sqle.getMessage() + "\n" + sqle);
             new Event(Event.getLeafLevelClassName(this), "insertAutoIncrementalPersistentState", "SQL Exception: "
                     + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
-            //return new Integer(28);
             throw sqle;
 
         } finally {
@@ -623,7 +621,6 @@ abstract public class Persistable {
             // return result is of type integer which indicates the number of rows updated
             return theStatement.executeUpdate(theSQLStatement.toString());
         } catch (SQLException sqle) {
-//			DEBUG: 
             System.err.println("An SQL Error Occured:" + sqle + "\n" + sqle.getErrorCode() + "\n" + sqle.getMessage() + "\n" + sqle);
             new Event(Event.getLeafLevelClassName(this), "deletePersistentState", "SQL Exception: " + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
             throw sqle;

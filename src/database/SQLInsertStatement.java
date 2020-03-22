@@ -77,9 +77,8 @@ public class SQLInsertStatement extends SQLStatement {
             }
         }
 
-        if (!theValuesString.toString().equals("") && !theColumnNamesList.toString().equals(""))
         // this must be the case for an insert statement
-        {
+        if (!theValuesString.toString().equals("") && !theColumnNamesList.toString().equals("")) {
             theValuesString.append(" ) ");
             theColumnNamesList.append(" ) ");
         }

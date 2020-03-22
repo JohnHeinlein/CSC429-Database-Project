@@ -36,13 +36,11 @@ import java.util.Enumeration;
  *  by commas (no spaces).
  */
 //--------------------------------------------------------------
-public class StringList implements Enumeration {
+public class StringList implements Enumeration<String> {
     /** The delimeter for elements in the list */
     private char delimiter = ',';
     /** Reference to the string */
     private String myString;
-    /** The current token */
-    private String myToken = null;
     /** Index bounds of current token */
     private int start, end;
 
@@ -106,8 +104,9 @@ public class StringList implements Enumeration {
      * @return Object indicating the next element retrieved from list
      */
     //----------------------------------------------------------
-    public Object nextElement() {
-        myToken = null;
+    public String nextElement() {
+        // The current token
+        String myToken = null;
 
         if (myString != null) {
             end = myString.indexOf(delimiter, start);

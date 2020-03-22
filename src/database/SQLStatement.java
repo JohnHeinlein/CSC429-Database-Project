@@ -28,11 +28,9 @@ package database;
 // Beginning of DatabaseManipulator class
 //---------------------------------------------------------------------------------------------------------
 public abstract class SQLStatement {
-    // constants used for parsing statements
-    private final char characterToEscape = '\'';
-    private final String escapeString = "\\";
-    protected String theSQLStatement;        // contains the resulting SQL statement
 
+    // contains the resulting SQL statement
+    protected String theSQLStatement;
 
     /**
      * In order to facilitate having apostrophe's in the data in the DB table
@@ -45,13 +43,15 @@ public abstract class SQLStatement {
         // define our local data and constants
         StringBuilder outString = new StringBuilder();
         int inStringLen = inString.length();
+        // constants used for parsing statements
+        char characterToEscape = '\'';
         int indexOfEscapeChar = inString.indexOf(characterToEscape);
         boolean allDone = (indexOfEscapeChar == -1);
 
-        while (!allDone) // in other words, there is still an escape char to handle
-        {
+        // in other words, there is still an escape char to handle
+        while (!allDone) {
             String prefix = inString.substring(0, indexOfEscapeChar);
-            outString.append(prefix).append(escapeString).append(inString.charAt(indexOfEscapeChar));
+            outString.append(prefix).append("\\").append(inString.charAt(indexOfEscapeChar));
 
             if (indexOfEscapeChar + 1 >= inStringLen) {
                 allDone = true;

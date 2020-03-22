@@ -47,8 +47,8 @@ public class ControlRegistry extends Registry {
 
     // Class constructor
     //----------------------------------------------------------
-    public ControlRegistry(String classname)    // the name of the class that contains this Registry, debug only
-    {
+    // the name of the class that contains this Registry, debug only
+    public ControlRegistry(String classname) {
         super(classname);    // construct our base class
     }
 
@@ -63,14 +63,11 @@ public class ControlRegistry extends Registry {
      */
     //----------------------------------------------------------
     public void updateSubscribers(String key, Object value) {
-        // DEBUG: System.out.println("ControlRegistry.updateSubscribers - " + key + ", value " + value);
-
         // Get all subscribers to this key
         Object tempObj = mySubscribers.get(key);
 
         // make sure we have subscribers
         if (tempObj == null) {
-            // DEBUG: System.out.println("ControlRegistry[" + myClassName + "].updateSubscribers - no subscribers found for dependency " + dependProperty);
             return;
         }
 
