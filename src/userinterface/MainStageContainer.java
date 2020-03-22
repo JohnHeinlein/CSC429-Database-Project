@@ -12,22 +12,18 @@
 // specify the package
 package userinterface;
 
-// system imports
-
 import javafx.stage.Stage;
-
-// project imports
 
 /**
  * The main stage for the Brockport GUI applications.
  * All scenes are inside this one stage only.
  */
 public class MainStageContainer {
-    // data members
 
     private static Stage myInstance = null;
 
     private MainStageContainer() {
+
     }
 
     public static Stage getInstance() {
@@ -39,9 +35,4 @@ public class MainStageContainer {
         myInstance.setTitle(title);
         myInstance.setResizable(false);
     }
-
 }
-
-
-
-

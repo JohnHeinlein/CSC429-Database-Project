@@ -25,12 +25,8 @@
 // specify the package
 package impresario;
 
-// system imports
-
-// local includes
-
-//==============================================================
 public interface IControl {
+
     // associate a Model to a Control object
     void subscribe(String key, IModel subscriber);        // for updating Models
 

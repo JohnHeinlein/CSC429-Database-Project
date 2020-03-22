@@ -26,13 +26,11 @@
 // specify the package
 package database;
 
-// system imports
 import java.util.Enumeration;
 import java.util.Properties;
 
-// Beginning of DatabaseManipulator class
-//---------------------------------------------------------------------------------------------------------
 public class SQLInsertStatement extends SQLStatement {
+
     /**
      *
      * This handles only equality in the WHERE clause. This also
@@ -41,10 +39,7 @@ public class SQLInsertStatement extends SQLStatement {
      * indicator will be provided. For text types, no entry in this
      * Properties object is necessary.
      */
-    //------------------------------------------------------------
-    public SQLInsertStatement(Properties schema,        // the name of the table to insert into
-                              Properties insertValues)    // the values to insert
-    {
+    public SQLInsertStatement(Properties schema, Properties insertValues) {
         // Begin construction of the actual SQL statement
         theSQLStatement = "INSERT INTO " + schema.getProperty("TableName");
 
@@ -86,7 +81,6 @@ public class SQLInsertStatement extends SQLStatement {
         theSQLStatement += theColumnNamesList.append(theValuesString).append(";");
     }
 }
-
 
 //---------------------------------------------------------------
 //	Revision History:

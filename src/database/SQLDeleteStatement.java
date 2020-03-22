@@ -25,12 +25,9 @@
 // specify the package
 package database;
 
-// system imports
 import java.util.Enumeration;
 import java.util.Properties;
 
-// Beginning of DatabaseManipulator class
-//---------------------------------------------------------------------------------------------------------
 public class SQLDeleteStatement extends SQLStatement {
     /**
      *
@@ -40,16 +37,9 @@ public class SQLDeleteStatement extends SQLStatement {
      * indicator will be provided. For text types, no entry in this
      * Properties object is necessary.
      */
-    //------------------------------------------------------------
-    public SQLDeleteStatement(Properties schema,        // the table schema
-                              Properties whereValues    // the values to delete
-    ) {
-        super();    // implicit, doesn't do anything, but what the hell
-
-        // Begin construction of the actual SQL statement
+    public SQLDeleteStatement(Properties schema, Properties whereValues) {
         theSQLStatement = "DELETE FROM " + schema.getProperty("TableName");
 
-        // Construct the WHERE part of the SQL statement
         StringBuilder theWhereString = new StringBuilder();
 
         // Now, traverse the WHERE clause Properties object
@@ -69,8 +59,8 @@ public class SQLDeleteStatement extends SQLStatement {
                     theWhereString.append(theColumnName).append(" IS NULL");
                 } else {
                     String actualType = "Text";
-
                     String whereTypeValue = schema.getProperty(theColumnName);
+
                     if (whereTypeValue != null) {
                         actualType = whereTypeValue;
                     }
@@ -81,7 +71,6 @@ public class SQLDeleteStatement extends SQLStatement {
                         theWhereString.append(theColumnName).append(" = ").append(theColumnValue);
                     } else {
                         theWhereString.append(theColumnName).append(" = '").append(theColumnValue).append("'");
-
                     }
                 }
             }

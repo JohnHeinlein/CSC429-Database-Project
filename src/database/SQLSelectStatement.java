@@ -25,17 +25,13 @@
 // specify the package
 package database;
 
-// system imports
-import Utilities.Debug;
+import utilities.Debug;
 
 import java.util.Enumeration;
 import java.util.Properties;
 
-// project imports
-
-// Beginning of DatabaseManipulator class
-//---------------------------------------------------------------------------------------------------------
 public class SQLSelectStatement extends SQLStatement {
+
     /**
      * This handles only equality in the WHERE clause. This also 
      * expects that for numeric types in the WHERE clause, a separate
@@ -43,9 +39,7 @@ public class SQLSelectStatement extends SQLStatement {
      * indicator will be provided. For text types, no entry in this
      * Properties object is necessary.
      */
-    //------------------------------------------------------------
-    public SQLSelectStatement(Properties schema,
-                              Properties whereValues) {
+    public SQLSelectStatement(Properties schema, Properties whereValues) {
         // Begin construction of the actual SQL statement
         theSQLStatement = "SELECT ";
 
@@ -54,7 +48,7 @@ public class SQLSelectStatement extends SQLStatement {
         while (fields.hasMoreElements()) {
             String field = (String) fields.nextElement();
             if (!field.equals("TableName")) // skip the leading comma if we're at the beginning
-                theSQLStatement += ((theSQLStatement.length() > 7)? ", " : "") + field;
+                theSQLStatement += ((theSQLStatement.length() > 7) ? ", " : "") + field;
         }
         // add the tablename
         theSQLStatement += " FROM " + schema.getProperty("TableName");
@@ -92,9 +86,7 @@ public class SQLSelectStatement extends SQLStatement {
         theSQLStatement += theWhereString.append(";");
         Debug.logMsg("Generated SELECT statement: \"" + theSQLStatement + "\"");
     }
-
 }
-
 
 //---------------------------------------------------------------
 //	Revision History:

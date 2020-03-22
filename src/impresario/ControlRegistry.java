@@ -25,13 +25,10 @@
 // specify the package
 package impresario;
 
-// system imports
 import event.Event;
 
 import java.util.Enumeration;
 import java.util.Vector;
-
-// project imports
 
 /**
  * This class is used to instantiate the object that is encapsulated
@@ -41,17 +38,12 @@ import java.util.Vector;
  * this class' methods are used to update the GUI controls that subscribe to
  * the keys that depend on the key on which the state change is posted.
  */
-//==============================================================
 public class ControlRegistry extends Registry {
-    // data members
 
-    // Class constructor
-    //----------------------------------------------------------
     // the name of the class that contains this Registry, debug only
     public ControlRegistry(String classname) {
         super(classname);    // construct our base class
     }
-
 
     /**
      * This method invokes the stateChangeRequest method on all IModels that
@@ -61,7 +53,6 @@ public class ControlRegistry extends Registry {
      *
      * @param    value    The value of the key that has changed
      */
-    //----------------------------------------------------------
     public void updateSubscribers(String key, Object value) {
         // Get all subscribers to this key
         Object tempObj = mySubscribers.get(key);
@@ -82,7 +73,7 @@ public class ControlRegistry extends Registry {
                     System.err.println("ControlRegistry.updateSubscribers - Invalid Subscriber type!");
                 }
             });
-        } else    // we must have a single subscriber
+        } else {   // we must have a single subscriber
             // If not, use the standard update via a key-value pair
             if (tempObj instanceof IModel) {
                 // DEBUG: System.out.println("Changeable [" + key + "] " + dependProperty + ": " + client.getValue(dependProperty));
@@ -91,9 +82,9 @@ public class ControlRegistry extends Registry {
                 new Event(Event.getLeafLevelClassName(this), "UpdateSubscribers", "EVT_InvalidSubscriber", "Invalid Subscriber: " + tempObj.getClass(), Event.WARNING);
                 System.err.println("ControlRegistry.updateSubscribers - Invalid Subscriber type!");
             }
+        }
     }
 }
-
 
 //**************************************************************
 //	Revision History:

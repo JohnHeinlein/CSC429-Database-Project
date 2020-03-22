@@ -12,21 +12,14 @@
 // specify the package
 package userinterface;
 
-// system imports
-
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
-// project imports
-
-//==============================================================
 public class MessageView extends Text {
 
-    // Class constructor
-    //----------------------------------------------------------
     public MessageView(String initialMessage) {
         super(initialMessage);
         setFont(Font.font("Helvetica", FontWeight.BOLD, 16));
@@ -37,7 +30,6 @@ public class MessageView extends Text {
     /**
      * Display ordinary message
      */
-    //----------------------------------------------------------
     public void displayMessage(String message) {
         // display the passed text in red
         setFill(Color.BLUE);
@@ -47,7 +39,6 @@ public class MessageView extends Text {
     /**
      * Display error message
      */
-    //----------------------------------------------------------
     public void displayErrorMessage(String message) {
         // display the passed text in red
         setFill(Color.RED);
@@ -57,13 +48,7 @@ public class MessageView extends Text {
     /**
      * Clear error message
      */
-    //----------------------------------------------------------
     public void clearErrorMessage() {
         setText("                           ");
     }
-
-
 }
-
-
-

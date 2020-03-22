@@ -25,12 +25,8 @@
 // specify the package
 package impresario;
 
-// system imports
-
-// local includes
-
-//==============================================================
 public interface IModel {
+
     /** A method that View objects can use for their construction */
     Object getState(String key);
 

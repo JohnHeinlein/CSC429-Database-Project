@@ -5,6 +5,7 @@ import javafx.scene.layout.VBox;
 import model.TreeType;
 
 public class TreeAddView extends View {
+
     public TreeAddView(IModel model) {
         super (model, "TreeAddView");
 

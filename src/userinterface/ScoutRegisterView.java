@@ -38,6 +38,7 @@ public class ScoutRegisterView extends View{
         submitButton("ScoutRegisterSubmit");
         cancelButton();
     }
+
     @Override
     public void updateState(String key, Object value) {
 

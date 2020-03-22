@@ -25,13 +25,11 @@
 // specify the package
 package database;
 
-// system imports
 import java.util.Enumeration;
 import java.util.Properties;
 
-// Beginning of DatabaseManipulator class
-//---------------------------------------------------------------------------------------------------------
 public class SQLQueryStatementWithExactMatches extends SQLStatement {
+
     /**
      *
      * This handles only equality in the WHERE clause. This also 
@@ -40,10 +38,7 @@ public class SQLQueryStatementWithExactMatches extends SQLStatement {
      * indicator will be provided. For text types, no entry in this
      * Properties object is necessary.
      */
-    //------------------------------------------------------------
-    public SQLQueryStatementWithExactMatches(Properties selSchema,
-                                             Properties projectionSchema,
-                                             Properties selectionValues) {
+    public SQLQueryStatementWithExactMatches(Properties selSchema, Properties projectionSchema, Properties selectionValues) {
         // Begin construction of the actual SQL statement
         theSQLStatement = "SELECT ";
 
@@ -114,7 +109,6 @@ public class SQLQueryStatementWithExactMatches extends SQLStatement {
         theSQLStatement += theWhereString.append(";");
     }
 }
-
 
 //---------------------------------------------------------------
 //	Revision History:

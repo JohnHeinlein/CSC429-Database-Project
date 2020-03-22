@@ -24,19 +24,15 @@
 // specify the package
 package common;
 
-// system imports
-
 import java.util.Enumeration;
-
-// local imports
 
 /** This class handles a string which contains embedded strings. 
  *  The enumeration interface is implemented to provide access 
  *  to string elements.	The tokens are assumed to be separated 
  *  by commas (no spaces).
  */
-//--------------------------------------------------------------
 public class StringList implements Enumeration<String> {
+
     /** The delimeter for elements in the list */
     private char delimiter = ',';
     /** Reference to the string */
@@ -48,7 +44,6 @@ public class StringList implements Enumeration<String> {
      *
      * @param    str        The comma-separated String to convert to an object of this type
      */
-    //----------------------------------------------------------
     public StringList(String str) {
         // assign the reference
         myString = str;
@@ -62,7 +57,6 @@ public class StringList implements Enumeration<String> {
      * @param    str        The comma-separated String to convert to an object of this type
      * @param    del        delimiter used for parsing the list
      */
-    //----------------------------------------------------------
     public StringList(String str, char del) {
         // assign the reference
         myString = str;
@@ -77,14 +71,12 @@ public class StringList implements Enumeration<String> {
      *
      * @return int value returning the length of the string
      */
-    //----------------------------------------------------------
     public int length() {
         return myString == null ? 0 : myString.length();
     }
 
 
     /** Return the string version of our string(?) */
-    //----------------------------------------------------------
     public String toString() {
         return myString;
     }
@@ -93,7 +85,6 @@ public class StringList implements Enumeration<String> {
      *
      * @return boolean value indicating whether there are more elements in the list (or not)
      */
-    //----------------------------------------------------------
     public boolean hasMoreElements() {
         return myString != null && start < myString.length();
     }
@@ -103,23 +94,22 @@ public class StringList implements Enumeration<String> {
      *
      * @return Object indicating the next element retrieved from list
      */
-    //----------------------------------------------------------
     public String nextElement() {
-        // The current token
         String myToken = null;
 
         if (myString != null) {
             end = myString.indexOf(delimiter, start);
             // make sure we handle the end of the string correctly
-            if (end < 0)
+            if (end < 0) {
                 end = myString.length();
+            }
+
             myToken = myString.substring(start, end);
             start = end + 1;
         }
         return myToken;
     }
 }
-
 
 //**************************************************************
 //	Revision History:

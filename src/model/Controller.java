@@ -1,6 +1,5 @@
 package model;
 
-import Utilities.Utilities;
 import impresario.IModel;
 import impresario.IView;
 import impresario.ModelRegistry;
@@ -10,25 +9,22 @@ import userinterface.MainStageContainer;
 import userinterface.View;
 import userinterface.ViewFactory;
 import userinterface.WindowPosition;
-import Utilities.Debug;
+import utilities.Debug;
 
 import java.util.Hashtable;
 import java.util.Properties;
 
 public class Controller implements IView, IModel {
+
     private Properties dependencies;
     private ModelRegistry myRegistry; // What even is this
-
-    //Collections
-
-    //
 
     private Hashtable<String, Scene> myViews;
     private Stage myStage;
 
     public Controller() {
         myStage = MainStageContainer.getInstance();
-        myViews = new Hashtable<String, Scene>();
+        myViews = new Hashtable<>();
         myRegistry = new ModelRegistry("Controller");
 
         setDependencies();

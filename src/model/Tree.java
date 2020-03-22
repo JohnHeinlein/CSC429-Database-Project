@@ -4,6 +4,7 @@ import java.util.Properties;
 import impresario.IView;
 
 public class Tree extends EntityBase implements IView {
+
     private static final String myTableName = "tree";
     private TreeType myType;
 

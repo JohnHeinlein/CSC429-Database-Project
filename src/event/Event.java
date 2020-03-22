@@ -23,21 +23,16 @@
 // specify the package
 package event;
 
-// system imports
-
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Locale;
-
-// project imports
 
 /**
  * The destination class for events in the system. The current 
  * implementation displays the events in a modal popup window.
  */
-//==============================================================
 public class Event {
-    // data members
+
     // Event level information
     public static final int DEBUG = 0;
     public static final int INFORMATION = 1;
@@ -47,14 +42,13 @@ public class Event {
     public static final int NUMBER_SEVERITY_LEVELS = 5;
 
     // String values corresponding to the various event levels
-    public static final String[] SeverityDescription =
-            {
-                    "Debug",
-                    "Information",
-                    "Warning",
-                    "Error",
-                    "Fatal",
-            };
+    public static final String[] SeverityDescription ={
+            "Debug",
+            "Information",
+            "Warning",
+            "Error",
+            "Fatal",
+    };
 
     /**
      * name of the source class
@@ -111,7 +105,6 @@ public class Event {
      *
      * @param    severity    Ordinal severity level for event
      */
-    //----------------------------------------------------------
     public Event(String source, String name, String description, final int severity) {
         // forward to another constructor, provide defaults
         this(source, name, "NOTAG", null, description, severity);
@@ -132,13 +125,11 @@ public class Event {
      * @param    severity    Ordinal severity level for event
      *
      */
-    //----------------------------------------------------------
     public Event(String source, String name, String tag, String description, final int severity) {
         // forward to another constructor, provide defaults
         this(source, name, tag, null, description, severity);
     }
 
-    //----------------------------------------------------------
     public Event(String source, String name, String tag, String params, String description, final int severity) {
         // create a timestamp
         Calendar rightNow = Calendar.getInstance(new Locale("en", "US"));
@@ -162,7 +153,6 @@ public class Event {
      *
      * @return int value indicating the ordinal value of the severity level
      */
-    //----------------------------------------------------------
     public static int getSeverityMapping(String level) {
         // cruise through the list of severity descriptions
         // and see if we can find a match
@@ -171,7 +161,7 @@ public class Event {
                 return (cnt);
 
         // no match, return lowest level - should never happen
-        return (0);
+        return 0;
     }
 
     /**
@@ -181,19 +171,20 @@ public class Event {
      *
      * @return String indicating leaf-level class name
      */
-    //----------------------------------------------------------------
     public static String getLeafLevelClassName(Object obj) {
         String fullClassName = (obj.getClass()).getName();
         int lastIndexOfPeriod = fullClassName.lastIndexOf('.');
         if (lastIndexOfPeriod >= 0) {
             int fullClassNameLen = fullClassName.length();
 
-            if ((lastIndexOfPeriod + 1) >= fullClassNameLen)
+            if ((lastIndexOfPeriod + 1) >= fullClassNameLen) {
                 return fullClassName;
-            else
+            } else {
                 return fullClassName.substring(lastIndexOfPeriod + 1);
-        } else
+            }
+        } else {
             return fullClassName;
+        }
     }
 
     /**
@@ -205,16 +196,14 @@ public class Event {
      * @return String value providing a displayable form of the event in a format
      *			which can be seen by looking at the code
      */
-    //----------------------------------------------------------
     public String toString() {
-        return ("[" + myTime + "]"
-                + "|" + myClass
-                + "|" + myMethod
-                + "|" + SeverityDescription[mySeverity]
-                + "|" + myTag
-                + "|" + myParams
-                + "<" + myDescription + ">"
-        );
+        return "[" + myTime + "]"
+             + "|" + myClass
+             + "|" + myMethod
+             + "|" + SeverityDescription[mySeverity]
+             + "|" + myTag
+             + "|" + myParams
+             + "<" + myDescription + ">";
     }
 
     /**
@@ -222,7 +211,6 @@ public class Event {
      *
      * @return String object indicating class name
      */
-    //----------------------------------------------------------
     public String getSource() {
         return myClass;
     }
@@ -232,7 +220,6 @@ public class Event {
      *
      * @return String object indicating the comma-separated parameter list
      */
-    //----------------------------------------------------------
     public String getParameters() {
         return myParams;
     }
@@ -242,7 +229,6 @@ public class Event {
      *
      * @return String object indicating the internationalization tag
      */
-    //----------------------------------------------------------
     public String getTag() {
         return myTag;
     }
@@ -252,7 +238,6 @@ public class Event {
      *
      * @return String object indicating method name
      */
-    //----------------------------------------------------------
     public String getName() {
         return myMethod;
     }
@@ -262,7 +247,6 @@ public class Event {
      *
      * @return String object indicating the plain English description
      */
-    //----------------------------------------------------------
     public String getDescription() {
         return myDescription;
     }
@@ -272,12 +256,10 @@ public class Event {
      *
      * @return String object containing the date and time of this event in US date format
      */
-    //----------------------------------------------------------
     public String getTime() {
         // create a timestamp
         Calendar rightNow = Calendar.getInstance(new Locale("en", "US"));
         return (DateFormat.getDateInstance(DateFormat.SHORT, new Locale("en", "US")).format(rightNow.getTime()));
-
     }
 
     /**
@@ -285,7 +267,6 @@ public class Event {
      *
      * @return String object indicating the severity level of this event
      */
-    //----------------------------------------------------------
     public String getSeverityDesc() {
         return SeverityDescription[mySeverity];
     }
@@ -295,13 +276,11 @@ public class Event {
      *
      * @return int value indicating the severity level of this event
      */
-    //----------------------------------------------------------
     public int getSeverity() {
         return mySeverity;
     }
 
     /** Not used */
-    //----------------------------------------------------------
     public String getStatus() {
         return SeverityDescription[mySeverity];
     }

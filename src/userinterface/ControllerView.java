@@ -26,7 +26,6 @@ public class ControllerView extends View{
                 makeButt("Register","ScoutRegister",null));
 
 
-        // --------------------
         // Final configuration
 
         setTitle("Tree Sales System");

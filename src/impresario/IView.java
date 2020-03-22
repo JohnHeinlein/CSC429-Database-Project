@@ -25,15 +25,10 @@
 // specify the package
 package impresario;
 
-// system imports
-
-// local includes
-
-//==============================================================
 public interface IView {
+
     // allows a Model to update our visual state
     void updateState(String key, Object value);
-
 }
 
 //**************************************************************

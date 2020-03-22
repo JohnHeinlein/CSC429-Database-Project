@@ -28,17 +28,12 @@
 // specify the package
 package impresario;
 
-// system imports
-
 import common.PropertyFile;
 import common.StringList;
 import event.Event;
 
-import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Vector;
-
-// project imports
 
 /**
  * This class is used to instantiate the object that is encapsulated
@@ -49,9 +44,7 @@ import java.util.Vector;
  * this class' methods are used to update the GUI controls that subscribe to
  * the keys that depend on the key on which the state change is posted.
  */
-//==============================================================
 public class ModelRegistry extends Registry {
-    // data members
 
     /** A list of keys that are dependant on other keys */
     private Properties myDependencies;
@@ -66,7 +59,6 @@ public class ModelRegistry extends Registry {
         // save our dependencies
         myDependencies = dependencies;
     }
-
 
     /**
      * @param classname the name of the class that contains this Registry, debug only
@@ -87,7 +79,6 @@ public class ModelRegistry extends Registry {
         myDependencies = new Properties();  // may be replaced later
     }
 
-
     /**
      * @param dependencies filename that contains the dependency information for keys
      */
@@ -106,14 +97,13 @@ public class ModelRegistry extends Registry {
      * @param    key        Value of key on which the state change was posted and whose
      *					dependencies must be determined
      */
-    //----------------------------------------------------------
     public void updateSubscribers(String key, IModel client) {
         // now update all the subscribers to the changed key
         StringList propertyList = new StringList(key + "," + myDependencies.getProperty(key));
 
         while (propertyList.hasMoreElements()) {
             // Pick out each dependant property from the list
-            String dependProperty = (String) propertyList.nextElement();
+            String dependProperty = propertyList.nextElement();
 
             // Get all subscribers to this dependant property
             Object tempObj = mySubscribers.get(dependProperty);
@@ -122,7 +112,6 @@ public class ModelRegistry extends Registry {
             if (tempObj == null) {
                 continue;
             }
-            if (tempObj == null) continue;
 
             // see if we have multiple subscribers
             if (tempObj instanceof Vector) {
@@ -135,18 +124,17 @@ public class ModelRegistry extends Registry {
                         new Event(Event.getLeafLevelClassName(this), "UpdateSubscribers", "EVT_InvalidSubscriber", "Vector Invalid Subscriber: " + subscriber.getClass(), Event.WARNING);
                     }
                 });
-            } else    // we must have a single subscriber
+            } else {    // we must have a single subscriber
                 // If not, use the standard update via a key-value pair
                 if (tempObj instanceof IView) {
                     ((IView) tempObj).updateState(dependProperty, client.getState(dependProperty));
                 } else {
                     new Event(Event.getLeafLevelClassName(this), "UpdateSubscribers", "EVT_InvalidSubscriber", "Invalid Subscriber: " + tempObj.getClass(), Event.WARNING);
                 }
+            }
         }
     }
-
 }
-
 
 //**************************************************************
 //	Revision History:

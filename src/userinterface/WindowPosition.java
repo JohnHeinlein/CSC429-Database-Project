@@ -8,31 +8,24 @@
 // Specify the package
 package userinterface;
 
-// system imports
-
 import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-
-// project imports
 
 /**
  * Provides a means of placing the main stage of the application
  * in the center of the screen, top left corner, bottom right
  * corner, top right corner, bottom left corner
  */
-//==============================================================
 public class WindowPosition {
-    private static Rectangle2D primaryScreenBounds =
-            Screen.getPrimary().getVisualBounds();
 
+    private static Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
 
     /**
      * Used to place the stage in the center of the screen
      *
      * @param    s    Stage to place at the center of the screen
      */
-    //--------------------------------------------------------------------------
     public static void placeCenter(Stage s) {
         if (s != null) {
             s.centerOnScreen();
@@ -44,7 +37,6 @@ public class WindowPosition {
      *
      * @param    s    Stage to place at the top left corner of the screen
      */
-    //--------------------------------------------------------------------------
     public static void placeTopLeft(Stage s) {
         if (s != null) {
             s.setX(primaryScreenBounds.getMinX());
@@ -57,11 +49,9 @@ public class WindowPosition {
      *
      * @param    s    Stage to place at the top right corner of the screen
      */
-    //--------------------------------------------------------------------------
     public static void placeTopRight(Stage s) {
         if (s != null) {
-            s.setX(primaryScreenBounds.getMinX() +
-                    primaryScreenBounds.getWidth() - s.getWidth());
+            s.setX(primaryScreenBounds.getMinX() + primaryScreenBounds.getWidth() - s.getWidth());
             s.setY(primaryScreenBounds.getMinY());
         }
     }
@@ -71,12 +61,10 @@ public class WindowPosition {
      *
      * @param    s    Stage to place at the bottom left corner of the screen
      */
-    //--------------------------------------------------------------------------
     public static void placeBottomLeft(Stage s) {
         if (s != null) {
             s.setX(primaryScreenBounds.getMinX());
-            s.setY(primaryScreenBounds.getMinY() +
-                    primaryScreenBounds.getHeight() - s.getHeight());
+            s.setY(primaryScreenBounds.getMinY() + primaryScreenBounds.getHeight() - s.getHeight());
         }
 
     }
@@ -86,19 +74,10 @@ public class WindowPosition {
      *
      * @param    s    Stage to place at the bottom right corner of the screen
      */
-    //--------------------------------------------------------------------------
     public static void placeBottomRight(Stage s) {
         if (s != null) {
-            s.setX(primaryScreenBounds.getMinX() +
-                    primaryScreenBounds.getWidth() - s.getWidth());
-            s.setY(primaryScreenBounds.getMinY() +
-                    primaryScreenBounds.getHeight() - s.getHeight());
+            s.setX(primaryScreenBounds.getMinX() + primaryScreenBounds.getWidth() - s.getWidth());
+            s.setY(primaryScreenBounds.getMinY() + primaryScreenBounds.getHeight() - s.getHeight());
         }
     }
 }
-
-
-//---------------------------------------------------------------
-//	Revision History:
-
-

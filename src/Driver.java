@@ -1,9 +1,8 @@
 import javafx.application.Application;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import model.Controller;
 import userinterface.MainStageContainer;
-import Utilities.Debug;
+import utilities.Debug;
 
 public class Driver{
     public static void main(String[] args) {
@@ -14,7 +13,6 @@ public class Driver{
         public void start(Stage primaryStage) {
             System.out.println("CSC429 Project 1.00");
             if(Debug.setDebug(true)){
-                //System.out.println("Debugging enabled");
                 Debug.logErr("Debugging enabled");
             }
 

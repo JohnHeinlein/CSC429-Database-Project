@@ -1,11 +1,11 @@
-package Utilities;
+package utilities;
 
 /**
  * Class containing static methods to aid in debug logs
  * call setDebug(true) in the main method to enable logErr calls
  */
-
 public class Debug {
+
     public static boolean debug;
 
     public static Boolean setDebug(Boolean val){

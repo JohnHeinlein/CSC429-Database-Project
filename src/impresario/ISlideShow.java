@@ -25,11 +25,6 @@
 // specify the package
 package impresario;
 
-// system imports
-
-// local includes
-
-//==============================================================
 public interface ISlideShow {
 
     /** Swap to the view indicated by the String parameter */

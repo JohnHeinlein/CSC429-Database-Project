@@ -23,8 +23,6 @@
 // specify the package
 package event;
 
-// system imports
-
 import common.StringList;
 
 import javax.swing.*;
@@ -32,8 +30,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ResourceBundle;
-
-// project imports
 
 /**
  * This class maintains the record of all generated events in a log file.
@@ -55,9 +51,8 @@ import java.util.ResourceBundle;
  *
  * This class implements the SINGLETON pattern. Hence, there will only be one instance of EventLog
  */
-//==============================================================
 public class EventLog {
-    // data members
+
     /**
      * Log file size limit
      */
@@ -103,15 +98,12 @@ public class EventLog {
      */
     ResourceBundle myMessages;
 
-
     /**
      * Class constructor, protected to enforce singleton
      */
-    //----------------------------------------------------------
     protected EventLog() {
         myMessages = null;
         reportingLevel = "Error";    // default reporting level
-
         LogFile = "ErrorLog.txt";
         Backup = "ErrorLogBackup.txt";
 
@@ -135,7 +127,6 @@ public class EventLog {
      *
      * @return The single EventLog instance
      */
-    //----------------------------------------------------------
     public static EventLog instance() {
         if (instance == null) {
             instance = new EventLog();
@@ -150,7 +141,6 @@ public class EventLog {
      * @return String object representing the regular log file name
      *
      */
-    //----------------------------------------------------------
     public static String getLogfileName() {
         return LogFile;
     }
@@ -160,7 +150,6 @@ public class EventLog {
      *
      * @return String object representing the backup log file name
      */
-    //----------------------------------------------------------
     public static String getBackupLogfileName() {
         return Backup;
     }
@@ -181,7 +170,6 @@ public class EventLog {
      *								or not
      *
      */
-    //---------------------------------------------------------------
     public static String replaceParameters(String source, String paramList, boolean displaySubErrors) {
         return replaceParameters(source, paramList, displaySubErrors, true);
     }
@@ -202,7 +190,6 @@ public class EventLog {
      *						to substitute the parameter points in the original description
      *
      */
-    //---------------------------------------------------------------
     public static String replaceParameters(String source, String paramList) {
         return replaceParameters(source, paramList, true, true);
     }
@@ -223,7 +210,6 @@ public class EventLog {
      *
      * @param    checkFileLength        boolean indicating whether to check for long file names or not
      */
-    //-------------------------------------------------------------
     public static String replaceParameters(String source, String paramList, boolean displaySubErrors, boolean checkFileLength) {
         String[] params;
         int numOfParams = 0;
@@ -232,7 +218,7 @@ public class EventLog {
         // of elements it has
         StringList paramStringList = new StringList(paramList);
         while (paramStringList.hasMoreElements()) {
-            String dum = (String) paramStringList.nextElement();
+            String dum = paramStringList.nextElement();
             numOfParams++;
         }
 
@@ -244,7 +230,7 @@ public class EventLog {
 
         // and go through it to extract its individual elements into the parameter array
         for (int cnt = 0; cnt < numOfParams; cnt++) {
-            params[cnt] = (String) paramStringList.nextElement();
+            params[cnt] = paramStringList.nextElement();
             if (checkFileLength)
                 if (params[cnt].length() > MAX_PARAM_LENGTH) {
                     params[cnt] = "..." + params[cnt].substring(params[cnt].length() - MAX_PARAM_LENGTH);
@@ -273,8 +259,11 @@ public class EventLog {
                 // Put up an error in parsing if not found
                 if (posOfClosePlaceHolder < 0) {
                     done = true;
-                    if (displaySubErrors)
+
+                    if (displaySubErrors) {
                         new Event("EventLog", "String replaceParameters", "No close placeholder corresponding to open placeholder in source string " + source, Event.WARNING);
+                    }
+
                     // Append the rest of the description string - to return later
                     paramString.append(source, currentStringPosition, strlen);
                 } else {
@@ -282,15 +271,20 @@ public class EventLog {
                     String paramIndexStr = source.substring(posOfPlaceHolder + 1, posOfClosePlaceHolder);
                     int paramIndex = 0;
                     String paramValue = null;
+
                     try {
                         paramIndex = Integer.parseInt(paramIndexStr);
                     } catch (NumberFormatException ex) {
                         // Display a parsing sub-error if not a good number
                         done = true;
-                        if (displaySubErrors)
+
+                        if (displaySubErrors) {
                             new Event("EventLog", "String replaceParameters", "Specified parameter index " + paramIndexStr + " not an integer ", Event.WARNING);
+                        }
+
                         paramString.append(source, currentStringPosition, strlen);
                     }
+
                     try {
                         // Get the actual parameter corresponding to this index from the parameter array.
                         // NOTE : The actual description string could be of the form "xxx <1> yyy <0> zzz".
@@ -303,10 +297,13 @@ public class EventLog {
                     // If not, we display a parsing sub-error and append the rest of the description string - to return later
                     catch (ArrayIndexOutOfBoundsException ex) {
                         done = true;
-                        if (displaySubErrors)
+                        if (displaySubErrors) {
                             new Event("EventLog", "String replaceParameters", "No parameter provided to correspond to index " + paramIndex, Event.WARNING);
+                        }
+
                         paramString.append(source, currentStringPosition, strlen);
                     }
+
                     if (!done) {
                         // If all is OK, we append the description string till the beginning of the open placeholder position,
                         // followed by an append of the actual parameter retrieved
@@ -317,8 +314,9 @@ public class EventLog {
                         if (posOfClosePlaceHolder == strlen) {
                             currentStringPosition = strlen;
                             done = true;
-                        } else
+                        } else {
                             currentStringPosition = posOfClosePlaceHolder + 1;
+                        }
                     }
                 }
             }
@@ -331,7 +329,6 @@ public class EventLog {
     /**
      * Disable logging events if we're on a non-writable media (CD-ROM)
      */
-    //----------------------------------------------------------
     public void disallowLogFile() {
         allowWrites = false;
     }
@@ -339,7 +336,6 @@ public class EventLog {
     /**
      * Allow popup display (on client side applications for example)
      */
-    //----------------------------------------------------------
     public void allowPopupDisplay() {
         allowPopupDisplay = true;
     }
@@ -350,7 +346,6 @@ public class EventLog {
      *
      * @param    messages    The Messages Bundle to use for Internationalization
      */
-    //----------------------------------------------------------
     public void setMessages(ResourceBundle messages) {
         myMessages = messages;
     }
@@ -361,7 +356,6 @@ public class EventLog {
      *
      * @param    level    String representing desired severity level
      */
-    //----------------------------------------------------------
     public void setSeverityFilter(String level) {
         reportingLevel = level;
     }
@@ -371,9 +365,7 @@ public class EventLog {
      *
      * @param    event    The Event object to record in the log
      */
-    //-------------------------------------------------------------
     public void addEvent(Event event) {
-
         // decide if this event should be shown to the user
         switch (event.getSeverityDesc()) {
             case "Warning":
@@ -387,6 +379,7 @@ public class EventLog {
                             "Error",
                             JOptionPane.ERROR_MESSAGE);
                 }
+
                 break;
         }
 
@@ -399,6 +392,7 @@ public class EventLog {
                     FileOutputStream filestream = new FileOutputStream(LogFile, true);
                     OutputStreamWriter outstream = new OutputStreamWriter(filestream);
                     String eventstring = event.toString() + "\r\n";
+
                     outstream.write(eventstring, 0, eventstring.length());
                     outstream.close();
                     filestream.close();

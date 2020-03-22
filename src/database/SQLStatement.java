@@ -25,8 +25,6 @@
 // specify the package
 package database;
 
-// Beginning of DatabaseManipulator class
-//---------------------------------------------------------------------------------------------------------
 public abstract class SQLStatement {
 
     // contains the resulting SQL statement
@@ -38,7 +36,6 @@ public abstract class SQLStatement {
      * accomplishes that.
      *
      */
-    //----------------------------------------------------------------------
     protected String insertEscapes(String inString) {
         // define our local data and constants
         StringBuilder outString = new StringBuilder();
@@ -68,9 +65,7 @@ public abstract class SQLStatement {
         return outString.toString();
     }
 
-
     // override the toString method to output the constructed string
-    //----------------------------------------------------------
     public String toString() {
         return theSQLStatement;
     }

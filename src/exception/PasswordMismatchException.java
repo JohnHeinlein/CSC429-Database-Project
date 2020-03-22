@@ -24,24 +24,17 @@
 // specify the package
 package exception;
 
-// system imports
-
-// local imports
-
 /**
  * This class indicates an exception that is thrown if passwords
  * don't match
  *
  */
-//--------------------------------------------------------------
-public class PasswordMismatchException
-        extends Exception {
-    //--------------------------------------------------------
+public class PasswordMismatchException extends Exception {
+
     public PasswordMismatchException(String message) {
         super(message);
     }
 }
-
 
 //**************************************************************
 //	Revision History:

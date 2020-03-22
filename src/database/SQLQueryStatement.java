@@ -25,15 +25,11 @@
 // specify the package
 package database;
 
-// system imports
 import java.util.Enumeration;
 import java.util.Properties;
 
-// project imports
-
-// Beginning of DatabaseManipulator class
-//---------------------------------------------------------------------------------------------------------
 public class SQLQueryStatement extends SQLStatement {
+
     /**
      *
      * This handles only equality in the WHERE clause. This also 
@@ -42,10 +38,7 @@ public class SQLQueryStatement extends SQLStatement {
      * indicator will be provided. For text types, no entry in this
      * Properties object is necessary.
      */
-    //------------------------------------------------------------
-    public SQLQueryStatement(Properties selSchema,
-                             Properties projectionSchema,
-                             Properties selectionValues) {
+    public SQLQueryStatement(Properties selSchema, Properties projectionSchema, Properties selectionValues) {
         // Begin construction of the actual SQL statement
         theSQLStatement = "SELECT ";
 

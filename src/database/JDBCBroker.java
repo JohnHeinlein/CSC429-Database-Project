@@ -26,21 +26,16 @@
 // specify the package
 package database;
 
-/// system imports
-
-import Utilities.Debug;
+import utilities.Debug;
 import common.PropertyFile;
 import event.Event;
 
-import javax.swing.*;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.SQLException;
 
-// project imports
-
-//==============================================================
 public class JDBCBroker {
+
     public static Driver theDriver = null;
     // Single broker to be shared by all other Servlets
     private static JDBCBroker myInstance = null;
@@ -51,15 +46,13 @@ public class JDBCBroker {
     private String username;
     private String password;
 
-    // private constructor for singleton
-    //----------------------------------------------------------
     protected JDBCBroker() {
-        // DEBUG: System.out.println("JDBCBroker.JDBCBroker()");
         PropertyFile props = new PropertyFile("dbConfig.ini");
         dbName = props.getProperty("dbName");
         username = props.getProperty("username");
         password = props.getProperty("password");
         String driverClassName = "com.mysql.jdbc.Driver";
+
         try {
             // load and register the JDBC driver classes
             theDriver = (Driver) Class.forName(driverClassName).newInstance();
@@ -75,11 +68,7 @@ public class JDBCBroker {
         }
     }
 
-    // singleton constructor
-    //----------------------------------------------------------
     static public JDBCBroker getInstance() {
-        // DEBUG: System.out.println("JDBCBroker.getInstance()");
-
         if (myInstance == null) {
             myInstance = new JDBCBroker();
         }
@@ -88,7 +77,6 @@ public class JDBCBroker {
     }
 
     /** Create a connection to the database */
-    //--------------------------------------------------------
     public Connection getConnection() {
         if (myInstance != null
                 && theDBConnection == null
@@ -107,14 +95,11 @@ public class JDBCBroker {
         return theDBConnection;
     }
 
-
     /** Release a previously allocated connection */
-    //--------------------------------------------------------
     public void releaseConnection(Connection connection) {
         // don't release the connection, hang on till we're destructed
     }
 
-    //--------------------------------------------------------
     protected void finalize() {
         if (theDBConnection != null) {
             try {

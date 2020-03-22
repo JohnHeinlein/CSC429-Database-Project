@@ -25,38 +25,26 @@
 // specify the package
 package database;
 
-// system imports
 import java.util.Enumeration;
 import java.util.Properties;
 
-// project imports
-
-// Beginning of DatabaseManipulator class
-//---------------------------------------------------------------------------------------------------------
 public class SQLUpdateStatement extends SQLStatement {
+
     /**
-     *
      * This handles only equality in the WHERE clause. This also 
      * expects that for numeric types in the WHERE clause, a separate
      * Properties object containing the column name and numeric type
      * indicator will be provided. For text types, no entry in this
      * Properties object is necessary.
      */
-    //------------------------------------------------------------
-    public SQLUpdateStatement(Properties schema,        // the table's schema
-                              Properties updateValues,    // the values to update
-                              Properties whereValues)    // condition update values
-    {
-        super();    // implicit, doesn't do anything, but what the hell
-
+    public SQLUpdateStatement(Properties schema, Properties updateValues, Properties whereValues) {
         // Begin construction of the actual SQL statement
         theSQLStatement = "UPDATE " + schema.getProperty("TableName");
 
         // Construct the SET part of the SQL statement
         StringBuilder theSetString = new StringBuilder();
 
-        // Now, traverse the update Properties object (used for creating
-        // the SET part of this statement)
+        // Now, traverse the update Properties object (used for creating the SET part of this statement)
         Enumeration theSetColumns = updateValues.propertyNames();
         while (theSetColumns.hasMoreElements()) {
             if (theSetString.toString().equals("")) {
@@ -67,7 +55,6 @@ public class SQLUpdateStatement extends SQLStatement {
 
             String theColumnName = (String) theSetColumns.nextElement();
             String theColumnValue = insertEscapes(updateValues.getProperty(theColumnName));
-
             String updateType = schema.getProperty(theColumnName);
 
             // if the type is numeric, do NOT include quotes
@@ -111,7 +98,6 @@ public class SQLUpdateStatement extends SQLStatement {
         theSQLStatement += theWhereString.append(";");
     }
 }
-
 
 //---------------------------------------------------------------
 //	Revision History:

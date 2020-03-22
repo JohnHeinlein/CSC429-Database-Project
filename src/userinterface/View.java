@@ -16,7 +16,7 @@ import impresario.ControlRegistry;
 import impresario.IControl;
 import impresario.IModel;
 import impresario.IView;
-import Utilities.Debug;
+import utilities.Debug;
 import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -36,13 +36,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Properties;
 
-public abstract class View
-        extends Group
-        implements IView, IControl {
+public abstract class View extends Group implements IView, IControl {
+
     protected IModel myModel;
     protected ControlRegistry myRegistry;
 
-    private BorderPane container;
     private VBox header;
     private HBox footer;
     private GridPane content;
@@ -52,21 +50,19 @@ public abstract class View
     private final double FIELD_WIDTH = 300.0;
 
     private Properties props; //Collects information from input fields for submission
-    private HashMap<String,Control> controlList; //Keeps track of what content is a control
+    private HashMap<String, Control> controlList; //Keeps track of what content is a control
     private String viewName; //Debugging purposes
 
-    // Class constructor
-    //----------------------------------------------------------
     public View(IModel model, String classname) {
         myModel = model;
         myRegistry = new ControlRegistry(classname);
 
-        container = new BorderPane();
+        BorderPane container = new BorderPane();
         header = new VBox();
         footer = new HBox();
         content = new GridPane();
 
-        controlList = new HashMap<String,Control>();
+        controlList = new HashMap<>();
         props = new Properties();
         viewName = classname; //Debugging purposes
 
@@ -92,6 +88,7 @@ public abstract class View
 
     // ***************
     // Header methods
+    // ***************
 
     /**
      * Adds a title label to the header
@@ -119,7 +116,7 @@ public abstract class View
      * @param name     Name of section to appear alongside Nodes
      * @param controls Node(s) appearing in section. Region is source of setPrefWidth
      */
-    public void addContent(String name, Region... controls) {
+    public void addContent(String name, Region ... controls) {
         // Label
         Label label = new Label(name);
         label.setFont(LABEL_FONT);
@@ -130,19 +127,19 @@ public abstract class View
             control.setPrefWidth(FIELD_WIDTH / controls.length); //Scale width to fill space
             controlBox.getChildren().add(control);
 
-            switch(control.getClass().toString()){
+            switch (control.getClass().toString()) {
                 case "class javafx.scene.control.ComboBox":
                 case "class javafx.scene.control.DatePicker":
-                    controlList.put(name, (Control)control);
+                    controlList.put(name, (Control) control);
                     break;
                 case "class userinterface.View$TextFieldWrapper":
-                    controlList.put(name, ((TextFieldWrapper)control).getField());
+                    controlList.put(name, ((TextFieldWrapper) control).getField());
                     break;
                 case "class userinterface.View$NotesFieldWrapper":
-                    controlList.put(name, ((NotesFieldWrapper)control).getField());
+                    controlList.put(name, ((NotesFieldWrapper) control).getField());
                     break;
             }
-            props.put(name,"");
+            props.put(name, "");
         }
 
         content.addColumn(0, label);
@@ -157,6 +154,7 @@ public abstract class View
     // ***************
     // Footer methods
     // ***************
+
     /**
      * Adds a misc button to footer to return to ControllerView
      */
@@ -173,31 +171,31 @@ public abstract class View
      * Adds a submit button to footer to return to ControllerView
      */
     public void submitButton(String state) {
-        Button submitButton = makeButt("Submit",e -> {
-            for(String field : controlList.keySet()){
+        Button submitButton = makeButt("Submit", e -> {
+            for (String field : controlList.keySet()) {
                 Control control = controlList.get(field);
                 Debug.logMsg("Extracting input from " + control.getClass().toString());
-                switch(control.getClass().toString()){
+                switch (control.getClass().toString()) {
                     case "class javafx.scene.control.ComboBox":
-                        props.put(field,((ComboBox<String>)control).getValue());
+                        props.put(field, ((ComboBox<String>) control).getValue());
                         break;
                     case "class javafx.scene.control.DatePicker":
-                        props.put(field, ((DatePicker)control).getConverter().toString());
+                        props.put(field, ((DatePicker) control).getConverter().toString());
                         break;
                     case "class javafx.scene.control.TextField":
-                        props.put(field, ((TextField)control).getText());
+                        props.put(field, ((TextField) control).getText());
                         break;
                     case "class javafx.scene.control.TextArea":
-                        props.put(field, ((TextArea)control).getText());
+                        props.put(field, ((TextArea) control).getText());
                         break;
                 }
             }
             Debug.logMsg("\nFields queried:\n\t"
                     + controlList.toString()
-                        .replaceAll(",",",\n\t")
-                        .replaceAll("@[^},]*","") //Exclude memory address (trust me)
+                    .replaceAll(",", ",\n\t")
+                    .replaceAll("@[^},]*", "") //Exclude memory address (trust me)
                     + "\nProperties retrieved:\n\t"
-                            + props.toString().replaceAll(",",",\n\t"));
+                    + props.toString().replaceAll(",", ",\n\t"));
             myModel.stateChangeRequest(state, props);
             clear();
         });
@@ -209,8 +207,8 @@ public abstract class View
      * Adds a cancel button to footer to return to ControllerView
      */
     public void cancelButton() {
-        Button cancelButton = makeButt("Cancel", e ->{
-            myModel.stateChangeRequest("Cancel",null);
+        Button cancelButton = makeButt("Cancel", e -> {
+            myModel.stateChangeRequest("Cancel", null);
             clear();
         });
         cancelButton.setStyle("-fx-background-color: indianred");
@@ -224,24 +222,24 @@ public abstract class View
             if ((box instanceof HBox || box instanceof VBox) && GridPane.getColumnIndex(box) == 1) {
 
                 // For every node contained in that box...
-                for(Node node : ((Pane)box).getChildren()) {
+                for (Node node : ((Pane) box).getChildren()) {
                     // Cast the node to Region (ComboBox, etc.)
-                    if(node instanceof MessageView){
-                        ((MessageView)node).setText("");
-                        ((MessageView)node).clearErrorMessage();
+                    if (node instanceof MessageView) {
+                        ((MessageView) node).setText("");
+                        ((MessageView) node).clearErrorMessage();
                         continue;
                     }
 
-                    Region control = (Region)node;
+                    Region control = (Region) node;
                     // Clear text input fields
                     if (control instanceof TextInputControl)
                         ((TextInputControl) control).clear();
 
-                    // Set combobox to default value
+                        // Set combobox to default value
                     else if (control instanceof ComboBox)
                         ((ComboBox) control).getSelectionModel().selectFirst();
 
-                    // Clear datepicker
+                        // Clear datepicker
                     else if (control instanceof DatePicker)
                         ((DatePicker) control).setValue(null);
                 }
@@ -270,42 +268,56 @@ public abstract class View
     }
 
     public TextFieldWrapper makeField(String prompt) {
-        return makeField(prompt,true);
+        return makeField(prompt, true);
     }
+
     public TextFieldWrapper makeField(String prompt, boolean editable) {
         TextFieldWrapper field = new TextFieldWrapper(prompt);
         field.setEditable(editable);
         field.setDisable(!editable);
         return field;
     }
-    protected class TextFieldWrapper extends VBox{
+
+    protected static class TextFieldWrapper extends VBox {
         private TextField field;
         private MessageView message;
 
-        public TextFieldWrapper(String prompt){
+        public TextFieldWrapper(String prompt) {
             field = new TextField();
             field.setPromptText(prompt);
 
             message = new MessageView("");
 
-            getChildren().addAll(field,message);
+            getChildren().addAll(field, message);
             setAlignment(Pos.CENTER_LEFT);
         }
 
-        public void setListener(ChangeListener<? super String> listener){
+        public void setListener(ChangeListener<? super String> listener) {
             field.textProperty().addListener(listener);
         }
 
-        public TextField getField(){ return field; }
+        public TextField getField() {
+            return field;
+        }
 
-        public void message(String text){ message.displayMessage(text); }
-        public void error(String err){ message.displayErrorMessage(err); }
+        public void message(String text) {
+            message.displayMessage(text);
+        }
+
+        public void error(String err) {
+            message.displayErrorMessage(err);
+        }
 
         //Pass to field for convenience
-        public void setEditable(Boolean flag){ field.setEditable(flag); }
-        public String getText(){ return field.getText(); }
+        public void setEditable(Boolean flag) {
+            field.setEditable(flag);
+        }
 
-        public void clear(){
+        public String getText() {
+            return field.getText();
+        }
+
+        public void clear() {
             message.clearErrorMessage();
             message.setText("");
 
@@ -316,11 +328,12 @@ public abstract class View
     public NotesFieldWrapper makeNotesField(String prompt, int maxLength) {
         return new NotesFieldWrapper(prompt, maxLength);
     }
-    protected class NotesFieldWrapper extends VBox{
+
+    protected class NotesFieldWrapper extends VBox {
         private TextArea field;
         private Label label;
 
-        public NotesFieldWrapper(String prompt, int maxLength){
+        public NotesFieldWrapper(String prompt, int maxLength) {
             label = new Label();
 
             field = new TextArea();
@@ -336,17 +349,17 @@ public abstract class View
             });
 
 
-            getChildren().addAll(field,label);
+            getChildren().addAll(field, label);
             setAlignment(Pos.CENTER_LEFT);
         }
 
-        public TextArea getField(){
+        public TextArea getField() {
             return field;
         }
     }
 
     // Give any number of string options. The first will be the default.
-    public ComboBox<String> makeComboBox(String ... choices){
+    public ComboBox<String> makeComboBox(String... choices) {
         ComboBox<String> combo = new ComboBox<>();
         combo.getItems().addAll(choices);
         combo.getSelectionModel().selectFirst();

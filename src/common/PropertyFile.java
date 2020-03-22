@@ -25,8 +25,6 @@
 // specify the package
 package common;
 
-// system imports
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -37,14 +35,12 @@ import java.util.Properties;
 import event.Event;
 
 /** Layer a file onto a Properties object */
-//==============================================================
 public class PropertyFile extends Properties {
-    // data members
+
     private String myFilename;
     private static boolean allowWrites = true;
 
     /** Constructs and fills the object with properties from the file */
-    //----------------------------------------------------------
     public PropertyFile(String filename) {
         // save the filename for later
         myFilename = filename.replace('\\', File.separatorChar);
@@ -60,38 +56,31 @@ public class PropertyFile extends Properties {
     }
 
     /** Copy constructor */
-    //----------------------------------------------------------
     public PropertyFile(PropertyFile props) {
         // setup our properties as copies of the original
         putAll(props);
     }
 
-    /** default constructor */
-    //----------------------------------------------------------
     protected PropertyFile() {
         // create an empty propertyfile
     }
 
-    //----------------------------------------------------------
     public void disallowStores() {
         allowWrites = false;
     }
 
-
-    //----------------------------------------------------------
     public void allowStores() {
         allowWrites = true;
     }
 
-
     /** Overload the store method to take a filename */
-    //----------------------------------------------------------
     public void store(String filename, String comment) {
         if (allowWrites) {
             try {
                 filename = filename.replace('\\', File.separatorChar);
                 FileOutputStream propFile = new FileOutputStream(filename);
-                super.store(propFile, comment);
+
+                store(propFile, comment);
                 propFile.close();
             } catch (Exception e) {
                 new Event(Event.getLeafLevelClassName(this), "store(filename, comment)", "Could not store PropertyFile: " + filename, Event.WARNING);
@@ -100,23 +89,20 @@ public class PropertyFile extends Properties {
         }
     }
 
-
     /** Provide the name of the loaded file */
-    //----------------------------------------------------------
     public String getFilename() {
         return myFilename;
     }
 
-
     /** Overload the store method to use the original filename */
-    //----------------------------------------------------------
     public void store() {
         if (allowWrites) {
             if (myFilename != null) {
                 try {
                     myFilename = myFilename.replace('\\', File.separatorChar);
                     FileOutputStream propFile = new FileOutputStream(myFilename);
-                    super.store(propFile, "");
+
+                    store(propFile, "");
                     propFile.close();
                 } catch (Exception e) {
                     new Event(Event.getLeafLevelClassName(this), "store", "Could not store PropertyFile: " + myFilename, Event.WARNING);
