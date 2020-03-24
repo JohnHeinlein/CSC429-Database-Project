@@ -425,7 +425,7 @@ abstract public class Persistable {
             theDBConnection = myBroker.getConnection();
             // verify the connection
             if (theDBConnection == null) {
-                System.err.println("Persistable.updatePersistentState - Could not connect to database!");
+                Debug.logErr("Could not connect to database!");
                 return null;
             }
 
@@ -437,13 +437,13 @@ abstract public class Persistable {
             Statement theStatement = theDBConnection.createStatement();
 
             // Stop Runaway Queries
-            theStatement.setMaxRows(MAX_ROWS);
+            //theStatement.setMaxRows(MAX_ROWS);
 
             // The method executeUpdate executes a query on the database. The return result is of type integer which
             // indicates the number of rows updated
             return theStatement.executeUpdate(theSQLStatement.toString());
         } catch (SQLException sqle) {
-            System.err.println("An SQL Error Occurred:" + sqle + "\n" + sqle.getErrorCode() + "\n" + sqle.getMessage() + "\n" + sqle);
+            Debug.logErr("An SQL Error Occurred:" + sqle + "\n" + sqle.getErrorCode() + "\n" + sqle.getMessage() + "\n" + sqle);
             new Event(Event.getLeafLevelClassName(this), "updatePersistentState", "SQL Exception: " + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
             throw sqle;
         } finally {
@@ -456,42 +456,56 @@ abstract public class Persistable {
      * fields into the database.
      * Returns an int indicating the auto-incremental id from SQL INSERT statement
      */
-    protected Integer insertAutoIncrementalPersistentState(Properties schema, Properties insertValues) throws SQLException {
-        int autoIncKey = -1;            // auto-increment key extracted from ResultSet
-        ResultSet theResultSet = null;    // auto-increment key in ResultSet
+    protected Integer insertAutoIncrementalPersistentState(
+            Properties schema, 		// the table schema
+            Properties insertValues)// the values to update
+            throws SQLException {
+
+        int autoIncKey = -1; 			// auto-increment key extracted from ResultSet
+        ResultSet theResultSet = null;	// auto-increment key in ResultSet
 
         try {
-            // connect to the database
             theDBConnection = myBroker.getConnection();
-            // verify the connection
             if (theDBConnection == null) {
-                System.err.println("Persistable.insertPersistentState - Could not connect to database!");
+                Debug.logErr("Could not connect to database!");
                 return null;
             }
+
+            // construct a SQL statement from the passed parameters
+            SQLInsertStatement theSQLStatement = new SQLInsertStatement(schema, insertValues);
+            Debug.logMsg("Generated statement: " + theSQLStatement.toString());
 
             // Once a connection has been established we can create an instance
             // of Statement, through which we will send queries to the database.
             // Only the Global Pool connection should be used!
             Statement theStatement = theDBConnection.createStatement();
 
-            // Stop Runaway Queries
-            theStatement.setMaxRows(MAX_ROWS);
+            // This hangs on my database for no fucking reason
+            //theStatement.setMaxRows(20000);
+
+            // The method executeUpdate executes a query on the database. The
+            // return result is of type integer which indicates the number of rows updated
+            int numRows = theStatement.executeUpdate(theSQLStatement.toString(), Statement.RETURN_GENERATED_KEYS);
 
             theResultSet = theStatement.getGeneratedKeys();
 
             if (theResultSet.next()) {
                 autoIncKey = theResultSet.getInt(1);
+                Debug.logMsg("autoIncKey: " + autoIncKey);
             } else {
-                System.out.println("Persistable.insertAutoIncrementalPersistentState - can't get the auto-increment key");
+                Debug.logErr("Can't get the auto-increment key");
             }
 
             return autoIncKey;
-        } catch (SQLException sqle) {
+        }
+        catch (SQLException sqle) {
+            Debug.logErr( "An SQL Error Occurred: SQL State: " + sqle.getSQLState() + "; Error Code = " + sqle.getErrorCode() + "; Message: " + sqle.getMessage() + "\n" + sqle);
             new Event(Event.getLeafLevelClassName(this), "insertAutoIncrementalPersistentState", "SQL Exception: "
                     + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
             throw sqle;
 
-        } finally {
+        }
+        finally {
             if (theResultSet != null)
                 theResultSet.close();
             closeStatement();
