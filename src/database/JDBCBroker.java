@@ -45,12 +45,14 @@ public class JDBCBroker {
     private String dbName;
     private String username;
     private String password;
+    private String server;
 
     protected JDBCBroker() {
         PropertyFile props = new PropertyFile("dbConfig.ini");
         dbName = props.getProperty("dbName");
         username = props.getProperty("username");
         password = props.getProperty("password");
+        server = props.getProperty("server");
         String driverClassName = "com.mysql.jdbc.Driver";
 
         try {
@@ -84,7 +86,11 @@ public class JDBCBroker {
             try {
                 //theDBConnection = DriverManager.getConnection("jdbc:mysql://dingusdong.us:3306/csc429_group_john","john","reallygoodpassword");
                 Debug.logMsg("Connecting to database...");
-                theDBConnection = theDriver.connect("jdbc:mysql://98.10.140.119:3306/csc429_group_john?user=john&password=reallygoodpassword", null);
+                theDBConnection = theDriver.connect(
+                        "jdbc:mysql://"+server+":3306/" + dbName +
+                                "?user=" + username
+                                + "&password=" + password,
+                        null);
                 if (theDBConnection == null)
                     Debug.logErr("Could not connect to database!");
             } catch (SQLException exc) {
