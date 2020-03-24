@@ -84,7 +84,6 @@ public class JDBCBroker {
                 && theDBConnection == null
                 && (dbName != null) && (username != null) && (password != null)) {
             try {
-                //theDBConnection = DriverManager.getConnection("jdbc:mysql://dingusdong.us:3306/csc429_group_john","john","reallygoodpassword");
                 Debug.logMsg("Connecting to database...");
                 theDBConnection = theDriver.connect(
                         "jdbc:mysql://"+server+":3306/" + dbName +
