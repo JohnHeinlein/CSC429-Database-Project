@@ -84,7 +84,7 @@ public class JDBCBroker {
             try {
                 //theDBConnection = DriverManager.getConnection("jdbc:mysql://dingusdong.us:3306/csc429_group_john","john","reallygoodpassword");
                 Debug.logMsg("Connecting to database...");
-                theDBConnection = theDriver.connect("jdbc:mysql://192.168.1.97:3306/csc429_group_john?user=john&password=reallygoodpassword", null);
+                theDBConnection = theDriver.connect("jdbc:mysql://98.10.140.119:3306/csc429_group_john?user=john&password=reallygoodpassword", null);
                 if (theDBConnection == null)
                     Debug.logErr("Could not connect to database!");
             } catch (SQLException exc) {

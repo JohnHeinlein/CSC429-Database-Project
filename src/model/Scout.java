@@ -65,6 +65,28 @@ public class Scout extends EntityBase implements IView, IModel {
         persistentState = new Properties();
     }
 
+    // Can also be used to create a NEW Scout (if the system it is part of
+    // allows for a new Scout to be set up)
+    //----------------------------------------------------------
+    public Scout (Properties props)
+    {
+        super(myTableName);
+
+        setDependencies();
+        persistentState = new Properties();
+        Enumeration allKeys = props.propertyNames();
+        while (allKeys.hasMoreElements() == true)
+        {
+            String nextKey = (String)allKeys.nextElement();
+            String nextValue = props.getProperty(nextKey);
+
+            if (nextValue != null)
+            {
+                persistentState.setProperty(nextKey, nextValue);
+            }
+        }
+    }
+
 
     /////////////////////////////////////////////////////////////////////////
     //
@@ -85,7 +107,7 @@ public class Scout extends EntityBase implements IView, IModel {
 
     @Override
     public void stateChangeRequest(String key, Object value) {
-        if (key.equals("InsertBook")) {
+        if (key.equals("InsertScout")) {
             Properties data = (Properties) value;
             persistentState.setProperty("firstName", data.getProperty("firstName"));
             persistentState.setProperty("lastName", data.getProperty("lastName"));
