@@ -84,7 +84,7 @@ public class JDBCBroker {
                 && theDBConnection == null
                 && (dbName != null) && (username != null) && (password != null)) {
             try {
-                Debug.logMsg("Connecting to database...");
+                Debug.logMsg("Connecting to database at " + server);
                 theDBConnection = theDriver.connect(
                         "jdbc:mysql://"+server+":3306/" + dbName +
                                 "?user=" + username
@@ -96,7 +96,6 @@ public class JDBCBroker {
                 Debug.logErr("Could not connect to database! (SQL Exception)" + "\n" + exc.getMessage());
             }
         }
-        Debug.logMsg("Connection: " + theDBConnection);
         return theDBConnection;
     }
 
