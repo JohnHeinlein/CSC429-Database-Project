@@ -26,6 +26,8 @@
 // specify the package
 package database;
 
+import utilities.Debug;
+
 import java.util.Enumeration;
 import java.util.Properties;
 
@@ -79,6 +81,7 @@ public class SQLInsertStatement extends SQLStatement {
         }
 
         theSQLStatement += theColumnNamesList.append(theValuesString).append(";");
+        Debug.logMsg("Generated INSERT statement: \"" + theSQLStatement + "\"");
     }
 }
 
