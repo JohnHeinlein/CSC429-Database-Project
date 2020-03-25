@@ -102,19 +102,15 @@ public class Controller implements IView, IModel {
             case "Generic":
                 createAndShowView(key + "View");
                 break;
+
+            //**********
+            //Submissions
+            //**********
             case "ScoutRegisterSubmit":
+                Debug.logMsg("Processing scout registration");
                 Scout newBoye = new Scout();
-                Properties data = (Properties)value;
-                newBoye.persistentState.setProperty("firstName", data.getProperty("firstName"));
-                newBoye.persistentState.setProperty("lastName", data.getProperty("lastName"));
-                newBoye.persistentState.setProperty("middleName", data.getProperty("middleName"));
-                newBoye.persistentState.setProperty("dateOfBirth", data.getProperty("dateOfBirth"));
-                newBoye.persistentState.setProperty("phoneNumber", data.getProperty("phoneNumber"));
-                newBoye.persistentState.setProperty("email", data.getProperty("email"));
-                newBoye.persistentState.setProperty("troopId", data.getProperty("troopId"));
-                newBoye.persistentState.setProperty("status", data.getProperty("status"));
+                newBoye.persistentState = (Properties)value;
                 newBoye.update();
-                System.out.println("Scout Inserted");
                 newBoye.persistentState.clear();
                 break;
 

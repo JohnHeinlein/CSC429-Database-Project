@@ -3,6 +3,7 @@ package model;
 import exception.InvalidPrimaryKeyException;
 import impresario.IModel;
 import impresario.IView;
+import utilities.Debug;
 
 import java.sql.SQLException;
 import java.util.Enumeration;
@@ -130,6 +131,7 @@ public class Scout extends EntityBase implements IView, IModel {
     protected void initializeSchema(String tableName) {
         if (mySchema == null) {
             mySchema = getSchemaInfo(tableName);
+            Debug.logMsg("Schema initialized");
         }
     }
     //
@@ -141,15 +143,27 @@ public class Scout extends EntityBase implements IView, IModel {
     private void updateStateInDatabase() {
         try {
             if (persistentState.getProperty("id") != null) {
+                Debug.logMsg("Scout id not null, updating state");
+
                 Properties whereClause = new Properties();
                 whereClause.setProperty("id", persistentState.getProperty("id"));
                 updatePersistentState(mySchema, persistentState, whereClause);
+
                 updateStatusMessage = "Scout data for id number : " + persistentState.getProperty("id") + " updated successfully in database!";
             } else {
+                Debug.logMsg("Scout id null, generating...");
+
                 Integer scoutId = insertAutoIncrementalPersistentState(mySchema, persistentState);
                 persistentState.setProperty("id", "" + scoutId.intValue());
+
+                Debug.logMsg("Updating state");
+                Properties whereClause = new Properties();
+                whereClause.setProperty("id", persistentState.getProperty("id"));
+                updatePersistentState(mySchema, persistentState, whereClause);
+
                 updateStatusMessage = "Account data for new account : " + persistentState.getProperty("id") + "installed successfully in database!";
             }
+
         } catch (SQLException ex) {
             updateStatusMessage = "Error in installing Scout data in database!";
         }
