@@ -130,20 +130,40 @@ public abstract class View extends Group implements IView, IControl {
             control.setPrefWidth(FIELD_WIDTH / controls.length); //Scale width to fill space
             controlBox.getChildren().add(control);
 
+            boolean isControl = false; //debug purposes
+
             switch (control.getClass().toString()) {
                 case "class javafx.scene.control.ComboBox":
                 case "class javafx.scene.control.DatePicker":
-                    controlList.put(propertyName, (Control) control);
+                    controlList.put(
+                            propertyName,
+                            (Control) control);
+                    props.put(propertyName, "");
+                    isControl = true;
                     break;
+
                 case "class userinterface.View$TextFieldWrapper":
                     TextField textfield = ((TextFieldWrapper) control).getField();
-                    controlList.put(Utilities.toCamelCase(textfield.getPromptText()), textfield);
+                    controlList.put(
+                            Utilities.toCamelCase(textfield.getPromptText()),
+                            textfield);
+                    props.put(Utilities.toCamelCase(textfield.getPromptText()), "");
+                    isControl = true;
                     break;
+
                 case "class userinterface.View$NotesFieldWrapper":
-                    controlList.put(propertyName, ((NotesFieldWrapper) control).getField());
+                    controlList.put(
+                            propertyName,
+                            ((NotesFieldWrapper) control).getField());
+                    props.put(propertyName,"");
+                    isControl = true;
                     break;
             }
-            props.put(propertyName, "");
+
+            // Print content that was added
+            Debug.logMsg("(" + viewName + ") Added "
+                    + ((isControl)? "control #" + controlList.size(): "button")
+                    + " from section \"" + name + "\"");
         }
 
         content.addColumn(0, label);
@@ -151,8 +171,6 @@ public abstract class View extends Group implements IView, IControl {
 
         GridPane.setHalignment(label, HPos.RIGHT);
         GridPane.setValignment(label, VPos.TOP);
-
-        Debug.logMsg("(" + viewName + ") Added control #" + controlList.size() + " \"" + name + "\"");
     }
 
     // ***************
@@ -354,13 +372,13 @@ public abstract class View extends Group implements IView, IControl {
                 props.put(field, data);
             }
         }
-        Debug.logMsg(
-                "\nFields queried:\n\t"
+        Debug.logMsg("("+viewName+")"+
+                "\n\tFields queried:\n\t\t"
                         + controlList.toString()
-                        .replaceAll(",", ",\n\t")
+                        .replaceAll(",", ",\n\t\t")
                         .replaceAll("@[^},]*", "") + //Exclude memory address (trust me)
-                        "\nProperties retrieved:\n\t"
-                        + props.toString().replaceAll(",", ",\n\t")
+                        "\n\tProperties retrieved:\n\t\t"
+                        + props.toString().replaceAll(",", ",\n\t\t")
         );
         return true;
     }
