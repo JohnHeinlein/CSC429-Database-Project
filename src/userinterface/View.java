@@ -48,6 +48,7 @@ public abstract class View extends Group implements IView, IControl {
     protected Properties props; //Collects information from input fields for submission
     protected HashMap<String, Control> controlList; //Keeps track of what content is a control
 
+    private BorderPane container;
     private VBox header;
     private HBox footer;
     private GridPane content;
@@ -59,7 +60,7 @@ public abstract class View extends Group implements IView, IControl {
         myRegistry = new ControlRegistry(classname);
         viewName = classname;
 
-        BorderPane container = new BorderPane();
+        container = new BorderPane();
         header = new VBox();
         footer = new HBox();
         content = new GridPane();
@@ -171,6 +172,10 @@ public abstract class View extends Group implements IView, IControl {
 
         GridPane.setHalignment(label, HPos.RIGHT);
         GridPane.setValignment(label, VPos.TOP);
+    }
+    public void addContent(TableView table){
+        table.setPrefWidth(1000);
+        container.setCenter(table);
     }
 
     // ***************

@@ -13,8 +13,10 @@ import utilities.Debug;
 
 import model.Scout;
 
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Properties;
+import java.util.Vector;
 
 public class Controller implements IView, IModel {
 
@@ -23,6 +25,8 @@ public class Controller implements IView, IModel {
 
     private Hashtable<String, Scene> myViews;
     private Stage myStage;
+
+    private ScoutCollection scoutCollection;
 
     public Controller() {
         myStage = MainStageContainer.getInstance();
@@ -81,6 +85,8 @@ public class Controller implements IView, IModel {
     @Override
     public Object getState(String key) {
         switch (key) {
+            case "ScoutList":
+                return scoutCollection;
             default: return null;
         }
     }
@@ -103,9 +109,9 @@ public class Controller implements IView, IModel {
                 createAndShowView(key + "View");
                 break;
 
-            //**********
-            //Submissions
-            //**********
+            //***************
+            // Insertions
+            //***************
             case "ScoutRegisterSubmit":
                 Debug.logMsg("Processing scout registration");
                 Scout newBoye = new Scout();
@@ -114,6 +120,40 @@ public class Controller implements IView, IModel {
                 newBoye.persistentState.clear();
                 break;
 
+            //***************
+            // Updates
+            //***************
+            case "ScoutUpdateSubmit":
+                Properties props = (Properties)value;
+                Vector<Scout> scouts = null;
+
+                scoutCollection = new ScoutCollection();
+
+                String firstName = (String)props.get("firstName");
+                String lastName = (String)props.get("lastName");
+                String email = (String)props.get("email");
+
+                if(firstName != null){
+                    scouts = scoutCollection.findScoutsWithFirstName(firstName);
+                }else if(lastName != null){
+                    scouts = scoutCollection.findScoutsWithLastName(lastName);
+                }else if(email != null){
+                    scouts = scoutCollection.findScoutsWithEmail(email);
+                }else{
+                    Debug.logErr("(" + key + ")" + "No valid field retrieved");
+                }
+                scoutCollection = new ScoutCollection(scouts);
+                Debug.logMsg("Created scout collection with scouts: " + Arrays.deepToString(scouts.toArray()));
+
+                createAndShowView("ScoutCollectionView");
+                break;
+
+            //***************
+            // Deletions
+            //***************
+            case "ScoutDeleteSubmit":
+
+                break;
             case "Cancel":
                 createAndShowView("ControllerView");
                 break;

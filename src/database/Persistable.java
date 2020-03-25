@@ -343,20 +343,19 @@ abstract public class Persistable {
         ResultSet theResultSet;            // the resultset from the SQLStatement execution
 
         try {
-            // connect to the database
             theDBConnection = myBroker.getConnection();
-
-            // verify the connection
             if (theDBConnection == null) {
-                System.err.println("Persistable.getSelectQueryResult - Could not connect to database!");
+                Debug.logErr("Could not connect to database!");
                 return null;
             }
 
             // verify the construction (should be exception?)
             if ((sqlSelectStatement == null) || (sqlSelectStatement.length() == 0)) {
-                System.err.println("Persistable.getSelectQueryResult - input SQL Select Statement Missing!");
+                Debug.logErr("input SQL Select Statement Missing!");
                 return null;
             }
+
+            Debug.logMsg("SQL Select statement: " + sqlSelectStatement);
 
             // Once a connection has been established we can create an instance
             // of Statement, through which we will send queries to the database.
@@ -364,15 +363,17 @@ abstract public class Persistable {
             Statement theStatement = theDBConnection.createStatement();
 
             // Stop Runaway Queries
-            theStatement.setMaxRows(MAX_ROWS);
+            //theStatement.setMaxRows(MAX_ROWS);
 
             // The method executeQuery executes a query on the database. The
             // return result is of type ResultSet which is one or more rows in
             // this case.
             theResultSet = theStatement.executeQuery(sqlSelectStatement);
+            Debug.logMsg("Got result set");
+
             // verify the results
             if (theResultSet == null) {
-                System.err.println("Persistable.getSelectQueryResult - Invalid result set from SQL statement!");
+                Debug.logErr("Invalid result set from SQL statement!");
                 return null;
             }
 

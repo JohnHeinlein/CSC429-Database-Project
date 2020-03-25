@@ -16,10 +16,20 @@ public class ScoutUpdateDeleteView extends View {
         addContent("Email",
                 makeField("Email"));
 
-        miscButton("Update", "ScoutUpdateSubmit", null);
-        miscButton("Delete", "ScoutDeleteSubmit", null);
+        //miscButton("Update", "ScoutUpdateSubmit", null);
+        footButt(makeButt("Update", e->{
+            scrapeFields();
+            myModel.stateChangeRequest("ScoutUpdateSubmit",props);
+        }));
+
+        footButt(makeButt("Delete",e->{
+            scrapeFields();
+            myModel.stateChangeRequest("ScoutDeleteSubmit",props);
+        }));
         cancelButton();
     }
+
+
 
     @Override
     public void updateState(String key, Object value) {
