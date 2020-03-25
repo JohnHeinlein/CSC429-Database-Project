@@ -45,7 +45,7 @@ public class TreeAddView extends View {
         addContent("Status",
                 makeComboBox("Active", "Inactive"));
 
-        submitButton("TreeAddSubmit");
+        submitButton();
         cancelButton();
     }
 

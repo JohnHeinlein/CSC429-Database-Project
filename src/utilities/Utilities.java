@@ -3,10 +3,7 @@ package utilities;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * Useful Utilities
@@ -105,5 +102,25 @@ public class Utilities {
         });
 
         return valid[0];
+    }
+
+    public static String toCamelCase(String s){
+        char[] chars = s.toCharArray();
+        ArrayList<Character> newStr = new ArrayList<>();
+
+        newStr.add(Character.toLowerCase(chars[0]));
+        for(int i = 1; i < chars.length; i++){
+            if(!Character.isWhitespace(chars[i])){
+                newStr.add(Character.isWhitespace(chars[i - 1])?
+                        Character.toUpperCase(chars[i]) :
+                        Character.toLowerCase(chars[i]));
+            }
+        }
+
+        char[] toRet = new char[newStr.size()];
+        for(int i = 0; i < toRet.length; i++){
+            toRet[i] = newStr.get(i);
+        }
+        return new String(toRet);
     }
 }

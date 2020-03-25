@@ -16,7 +16,6 @@ import impresario.ControlRegistry;
 import impresario.IControl;
 import impresario.IModel;
 import impresario.IView;
-import utilities.Debug;
 import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -25,37 +24,40 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.util.StringConverter;
+import utilities.Debug;
+import utilities.Utilities;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.Vector;
 
 public abstract class View extends Group implements IView, IControl {
+    private final String DEFAULT_FONT = "Comic Sans MS";
+    private final Font LABEL_FONT = new Font(DEFAULT_FONT, 18);
+    private final double FIELD_WIDTH = 300.0;
 
     protected IModel myModel;
     protected ControlRegistry myRegistry;
+
+    protected Properties props; //Collects information from input fields for submission
+    protected HashMap<String, Control> controlList; //Keeps track of what content is a control
 
     private VBox header;
     private HBox footer;
     private GridPane content;
 
-    private final String DEFAULT_FONT = "Comic Sans";
-    private final Font LABEL_FONT = new Font(DEFAULT_FONT, 18);
-    private final double FIELD_WIDTH = 300.0;
-
-    private Properties props; //Collects information from input fields for submission
-    private HashMap<String, Control> controlList; //Keeps track of what content is a control
     private String viewName; //Debugging purposes
 
     public View(IModel model, String classname) {
         myModel = model;
         myRegistry = new ControlRegistry(classname);
+        viewName = classname;
 
         BorderPane container = new BorderPane();
         header = new VBox();
@@ -64,7 +66,6 @@ public abstract class View extends Group implements IView, IControl {
 
         controlList = new HashMap<>();
         props = new Properties();
-        viewName = classname; //Debugging purposes
 
         //Header
         header.setAlignment(Pos.CENTER);
@@ -116,10 +117,12 @@ public abstract class View extends Group implements IView, IControl {
      * @param name     Name of section to appear alongside Nodes
      * @param controls Node(s) appearing in section. Region is source of setPrefWidth
      */
-    public void addContent(String name, Region ... controls) {
+    public void addContent(String name, Region... controls) {
         // Label
         Label label = new Label(name);
         label.setFont(LABEL_FONT);
+
+        String propertyName = Utilities.toCamelCase(name);
 
         // Controls/Fields
         HBox controlBox = new HBox();
@@ -130,16 +133,17 @@ public abstract class View extends Group implements IView, IControl {
             switch (control.getClass().toString()) {
                 case "class javafx.scene.control.ComboBox":
                 case "class javafx.scene.control.DatePicker":
-                    controlList.put(name, (Control) control);
+                    controlList.put(propertyName, (Control) control);
                     break;
                 case "class userinterface.View$TextFieldWrapper":
-                    controlList.put(name, ((TextFieldWrapper) control).getField());
+                    TextField textfield = ((TextFieldWrapper) control).getField();
+                    controlList.put(Utilities.toCamelCase(textfield.getPromptText()), textfield);
                     break;
                 case "class userinterface.View$NotesFieldWrapper":
-                    controlList.put(name, ((NotesFieldWrapper) control).getField());
+                    controlList.put(propertyName, ((NotesFieldWrapper) control).getField());
                     break;
             }
-            props.put(name, "");
+            props.put(propertyName, "");
         }
 
         content.addColumn(0, label);
@@ -148,7 +152,7 @@ public abstract class View extends Group implements IView, IControl {
         GridPane.setHalignment(label, HPos.RIGHT);
         GridPane.setValignment(label, VPos.TOP);
 
-        Debug.logMsg("(" + viewName + ") Added \"" + name + "\". Controls: " + controlList.size());
+        Debug.logMsg("(" + viewName + ") Added control #" + controlList.size() + " \"" + name + "\"");
     }
 
     // ***************
@@ -159,48 +163,25 @@ public abstract class View extends Group implements IView, IControl {
      * Adds a misc button to footer to return to ControllerView
      */
     public void miscButton(String name, String state, Object prop) {
-        Button miscButton = new Button(name);
-        miscButton.setOnAction(e -> {
-            myModel.stateChangeRequest(state, prop);
-            clear();
-        });
-        footButt(miscButton);
+        footButt(makeButt(name, state, prop));
     }
 
     /**
      * Adds a submit button to footer to return to ControllerView
      */
-    public void submitButton(String state) {
+    public void submitButton() {
         Button submitButton = makeButt("Submit", e -> {
-            for (String field : controlList.keySet()) {
-                Control control = controlList.get(field);
-                Debug.logMsg("Extracting input from " + control.getClass().toString());
-                switch (control.getClass().toString()) {
-                    case "class javafx.scene.control.ComboBox":
-                        props.put(field, ((ComboBox<String>) control).getValue());
-                        break;
-                    case "class javafx.scene.control.DatePicker":
-                        props.put(field, ((DatePicker) control).getConverter().toString());
-                        break;
-                    case "class javafx.scene.control.TextField":
-                        props.put(field, ((TextField) control).getText());
-                        break;
-                    case "class javafx.scene.control.TextArea":
-                        props.put(field, ((TextArea) control).getText());
-                        break;
-                }
-            }
-            Debug.logMsg("\nFields queried:\n\t"
-                    + controlList.toString()
-                    .replaceAll(",", ",\n\t")
-                    .replaceAll("@[^},]*", "") //Exclude memory address (trust me)
-                    + "\nProperties retrieved:\n\t"
-                    + props.toString().replaceAll(",", ",\n\t"));
-            myModel.stateChangeRequest(state, props);
-            clear();
+            submit();
         });
         submitButton.setStyle("-fx-background-color: lightgreen");
         footButt(submitButton);
+    }
+
+    /**
+     * Overridden to allow submitting data
+     */
+    protected void submit() {
+        scrapeFields();
     }
 
     /**
@@ -215,38 +196,6 @@ public abstract class View extends Group implements IView, IControl {
         footButt(cancelButton);
     }
 
-    private void clear() {
-        for (Node box : content.getChildren()) {
-
-            // If the node is an HBox or a VBox in the right column...
-            if ((box instanceof HBox || box instanceof VBox) && GridPane.getColumnIndex(box) == 1) {
-
-                // For every node contained in that box...
-                for (Node node : ((Pane) box).getChildren()) {
-                    // Cast the node to Region (ComboBox, etc.)
-                    if (node instanceof MessageView) {
-                        ((MessageView) node).setText("");
-                        ((MessageView) node).clearErrorMessage();
-                        continue;
-                    }
-
-                    Region control = (Region) node;
-                    // Clear text input fields
-                    if (control instanceof TextInputControl)
-                        ((TextInputControl) control).clear();
-
-                        // Set combobox to default value
-                    else if (control instanceof ComboBox)
-                        ((ComboBox) control).getSelectionModel().selectFirst();
-
-                        // Clear datepicker
-                    else if (control instanceof DatePicker)
-                        ((DatePicker) control).setValue(null);
-                }
-            }
-        }
-    }
-
     /**
      * Adds button to leftmost of footer
      */
@@ -255,18 +204,37 @@ public abstract class View extends Group implements IView, IControl {
     }
 
     // ***************
-    // Control creation
+    // Buttons
     // ***************
+
+    /**
+     * Returns a button that calls a statechangerequest
+     *
+     * @param text  Label of button
+     * @param state Name of state for statechangerequest
+     * @param prop  Properties to pass
+     * @return Formatted button
+     */
     public Button makeButt(String text, String state, Object prop) {
         return makeButt(text, e -> myModel.stateChangeRequest(state, prop));
     }
 
+    /**
+     * Returns a button with a specified function
+     *
+     * @param text  Label of button
+     * @param event Event Handler called on press. Recommended to be a lambda.
+     * @return Formatted button
+     */
     public Button makeButt(String text, EventHandler<ActionEvent> event) {
         Button butt = new Button(text);
         butt.setOnAction(event);
         return butt;
     }
 
+    // ***************
+    // Text Field
+    // ***************
     public TextFieldWrapper makeField(String prompt) {
         return makeField(prompt, true);
     }
@@ -278,87 +246,16 @@ public abstract class View extends Group implements IView, IControl {
         return field;
     }
 
-    protected static class TextFieldWrapper extends VBox {
-        private TextField field;
-        private MessageView message;
-
-        public TextFieldWrapper(String prompt) {
-            field = new TextField();
-            field.setPromptText(prompt);
-
-            message = new MessageView("");
-
-            getChildren().addAll(field, message);
-            setAlignment(Pos.CENTER_LEFT);
-        }
-
-        public void setListener(ChangeListener<? super String> listener) {
-            field.textProperty().addListener(listener);
-        }
-
-        public TextField getField() {
-            return field;
-        }
-
-        public void message(String text) {
-            message.displayMessage(text);
-        }
-
-        public void error(String err) {
-            message.displayErrorMessage(err);
-        }
-
-        //Pass to field for convenience
-        public void setEditable(Boolean flag) {
-            field.setEditable(flag);
-        }
-
-        public String getText() {
-            return field.getText();
-        }
-
-        public void clear() {
-            message.clearErrorMessage();
-            message.setText("");
-
-            field.clear();
-        }
-    }
-
     public NotesFieldWrapper makeNotesField(String prompt, int maxLength) {
         return new NotesFieldWrapper(prompt, maxLength);
     }
 
-    protected class NotesFieldWrapper extends VBox {
-        private TextArea field;
-        private Label label;
-
-        public NotesFieldWrapper(String prompt, int maxLength) {
-            label = new Label();
-
-            field = new TextArea();
-            field.setPromptText(prompt);
-            field.setPrefColumnCount(80);
-            field.setPrefRowCount((int) Math.ceil(maxLength / 80.0));
-            field.setWrapText(true);
-            field.setFont(new Font(DEFAULT_FONT, 12));
-            field.textProperty().addListener((observableValue, s, t1) -> {
-                if (field.getText().length() >= maxLength)
-                    field.setText(field.getText().substring(0, maxLength));
-                label.setText(field.getText().length() + "/" + maxLength);
-            });
-
-
-            getChildren().addAll(field, label);
-            setAlignment(Pos.CENTER_LEFT);
-        }
-
-        public TextArea getField() {
-            return field;
-        }
-    }
-
-    // Give any number of string options. The first will be the default.
+    /**
+     * Creates combo box with any number of choices. Defaults to first choice.
+     *
+     * @param choices List of choices. First will be selected by default.
+     * @return
+     */
     public ComboBox<String> makeComboBox(String... choices) {
         ComboBox<String> combo = new ComboBox<>();
         combo.getItems().addAll(choices);
@@ -367,6 +264,12 @@ public abstract class View extends Group implements IView, IControl {
         return combo;
     }
 
+    /**
+     * Creates pre-formatted date picker.
+     * Defaults to pattern "MM/dd/yyyy"
+     *
+     * @return Formatted date picker
+     */
     public DatePicker makeDatePicker() {
         DatePicker picker = new DatePicker();
 
@@ -386,10 +289,14 @@ public abstract class View extends Group implements IView, IControl {
 
         picker.setOnAction(e -> {
             LocalDate date = picker.getValue();
-            Debug.logErr("Selected date: " + date);
+            Debug.logMsg("Selected date: " + date);
         });
         return picker;
     }
+
+    // ***************
+    // Misc controls
+    // ***************
 
     // TODO: Fill the ScrollPane with something.
     public ScrollPane makeScrollPane(String modelState, String collectionState) {
@@ -415,9 +322,105 @@ public abstract class View extends Group implements IView, IControl {
         return content;
     }
 
+    /**
+     * Scrapes the fields into the local Properties object
+     */
+    public Boolean scrapeFields() {
+        for (String field : controlList.keySet()) {
+            Control control = controlList.get(field);
+            String data = "";
+            switch (control.getClass().toString()) {
+                case "class javafx.scene.control.ComboBox":
+                    data = ((ComboBox<String>) control).getValue();
+                    break;
+                case "class javafx.scene.control.DatePicker":
+                    data = ((DatePicker) control).getValue().toString();
+                    break;
+                case "class javafx.scene.control.TextField":
+                    data = ((TextField) control).getText();
+                    break;
+                case "class javafx.scene.control.TextArea":
+                    data = ((TextArea) control).getText();
+                    break;
+                default:
+                    Debug.logErr("Unsupported Control type " + control.getClass().toString());
+                    errorMessage("Unsupported Control type, enable debugging");
+            }
+            if (data.equals("") || data == null) {
+                errorMessage("All fields must be entered!");
+                Debug.logErr("Empty fields, returning false");
+                return false;
+            } else {
+                props.put(field, data);
+            }
+        }
+        Debug.logMsg(
+                "\nFields queried:\n\t"
+                        + controlList.toString()
+                        .replaceAll(",", ",\n\t")
+                        .replaceAll("@[^},]*", "") + //Exclude memory address (trust me)
+                        "\nProperties retrieved:\n\t"
+                        + props.toString().replaceAll(",", ",\n\t")
+        );
+        return true;
+    }
+
+    protected String getValue(Control control) {
+        switch (control.getClass().toString()) {
+            case "class javafx.scene.control.ComboBox":
+                return ((ComboBox<String>) control).getValue();
+            case "class javafx.scene.control.DatePicker":
+                return ((DatePicker) control).getConverter().toString();
+            case "class javafx.scene.control.TextField":
+                return ((TextField) control).getText();
+            case "class javafx.scene.control.TextArea":
+                return ((TextArea) control).getText();
+            default:
+                Debug.logErr("Unsupported control: " + control.getClass());
+                return null;
+        }
+    }
+
     // ***************
-    // Model methods
+    // Data manipulation methods
     // ***************
+
+    /**
+     * Clears the entered information for all controls in View
+     */
+    private void clear() {
+        for (Control control : controlList.values()) {
+            switch (control.getClass().toString()) {
+                case "class javafx.scene.control.ComboBox":
+                    ((ComboBox) control).getSelectionModel().selectFirst();
+                    break;
+                case "class javafx.scene.control.DatePicker":
+                    ((DatePicker) control).setValue(null);
+                    break;
+                case "class javafx.scene.control.TextField":
+                    ((TextField) control).clear();
+                    break;
+                case "class javafx.scene.control.TextArea":
+                    ((TextArea) control).clear();
+                    break;
+                default:
+                    Debug.logErr("Unsupported control: " + control.getClass());
+                    break;
+            }
+        }
+        Debug.logMsg("(" + viewName + ") Cleared fields");
+    }
+
+    public void errorMessage(String msg) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setGraphic(null);
+        alert.setContentText("Error: " + msg);
+
+        alert.showAndWait();
+    }
+
     public void setRegistry(ControlRegistry registry) {
         myRegistry = registry;
     }
@@ -430,5 +433,82 @@ public abstract class View extends Group implements IView, IControl {
     // Allow models to unregister for state updates
     public void unSubscribe(String key, IModel subscriber) {
         myRegistry.unSubscribe(key, subscriber);
+    }
+
+    protected class TextFieldWrapper extends VBox {
+        private TextField field;
+        private MessageView message;
+
+        public TextFieldWrapper(String prompt) {
+            field = new TextField();
+            field.setPromptText(prompt);
+            field.setOnAction(e -> submit());
+
+            message = new MessageView("");
+
+            getChildren().addAll(field, message);
+            setAlignment(Pos.CENTER_LEFT);
+        }
+
+        public void setListener(ChangeListener<? super String> listener) {
+            field.textProperty().addListener(listener);
+        }
+
+        public TextField getField() {
+            return field;
+        }
+
+        public void message(String text) {
+            message.displayMessage(text);
+        }
+
+        public void error(String err) {
+            message.displayErrorMessage(err);
+        }
+
+        //Pass to field so we don't need to chain getField().setEditable();
+        public void setEditable(Boolean flag) {
+            field.setEditable(flag);
+        }
+
+        public String getText() {
+            return field.getText();
+        }
+
+        public void clear() {
+            message.clearErrorMessage();
+            message.setText("");
+
+            field.clear();
+        }
+    }
+
+    protected class NotesFieldWrapper extends VBox {
+        private TextArea field;
+        private Label label;
+
+        public NotesFieldWrapper(String prompt, int maxLength) {
+            label = new Label();
+
+            field = new TextArea();
+            field.setPromptText(prompt);
+            field.setPrefColumnCount(80);
+            field.setPrefRowCount((int) Math.ceil(maxLength / 80.0));
+            field.setWrapText(true);
+            field.setFont(new Font(DEFAULT_FONT, 12));
+
+            field.textProperty().addListener((observableValue, s, t1) -> {
+                if (field.getText().length() >= maxLength)
+                    field.setText(field.getText().substring(0, maxLength));
+                label.setText(field.getText().length() + "/" + maxLength);
+            });
+
+            getChildren().addAll(field, label);
+            setAlignment(Pos.CENTER_LEFT);
+        }
+
+        public TextArea getField() {
+            return field;
+        }
     }
 }

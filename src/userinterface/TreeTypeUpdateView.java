@@ -9,7 +9,7 @@ public class TreeTypeUpdateView extends View {
 
         setTitle("Update a Tree Type");
 
-        submitButton("TreeTypeUpdateSubmit");
+        submitButton();
         cancelButton();
     }
 
