@@ -98,7 +98,7 @@ public class ScoutCollection extends EntityBase implements IView {
         switch(key){
             case "Scouts":   return scoutList;
             case "ScoutList":return this;
-            default:        return null;
+            default:         return null;
         }
     }
 

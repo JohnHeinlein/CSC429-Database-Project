@@ -97,15 +97,20 @@ public class Controller implements IView, IModel {
         switch (key) {
             case "ScoutRegister":
             case "ScoutUpdateDelete":
+
             case "TreeAdd":
-            case "TreeUpdateDelete":
+            case "TreeUpdate":
+            case "TreeDelete":
+
             case "TreeTypeAdd":
             case "TreeTypeUpdate":
-            case "ShiftOpen":
+
             case "TreeSell":
+
+            case "ShiftOpen":
             case "ShiftClose":
 
-                // Case when no other processing is needed
+            // Case when no other processing is needed
             case "Generic":
                 createAndShowView(key + "View");
                 break;

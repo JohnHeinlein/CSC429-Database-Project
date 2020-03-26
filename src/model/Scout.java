@@ -76,7 +76,7 @@ public class Scout extends EntityBase implements IView, IModel {
         setDependencies();
         persistentState = new Properties();
         Enumeration allKeys = props.propertyNames();
-        while (allKeys.hasMoreElements() == true)
+        while (allKeys.hasMoreElements())
         {
             String nextKey = (String)allKeys.nextElement();
             String nextValue = props.getProperty(nextKey);

@@ -140,7 +140,7 @@ public abstract class View extends Group implements IView, IControl {
                             propertyName,
                             (Control) control);
                     props.put(propertyName, "");
-                    isControl = true;
+                    isControl = true; //Debugging
                     break;
 
                 case "class userinterface.View$TextFieldWrapper":
@@ -149,7 +149,7 @@ public abstract class View extends Group implements IView, IControl {
                             Utilities.toCamelCase(textfield.getPromptText()),
                             textfield);
                     props.put(Utilities.toCamelCase(textfield.getPromptText()), "");
-                    isControl = true;
+                    isControl = true; //Debugging
                     break;
 
                 case "class userinterface.View$NotesFieldWrapper":
@@ -157,7 +157,7 @@ public abstract class View extends Group implements IView, IControl {
                             propertyName,
                             ((NotesFieldWrapper) control).getField());
                     props.put(propertyName,"");
-                    isControl = true;
+                    isControl = true; //Debugging
                     break;
             }
 
