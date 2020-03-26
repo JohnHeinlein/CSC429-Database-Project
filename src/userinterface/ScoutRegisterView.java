@@ -45,7 +45,6 @@ public class ScoutRegisterView extends View {
         submitButton();
         cancelButton();
         myModel.subscribe("UpdateStatusMessage", this);
-        myModel.stateChangeRequest("ScoutRegisterSubmit", props);
     }
 
     @Override

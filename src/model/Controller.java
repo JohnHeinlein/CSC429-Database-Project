@@ -1,5 +1,6 @@
 package model;
 
+import exception.InvalidPrimaryKeyException;
 import impresario.IModel;
 import impresario.IView;
 import impresario.ModelRegistry;
@@ -153,6 +154,23 @@ public class Controller implements IView, IModel {
             //***************
             case "ScoutDeleteSubmit":
 
+                break;
+            //***************
+            // Add Tree Type
+            //***************
+            case "TreeTypeAddSubmit":
+                Debug.logMsg("Processing Tree Type Add");
+                try {
+                    Properties data = (Properties) value;
+                    TreeType newTreeBoye = new TreeType(data.getProperty("barcodePrefix"));
+                    Debug.logMsg("Error: Tree Type With barcode prefix: " + data.getProperty("barcodePrefix") + " Already Exists");
+                } catch (InvalidPrimaryKeyException IPKE) {
+                    Properties data = (Properties) value;
+                    TreeType newTreeBoye = new TreeType();
+                    newTreeBoye.persistentState = (Properties) value;
+                    newTreeBoye.update();
+                    newTreeBoye.persistentState.clear();
+                }
                 break;
             case "Cancel":
                 createAndShowView("ControllerView");

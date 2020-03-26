@@ -52,7 +52,7 @@ public class Scout extends EntityBase implements IView, IModel {
                 }
             }
         }
-        // If no Book found for this user name, throw an exception
+        // If no Scout found for this user name, throw an exception
         else {
             throw new InvalidPrimaryKeyException("No account matching id : " + ScoutId + " found.");
         }
