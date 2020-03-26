@@ -44,7 +44,7 @@ public class TreeType extends EntityBase implements IModel {
 
         for (Properties prop : table) {
             if (((String) prop.get("barcodePrefix")).startsWith(barcodeId)) {
-                return (String) prop.get("description");
+                return (String) prop.get("typeDescription");
             }
         }
         return "Invalid barcode";
