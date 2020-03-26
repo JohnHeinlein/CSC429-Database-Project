@@ -40,6 +40,7 @@ import java.util.Vector;
 public abstract class View extends Group implements IView, IControl {
     private final String DEFAULT_FONT = "Comic Sans MS";
     private final Font LABEL_FONT = new Font(DEFAULT_FONT, 18);
+    private final Font BUTTON_FONT = new Font(DEFAULT_FONT,14);
     private final double FIELD_WIDTH = 300.0;
 
     protected IModel myModel;
@@ -252,6 +253,7 @@ public abstract class View extends Group implements IView, IControl {
     public Button makeButt(String text, EventHandler<ActionEvent> event) {
         Button butt = new Button(text);
         butt.setOnAction(event);
+        butt.setFont(BUTTON_FONT);
         return butt;
     }
 
