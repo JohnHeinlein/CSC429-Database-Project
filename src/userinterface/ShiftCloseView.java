@@ -8,9 +8,6 @@ public class ShiftCloseView extends View{
 
         setTitle("Close a Shift");
 
-        addContent("",
-                makeScrollPane("", ""));
-
         submitButton();
         cancelButton();
     }
