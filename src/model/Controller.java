@@ -99,6 +99,7 @@ public class Controller implements IView, IModel {
             case "ScoutUpdateDelete":
 
             case "TreeAdd":
+            case "TreeUpdateDelete":
             case "TreeUpdate":
             case "TreeDelete":
 
@@ -168,7 +169,7 @@ public class Controller implements IView, IModel {
                 try {
                     Properties data = (Properties) value;
                     TreeType newTreeBoye = new TreeType(data.getProperty("barcodePrefix"));
-                    Debug.logMsg("Error: Tree Type With barcode prefix: " + data.getProperty("barcodePrefix") + " Already Exists");
+                    Debug.logMsg("Tree Type With barcode prefix: " + data.getProperty("barcodePrefix") + " Already Exists");
                 } catch (InvalidPrimaryKeyException IPKE) {
                     Properties data = (Properties) value;
                     TreeType newTreeBoye = new TreeType();
