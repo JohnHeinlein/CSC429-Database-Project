@@ -5,7 +5,7 @@ import impresario.IModel;
 import impresario.IView;
 import impresario.ModelRegistry;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import userinterface.MainStageContainer;
 import userinterface.View;
@@ -32,6 +32,9 @@ public class Controller implements IView, IModel {
 
     private ScoutCollection scoutCollection;
     private Scout scout;
+
+    private Tree tree;
+    private TreeType treeType;
 
     public Controller() {
         myStage = MainStageContainer.getInstance();
@@ -103,6 +106,8 @@ public class Controller implements IView, IModel {
 
     @Override
     public void stateChangeRequest(String key, Object value) {
+        Properties props;
+
         switch (key) {
             case "ScoutRegister":
             case "ScoutUpdateDelete":
@@ -130,24 +135,24 @@ public class Controller implements IView, IModel {
             //***************
             case "ScoutRegisterSubmit":
                 Debug.logMsg("Processing scout registration");
-                Scout newBoye = new Scout();
-                newBoye.persistentState = (Properties)value;
-                newBoye.update();
-                newBoye.persistentState.clear();
+                scout.persistentState = (Properties) value;
+                scout.update();
+                scout.persistentState.clear(); //Not totally sure if this is kosher
                 break;
 
             //***************
             // Updates
             //***************
             case "ScoutSearch":
-                Properties props = (Properties)value;
+                //TODO: Allow user to specify which field they are going to search for
+                props = (Properties)value;
                 Vector<Scout> scouts = null;
-
-                scoutCollection = new ScoutCollection();
 
                 String firstName = (String)props.get("firstName");
                 String lastName = (String)props.get("lastName");
                 String email = (String)props.get("email");
+
+                scoutCollection = new ScoutCollection();
 
                 if(firstName != null){
                     scouts = scoutCollection.findScoutsWithFirstName(firstName);
@@ -158,7 +163,8 @@ public class Controller implements IView, IModel {
                 }else{
                     Debug.logErr("(" + key + ")" + "No valid field retrieved");
                 }
-                scoutCollection = new ScoutCollection(scouts);
+                scoutCollection.updateState("Scouts",scouts);
+
                 Debug.logMsg("Created scout collection with scouts: " + Arrays.deepToString(scouts.toArray()));
 
                 createAndShowView("ScoutCollectionView");
@@ -175,11 +181,13 @@ public class Controller implements IView, IModel {
 
             case "ScoutUpdateSubmit":
                 Debug.logMsg("(" + key + ") Processing scout registration");
-                Properties updatedProps = (Properties) value;
-                for(Object field : updatedProps.keySet()){
-                    scout.persistentState.setProperty((String)field,(String)updatedProps.get(field));
+                props = (Properties) value;
+                for(Object field : props.keySet()){
+                    scout.persistentState.setProperty(
+                            (String)field,
+                            (String)props.get(field));
                 }
-                scout.update();
+                scout.updateState("dateStatusUpdated", java.time.LocalDate.now().toString()); //Internally calls update()
                 break;
 
             case "ScoutDelete":
@@ -189,6 +197,7 @@ public class Controller implements IView, IModel {
                     Debug.logErr(String.format("(%s) Invalid scout ID",key));
                 }
                 scout.updateState("status","Inactive");
+                scout.updateState("dateStatusUpdated", java.time.LocalDate.now().toString());
 
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setContentText("Scout status set to Inactive");
@@ -201,31 +210,28 @@ public class Controller implements IView, IModel {
             case "TreeTypeAddSubmit":
                 Debug.logMsg("Processing Tree Type Add");
                 try {
-                    Properties data = (Properties) value;
-                    TreeType newTreeBoye = new TreeType(data.getProperty("barcodePrefix"));
-                    Debug.logMsg("Tree Type With barcode prefix: " + data.getProperty("barcodePrefix") + " Already Exists");
+                    props = (Properties) value;
+                    treeType = new TreeType(props.getProperty("barcodePrefix"));
+                    Debug.logMsg("Tree Type With barcode prefix: " + props.getProperty("barcodePrefix") + " Already Exists");
                 } catch (InvalidPrimaryKeyException IPKE) {
-                    Properties data = (Properties) value;
-                    TreeType newTreeBoye = new TreeType();
-                    newTreeBoye.persistentState = (Properties) value;
-                    newTreeBoye.update();
-                    newTreeBoye.persistentState.clear();
+                    treeType.persistentState = (Properties) value;
+                    treeType.update();
+                    treeType.persistentState.clear();
                 }
                 break;
 
             case "TreeAddSubmit":
-                Debug.logMsg("Processing Tree Insertion");
+                Debug.logMsg(String.format("(%s) Processing Tree Insertion",key));
+                props = (Properties) value;
                 try {
-                    Properties data = (Properties) value;
-                    Tree newTreeBoye = new Tree(data.getProperty("barcode"));
-                    Debug.logMsg("Tree With barcode: " + data.getProperty("barcode") + " Already Exists");
+                    tree = new Tree(props.getProperty("barcode"));
+                    Debug.logMsg("Tree With barcode: " + props.getProperty("barcode") + " Already Exists");
                 } catch (InvalidPrimaryKeyException IPKE) {
-                    Properties data = (Properties) value;
-                    Tree newTreeBoye = new Tree();
-                    data.setProperty("dateStatusUpdated", java.time.LocalDate.now().toString());
-                    newTreeBoye.persistentState = data;
-                    newTreeBoye.update("Insert");
-                    newTreeBoye.persistentState.clear();
+                    tree = new Tree();
+                    props.setProperty("dateStatusUpdated", java.time.LocalDate.now().toString());
+                    tree.persistentState = props;
+                    tree.update("Insert");
+                    tree.persistentState.clear();
                 }
                 break;
 
