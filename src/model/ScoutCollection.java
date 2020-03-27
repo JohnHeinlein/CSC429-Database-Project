@@ -32,17 +32,17 @@ public class ScoutCollection extends EntityBase implements IView {
     }
 
     public Vector<Scout> findScoutsWithFirstName(String firstName){
-        String query = "SELECT * FROM " + myTableName + " WHERE firstName LIKE '%" + firstName + "%'";
+        String query = "SELECT * FROM " + myTableName + " WHERE firstName LIKE '%" + firstName + "%' AND status = 'Active'";
         return findScouts(query);
     }
 
     public Vector<Scout> findScoutsWithLastName(String lastName){
-        String query = "SELECT * FROM " + myTableName + " WHERE lastName LIKE '%" + lastName + "%'";
+        String query = "SELECT * FROM " + myTableName + " WHERE lastName LIKE '%" + lastName + "%' AND status = 'Active'";
         return findScouts(query);
     }
 
     public Vector<Scout> findScoutsWithEmail(String email){
-        String query = "SELECT * FROM " + myTableName + " WHERE email LIKE '%" + email + "%'";
+        String query = "SELECT * FROM " + myTableName + " WHERE email LIKE '%" + email + "%' AND status = 'Active'";
         return findScouts(query);
     }
 
@@ -119,7 +119,12 @@ public class ScoutCollection extends EntityBase implements IView {
         return retValue;
     }
 
-    public void updateState(String key, Object value){ stateChangeRequest(key,value); }
+    public void updateState(String key, Object value){
+        if(key.equals("Scouts")){
+            scoutList = (Vector<Scout>)value;
+        }
+        stateChangeRequest(key,value);
+    }
 
     protected void createAndShowView(){
         //javaFX stuff

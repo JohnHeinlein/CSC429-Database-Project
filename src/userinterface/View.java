@@ -34,6 +34,7 @@ import utilities.Utilities;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Vector;
 
@@ -206,7 +207,6 @@ public abstract class View extends Group implements IView, IControl {
     public void cancelButton() {
         Button cancelButton = makeButt("Cancel", e -> {
             myModel.stateChangeRequest("Cancel", null);
-            clear();
         });
         cancelButton.setStyle("-fx-background-color: indianred");
         footButt(cancelButton);
@@ -452,35 +452,8 @@ public abstract class View extends Group implements IView, IControl {
     }
 
     // ***************
-    // Data manipulation methods
+    // Pre-configured Alert boxes
     // ***************
-
-    /**
-     * Clears the entered information for all controls in View
-     */
-    private void clear() {
-        for (Control control : controlList.values()) {
-            switch (control.getClass().toString()) {
-                case "class javafx.scene.control.ComboBox":
-                    ((ComboBox) control).getSelectionModel().selectFirst();
-                    break;
-                case "class javafx.scene.control.DatePicker":
-                    ((DatePicker) control).setValue(null);
-                    break;
-                case "class javafx.scene.control.TextField":
-                    ((TextField) control).clear();
-                    break;
-                case "class javafx.scene.control.TextArea":
-                    ((TextArea) control).clear();
-                    break;
-                default:
-                    Debug.logErr("Unsupported control: " + control.getClass());
-                    break;
-            }
-        }
-        Debug.logMsg("(" + viewName + ") Cleared fields");
-    }
-
     public void errorMessage(String msg){
        makeAlert(msg, Alert.AlertType.ERROR);
     }
@@ -504,12 +477,20 @@ public abstract class View extends Group implements IView, IControl {
         }
         alert.showAndWait();
     }
+    public Optional<ButtonType> confirmMessage(String msg){
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setHeaderText(null);
+        alert.setGraphic(null);
+        alert.setTitle("Confirm Action");
+        alert.setContentText(msg);
+        return alert.showAndWait();
+    }
 
     public void setRegistry(ControlRegistry registry) {
         myRegistry = registry;
     }
 
-    // Allow models to register for state updaytes
+    // Allow models to register for state updates
     public void subscribe(String key, IModel subscriber) {
         myRegistry.subscribe(key, subscriber);
     }

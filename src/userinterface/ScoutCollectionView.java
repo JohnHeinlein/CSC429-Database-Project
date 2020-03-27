@@ -3,10 +3,7 @@ package userinterface;
 import impresario.IModel;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Alert;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import model.Scout;
 import model.ScoutCollection;
@@ -14,6 +11,7 @@ import utilities.Utilities;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Vector;
 
 public class ScoutCollectionView extends View{
@@ -59,7 +57,6 @@ public class ScoutCollectionView extends View{
                 errorMessage("Must select a scout!");
             }else {
                 myModel.stateChangeRequest("ScoutUpdate", selection.getId());
-                //TODO: Give feedback
             }
         }));
 
@@ -67,7 +64,13 @@ public class ScoutCollectionView extends View{
             if(selection == null) {
                 errorMessage("Must select a scout!");
             }else {
-                myModel.stateChangeRequest("ScoutDelete",selection.getId());
+                Optional<ButtonType> confirmation = confirmMessage("Are you sure you want to delete Scout " +  selection.getId() + "?");
+                if (confirmation.get() == ButtonType.OK){
+                    myModel.stateChangeRequest("ScoutDelete",selection.getId());
+                } else {
+
+                }
+
             }
         }));
         cancelButton();
