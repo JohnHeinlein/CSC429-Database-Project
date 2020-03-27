@@ -39,6 +39,7 @@ public class ScoutCollectionView extends View{
                 new TableColumn<>("Status"),
                 new TableColumn<>("Date Status Updated")
         );
+
         tableColumns.forEach(column ->{
            column.setMinWidth(100.0);
            column.setCellValueFactory(new PropertyValueFactory<>(Utilities.toCamelCase(column.getText())));
@@ -54,13 +55,13 @@ public class ScoutCollectionView extends View{
 
         addContent(tableOfScouts);
 
-        footButt(makeButt("Update",e ->{
-            errorMessage("You've clicked submit! I am a placeholder!");
-        }));
+        footButt(makeButt("Update",e ->
+            errorMessage(String.format("You've clicked update on %s! I am a placeholder!", tableOfScouts.getSelectionModel().getSelectedItem().getId()))
+        ));
 
-        footButt(makeButt("Delete",e->{
-            errorMessage("You've clicked delete! I am a placeholder!");
-        }));
+        footButt(makeButt("Delete",e->
+            errorMessage(String.format("You've clicked delete on %s! I am a placeholder!", tableOfScouts.getSelectionModel().getSelectedItem().getId()))
+        ));
 
         cancelButton();
 
