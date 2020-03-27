@@ -1,8 +1,10 @@
 package userinterface;
 
+import exception.InvalidPrimaryKeyException;
 import impresario.IModel;
 import javafx.scene.layout.VBox;
 import model.TreeType;
+import utilities.Debug;
 
 public class TreeAddView extends View {
 
@@ -12,7 +14,7 @@ public class TreeAddView extends View {
         setTitle("Add a Tree");
 
         TextFieldWrapper barcodeField = makeField("Barcode");
-        TextFieldWrapper typeField = makeField("(Type determined by barcode)",false);
+        TextFieldWrapper typeField = makeField("Tree Type",false);
 
         barcodeField.setListener(((observableValue, oldVal, newVal) -> {
             if(newVal.length() == 2){
@@ -36,17 +38,31 @@ public class TreeAddView extends View {
         addContent("Barcode",
                 barcodeField);
 
-        addContent("Type",
+        addContent("Tree Type",
                 typeField);
 
         addContent("Notes",
-                makeNotesField("Notes", 100)); //TODO: Get max length from schema
+                makeNotesField("Notes", 200));
 
         addContent("Status",
-                makeComboBox("Active", "Inactive"));
+                makeComboBox("Available", "Sold", "Damaged"));
 
         submitButton();
         cancelButton();
+    }
+
+    @Override
+    public void submit(){
+        if(scrapeFields()) {
+            try {
+                TreeType check = new TreeType(props.getProperty("barcode").substring(0, 2));
+                props.setProperty("treeType", (String) check.getState("getId"));
+                myModel.stateChangeRequest("TreeAddSubmit", props);
+            }
+            catch (InvalidPrimaryKeyException IPKE) {Debug.logMsg("Error Instantiating Tree Type With Barcode prefix: " + props.getProperty("barcode").substring(0, 2)); }
+        }else{
+            Debug.logErr("Failed submission: scrapeFields failed");
+        }
     }
 
     @Override

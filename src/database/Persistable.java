@@ -473,6 +473,7 @@ abstract public class Persistable {
             }
 
             // construct a SQL statement from the passed parameters
+
             SQLInsertStatement theSQLStatement = new SQLInsertStatement(schema, insertValues);
             Debug.logMsg("Generated statement: " + theSQLStatement.toString());
 
@@ -575,7 +576,7 @@ abstract public class Persistable {
             Statement theStatement = theDBConnection.createStatement();
 
             // Stop Runaway Queries
-            theStatement.setMaxRows(MAX_ROWS);
+            //theStatement.setMaxRows(MAX_ROWS);
 
             // The method executeQuery executes a query on the database. The
             // return result is of type integer which indicates the number of rows updated

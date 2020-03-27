@@ -18,6 +18,8 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Vector;
+import java.util.Date;
+import java.time.LocalDate;
 
 public class Controller implements IView, IModel {
 
@@ -172,6 +174,23 @@ public class Controller implements IView, IModel {
                     newTreeBoye.persistentState.clear();
                 }
                 break;
+
+            case "TreeAddSubmit":
+                Debug.logMsg("Processing Tree Insertion");
+                try {
+                    Properties data = (Properties) value;
+                    Tree newTreeBoye = new Tree(data.getProperty("barcode"));
+                    Debug.logMsg("Tree With barcode: " + data.getProperty("barcode") + " Already Exists");
+                } catch (InvalidPrimaryKeyException IPKE) {
+                    Properties data = (Properties) value;
+                    Tree newTreeBoye = new Tree();
+                    data.setProperty("dateStatusUpdated", java.time.LocalDate.now().toString());
+                    newTreeBoye.persistentState = data;
+                    newTreeBoye.update("Insert");
+                    newTreeBoye.persistentState.clear();
+                }
+                break;
+
             case "Cancel":
                 createAndShowView("ControllerView");
                 break;

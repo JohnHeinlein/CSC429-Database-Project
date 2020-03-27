@@ -130,7 +130,9 @@ public class TreeType extends EntityBase implements IModel, IView {
 
     @Override
     public Object getState(String key) {
-
+        if (key.equals("getId")) {
+            return persistentState.getProperty("id");
+        }
         return null;
     }
 
