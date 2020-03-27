@@ -105,7 +105,7 @@ public class Event {
      *
      * @param    severity    Ordinal severity level for event
      */
-    public Event(String source, String name, String description, final int severity) {
+    public Event(String source, String name, String description, int severity) {
         // forward to another constructor, provide defaults
         this(source, name, "NOTAG", null, description, severity);
     }
@@ -125,12 +125,12 @@ public class Event {
      * @param    severity    Ordinal severity level for event
      *
      */
-    public Event(String source, String name, String tag, String description, final int severity) {
+    public Event(String source, String name, String tag, String description, int severity) {
         // forward to another constructor, provide defaults
         this(source, name, tag, null, description, severity);
     }
 
-    public Event(String source, String name, String tag, String params, String description, final int severity) {
+    public Event(String source, String name, String tag, String params, String description, int severity) {
         // create a timestamp
         Calendar rightNow = Calendar.getInstance(new Locale("en", "US"));
         myTime = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, new Locale("en", "US")).format(rightNow.getTime());
@@ -174,17 +174,7 @@ public class Event {
     public static String getLeafLevelClassName(Object obj) {
         String fullClassName = (obj.getClass()).getName();
         int lastIndexOfPeriod = fullClassName.lastIndexOf('.');
-        if (lastIndexOfPeriod >= 0) {
-            int fullClassNameLen = fullClassName.length();
-
-            if ((lastIndexOfPeriod + 1) >= fullClassNameLen) {
-                return fullClassName;
-            } else {
-                return fullClassName.substring(lastIndexOfPeriod + 1);
-            }
-        } else {
-            return fullClassName;
-        }
+        return lastIndexOfPeriod >= 0 ? (lastIndexOfPeriod + 1) >= fullClassName.length() ? fullClassName : fullClassName.substring(lastIndexOfPeriod + 1) : fullClassName;
     }
 
     /**

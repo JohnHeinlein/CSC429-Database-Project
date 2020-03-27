@@ -218,7 +218,7 @@ public class EventLog {
         // of elements it has
         StringList paramStringList = new StringList(paramList);
         while (paramStringList.hasMoreElements()) {
-            String dum = paramStringList.nextElement();
+            paramStringList.nextElement();
             numOfParams++;
         }
 
@@ -236,7 +236,6 @@ public class EventLog {
                     params[cnt] = "..." + params[cnt].substring(params[cnt].length() - MAX_PARAM_LENGTH);
                 }
         }
-
 
         int strlen = source.length();
         StringBuilder paramString = new StringBuilder();
@@ -389,13 +388,13 @@ public class EventLog {
             if (allowWrites) {
                 // we do this only if we are allowed to write
                 try {
-                    FileOutputStream filestream = new FileOutputStream(LogFile, true);
-                    OutputStreamWriter outstream = new OutputStreamWriter(filestream);
-                    String eventstring = event.toString() + "\r\n";
+                    FileOutputStream fileStream = new FileOutputStream(LogFile, true);
+                    OutputStreamWriter outStream = new OutputStreamWriter(fileStream);
+                    String eventString = event + "\r\n";
 
-                    outstream.write(eventstring, 0, eventstring.length());
-                    outstream.close();
-                    filestream.close();
+                    outStream.write(eventString, 0, eventString.length());
+                    outStream.close();
+                    fileStream.close();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

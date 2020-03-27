@@ -157,7 +157,7 @@ public class Scout extends EntityBase implements IView, IModel {
                 Debug.logMsg("Scout id null, generating...");
 
                 Integer scoutId = insertAutoIncrementalPersistentState(mySchema, persistentState);
-                persistentState.setProperty("id", "" + scoutId.intValue());
+                persistentState.setProperty("id", String.valueOf(scoutId));
 
                 Debug.logMsg("Updating state");
                 Properties whereClause = new Properties();

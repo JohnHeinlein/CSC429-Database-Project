@@ -76,7 +76,6 @@ public class ControlRegistry extends Registry {
         } else {   // we must have a single subscriber
             // If not, use the standard update via a key-value pair
             if (tempObj instanceof IModel) {
-                // DEBUG: System.out.println("Changeable [" + key + "] " + dependProperty + ": " + client.getValue(dependProperty));
                 ((IModel) tempObj).stateChangeRequest(key, value);
             } else {
                 new Event(Event.getLeafLevelClassName(this), "UpdateSubscribers", "EVT_InvalidSubscriber", "Invalid Subscriber: " + tempObj.getClass(), Event.WARNING);
