@@ -19,7 +19,6 @@ import java.util.Vector;
 public class ScoutCollectionView extends View{
     protected TableView<ScoutTableModel> tableOfScouts;
     protected ScoutTableModel selection; //Selected scout
-    Scout scout = new Scout();
 
     public ScoutCollectionView(IModel model) {
         super(model, "ScoutCollectionView");
@@ -50,29 +49,31 @@ public class ScoutCollectionView extends View{
         tableOfScouts.setOnMousePressed(e ->{
             if (e.isPrimaryButtonDown() && e.getClickCount() >= 2){
                 selection = tableOfScouts.getSelectionModel().getSelectedItem();
-                scout.updateState("id",selection.getId());
-                //processScoutSelected();
             }
         });
 
         addContent(tableOfScouts);
 
         footButt(makeButt("Update",e ->{
-            errorMessage(String.format("You've clicked update on %s! I am a placeholder!",
-                    selection.getId()));
+            if(selection == null){
+                errorMessage("Must select a scout!");
+            }else {
+                myModel.stateChangeRequest("ScoutUpdate", selection.getId());
+                //TODO: Give feedback
+            }
         }));
 
         footButt(makeButt("Delete",e-> {
-            errorMessage(String.format("You've clicked delete on %s! I am a placeholder!",
-                    selection.getId()));
-            scout.updateState("status","Inactive");
+            if(selection == null) {
+                errorMessage("Must select a scout!");
+            }else {
+                myModel.stateChangeRequest("ScoutDelete",selection.getId());
+            }
         }));
-
         cancelButton();
 
         getEntryTableModelValues();
     }
-
     protected void getEntryTableModelValues(){
         ObservableList<ScoutTableModel> tableData = FXCollections.observableArrayList();
 
