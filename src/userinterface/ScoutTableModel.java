@@ -56,19 +56,4 @@ public class ScoutTableModel {
     public String getDateStatusUpdated(){ return dateStatusUpdated.get();}
     public void setDateStatusUpdated(String dateStatusUpdated){this.dateStatusUpdated.set(dateStatusUpdated);}
 
-    public Scout getScout(){
-        Scout scout = new Scout();
-
-        scout.stateChangeRequest("firstName", this.firstName);
-        scout.stateChangeRequest("lastName", this.lastName);
-        scout.stateChangeRequest("middleName", this.middleName);
-        scout.stateChangeRequest("dateOfBirth", this.dateOfBirth);
-        scout.stateChangeRequest("phoneNumber", this.phoneNumber);
-        scout.stateChangeRequest("email", this.email);
-        scout.stateChangeRequest("troopId", this.troopId);
-        scout.stateChangeRequest("status", this.status);
-        scout.stateChangeRequest("dateStatusUpdated", this.dateStatusUpdated);
-
-        return scout;
-    }
 }
