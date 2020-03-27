@@ -5,6 +5,7 @@ import impresario.IModel;
 import impresario.IView;
 import impresario.ModelRegistry;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import userinterface.MainStageContainer;
 import userinterface.View;
@@ -30,6 +31,7 @@ public class Controller implements IView, IModel {
     private Stage myStage;
 
     private ScoutCollection scoutCollection;
+    private Scout scout;
 
     public Controller() {
         myStage = MainStageContainer.getInstance();
@@ -42,19 +44,22 @@ public class Controller implements IView, IModel {
 
     public void createAndShowView(String viewName) {
         //Attempt to retrieve scene from table to avoid recreating it.
-        Scene currentScene = myViews.get(viewName);
-
-        if (currentScene == null) {
-            View newView = ViewFactory.createView(viewName, this);
-
-            if (newView == null) {
-                Debug.logErr("ViewFactory returned null view");
-                return;
-            }
-            currentScene = new Scene(newView);
-            myViews.put(viewName, currentScene);
-        };
-        swapToView(currentScene);
+//        Scene currentScene = myViews.get(viewName);
+//
+//        if (currentScene == null) {
+//            View newView = ViewFactory.createView(viewName, this);
+//
+//            if (newView == null) {
+//                Debug.logErr("ViewFactory returned null view");
+//                return;
+//            }
+//            currentScene = new Scene(newView);
+//            myViews.put(viewName, currentScene);
+//        };
+//        swapToView(currentScene);
+        View newView = ViewFactory.createView(viewName,this);
+        Scene newScene = new Scene(newView);
+        swapToView(newScene);
     }
 
     private void swapToView(Scene newScene) {
@@ -90,6 +95,8 @@ public class Controller implements IView, IModel {
         switch (key) {
             case "ScoutList":
                 return scoutCollection;
+            case "Scout":
+                return scout;
             default: return null;
         }
     }
@@ -155,6 +162,37 @@ public class Controller implements IView, IModel {
                 Debug.logMsg("Created scout collection with scouts: " + Arrays.deepToString(scouts.toArray()));
 
                 createAndShowView("ScoutCollectionView");
+                break;
+
+            case "ScoutUpdate":
+                try{
+                    scout = new Scout((String)value);
+                }catch(InvalidPrimaryKeyException ex){
+                    Debug.logErr(String.format("(%s) Invalid scout ID",key));
+                }
+                createAndShowView("ScoutUpdateView");
+                break;
+
+            case "ScoutUpdateSubmit":
+                Debug.logMsg("(" + key + ") Processing scout registration");
+                Properties updatedProps = (Properties) value;
+                for(Object field : updatedProps.keySet()){
+                    scout.persistentState.setProperty((String)field,(String)updatedProps.get(field));
+                }
+                scout.update();
+                break;
+
+            case "ScoutDelete":
+                try{
+                    scout = new Scout((String)value);
+                }catch(InvalidPrimaryKeyException ex){
+                    Debug.logErr(String.format("(%s) Invalid scout ID",key));
+                }
+                scout.updateState("status","Inactive");
+
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setContentText("Scout status set to Inactive");
+                alert.showAndWait();
                 break;
 
             //***************

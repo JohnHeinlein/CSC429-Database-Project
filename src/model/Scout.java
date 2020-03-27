@@ -123,6 +123,7 @@ public class Scout extends EntityBase implements IView, IModel {
             this.update();
 
             persistentState.clear();
+
         }else if(value instanceof String){
             String val = (String) value;
             persistentState.setProperty(key, val);
@@ -148,6 +149,7 @@ public class Scout extends EntityBase implements IView, IModel {
 
     //Updating Database State
     private void updateStateInDatabase() {
+        Debug.logMsg("Updating scout ID " + persistentState.getProperty("id"));
         try {
             if (persistentState.getProperty("id") != null) {
                 Debug.logMsg("Scout id not null, updating state");
