@@ -182,14 +182,6 @@ public abstract class View extends Group implements IView, IControl {
     // ***************
     // Footer methods
     // ***************
-
-    /**
-     * Adds a misc button to footer to return to ControllerView
-     */
-    public void miscButton(String name, String state, Object prop) {
-        footButt(makeButt(name, state, prop));
-    }
-
     /**
      * Adds a submit button to footer to return to ControllerView
      */
@@ -316,6 +308,8 @@ public abstract class View extends Group implements IView, IControl {
             LocalDate date = picker.getValue();
             Debug.logMsg("Selected date: " + date);
         });
+
+        picker.setEditable(false);
         return picker;
     }
 
@@ -348,9 +342,28 @@ public abstract class View extends Group implements IView, IControl {
     }
 
     /**
-     * Scrapes the fields into the local Properties object
+     * Scrapes the fields into the local Properties object.
+     * Shows error dialogue if a field is empty.
+     * @return Whether scrape was successful or not
      */
-    public Boolean scrapeFields() {
+    public Boolean scrapeFields(){
+        return scrapeFields(true);
+    }
+
+    /**
+     * Scrapes fields into the local Properties object
+     * @return Whether scrape was successful or not (always true for unsafe)
+     */
+    public Boolean scrapeFieldsUnsafe(){
+        return scrapeFields(false);
+    }
+
+    /**
+     * Scrapes the fields into the local Properties object.
+     * @param safe Whether or not all fields are required
+     * @return Whether scrape succeeded or not
+     */
+    private Boolean scrapeFields(Boolean safe) {
         for (String field : controlList.keySet()) {
             Control control = controlList.get(field);
             String data = "";
@@ -371,7 +384,7 @@ public abstract class View extends Group implements IView, IControl {
                     Debug.logErr("Unsupported Control type " + control.getClass().toString());
                     errorMessage("Unsupported Control type, enable debugging");
             }
-            if (data.equals("") || data == null) {
+            if (safe == true && data.equals("") || data == null) {
                 errorMessage("All fields must be entered!");
                 Debug.logErr("Empty fields, returning false");
                 return false;
@@ -468,6 +481,7 @@ public abstract class View extends Group implements IView, IControl {
             field = new TextField();
             field.setPromptText(prompt);
             field.setOnAction(e -> submit());
+            field.setStyle("-fx-font-family: " + DEFAULT_FONT);
 
             message = new MessageView("");
 
