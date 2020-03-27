@@ -20,7 +20,7 @@ import javafx.stage.Stage;
  */
 public class MainStageContainer {
 
-    private static Stage myInstance;
+    private static Stage myInstance = null;
 
     private MainStageContainer() {
 

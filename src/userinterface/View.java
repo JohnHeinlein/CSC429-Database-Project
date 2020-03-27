@@ -35,6 +35,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.Vector;
 
 public abstract class View extends Group implements IView, IControl {
     private final String DEFAULT_FONT = "Comic Sans MS";
@@ -185,7 +186,9 @@ public abstract class View extends Group implements IView, IControl {
      * Adds a submit button to footer to return to ControllerView
      */
     public void submitButton() {
-        Button submitButton = makeButt("Submit", e -> submit());
+        Button submitButton = makeButt("Submit", e -> {
+            submit();
+        });
         submitButton.setStyle("-fx-background-color: lightgreen");
         footButt(submitButton);
     }
@@ -288,7 +291,7 @@ public abstract class View extends Group implements IView, IControl {
         DatePicker picker = new DatePicker();
 
         picker.setConverter(new StringConverter<>() {
-            private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+            private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 
             @Override
             public String toString(LocalDate localDate) {
@@ -378,7 +381,7 @@ public abstract class View extends Group implements IView, IControl {
                     data = ((TextArea) control).getText();
                     break;
                 default:
-                    Debug.logErr("Unsupported Control type " + control.getClass());
+                    Debug.logErr("Unsupported Control type " + control.getClass().toString());
                     errorMessage("Unsupported Control type, enable debugging");
             }
             if (safe && data.equals("") || data == null) {
@@ -460,7 +463,7 @@ public abstract class View extends Group implements IView, IControl {
         myRegistry = registry;
     }
 
-    // Allow models to register for state updates
+    // Allow models to register for state updaytes
     public void subscribe(String key, IModel subscriber) {
         myRegistry.subscribe(key, subscriber);
     }

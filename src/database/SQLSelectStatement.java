@@ -64,7 +64,7 @@ public class SQLSelectStatement extends SQLStatement {
                 String theFieldValue = insertEscapes(whereValues.getProperty(theFieldName));
 
                 // Exclude empty strings
-                if (!theFieldValue.isEmpty()) {
+                if (theFieldValue.length() > 0) {
                     String theConjunctionClause = (theWhereString.toString().equals("")) ? " WHERE ": " AND ";
 
                     if (theFieldValue.equals("NULL")) {
@@ -76,7 +76,7 @@ public class SQLSelectStatement extends SQLStatement {
                         theWhereString.append(theConjunctionClause)
                                 .append(theFieldName)
                                 .append(" = ")
-                                .append(("numeric".equals(actualType))
+                                .append((actualType != null && actualType.equals("numeric"))
                                         ? theFieldValue
                                         : "'" + theFieldValue + "'");
                     }

@@ -65,7 +65,14 @@ public class SQLQueryStatement extends SQLStatement {
         if (selectionValues != null) {
             Enumeration theWhereFields = selectionValues.propertyNames();
             while (theWhereFields.hasMoreElements()) {
-                String theConjunctionClause = theWhereString.toString().isEmpty() ? " WHERE " : " AND ";
+                String theConjunctionClause = "";
+
+                if (theWhereString.toString().equals("")) {
+                    theConjunctionClause += " WHERE ";
+                } else {
+                    theConjunctionClause += " AND ";
+                }
+
                 String theFieldName = (String) theWhereFields.nextElement();
                 String theFieldValue = insertEscapes(selectionValues.getProperty(theFieldName));
 
@@ -77,7 +84,7 @@ public class SQLQueryStatement extends SQLStatement {
                     if (actualType != null) {
                         // if the type is numeric, do NOT include quotes
                         if (actualType.equals("numeric")) {
-                            if (!theFieldValue.isEmpty())
+                            if (theFieldValue.length() > 0)
                                 theWhereString.append(theConjunctionClause).append(theFieldName).append(" = ").append(theFieldValue);    // cannot partial match a numeric
                         } else {
                             // must the a text type
@@ -87,7 +94,7 @@ public class SQLQueryStatement extends SQLStatement {
                             } else
                                 // else, it is an actual value, include the quotes
                                 // if theFieldValue is zero length, leave the quotes out (search for blank field)
-                                if (!theFieldValue.isEmpty()) {
+                                if (theFieldValue.length() > 0) {
                                     theWhereString.append(theConjunctionClause).append(theFieldName).append(" LIKE '").append(theFieldValue).append("%'");
                                 }
                         }

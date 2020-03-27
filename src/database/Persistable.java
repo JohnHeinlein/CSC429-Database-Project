@@ -45,8 +45,8 @@ abstract public class Persistable {
     protected boolean available;        // whether or not we're available
     private static final int MAX_ROWS = 20000;
 
-    private Statement theStatement;
-    private Connection theDBConnection;
+    private Statement theStatement = null;
+    private Connection theDBConnection = null;
 
     protected Persistable() {
         // initialize our state

@@ -65,7 +65,13 @@ public class SQLQueryStatementWithExactMatches extends SQLStatement {
         if (selectionValues != null) {
             Enumeration theWhereFields = selectionValues.propertyNames();
             while (theWhereFields.hasMoreElements()) {
-                String theConjunctionClause = theWhereString.toString().isEmpty() ? " WHERE " : " AND ";
+                String theConjunctionClause = "";
+
+                if (theWhereString.toString().equals("")) {
+                    theConjunctionClause += " WHERE ";
+                } else {
+                    theConjunctionClause += " AND ";
+                }
 
                 String theFieldName = (String) theWhereFields.nextElement();
                 String theFieldValue = insertEscapes(selectionValues.getProperty(theFieldName));

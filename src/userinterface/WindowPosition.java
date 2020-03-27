@@ -19,7 +19,7 @@ import javafx.stage.Stage;
  */
 public class WindowPosition {
 
-    private static final Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+    private static Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
 
     /**
      * Used to place the stage in the center of the screen
