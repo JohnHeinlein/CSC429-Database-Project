@@ -15,11 +15,7 @@ import utilities.Debug;
 
 import model.Scout;
 
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.Properties;
-import java.util.Vector;
-import java.util.Date;
+import java.util.*;
 import java.time.LocalDate;
 
 public class Controller implements IView, IModel {
@@ -136,7 +132,7 @@ public class Controller implements IView, IModel {
             case "ScoutRegisterSubmit":
                 Debug.logMsg("Processing scout registration");
                 scout.persistentState = (Properties) value;
-                scout.update();
+                scout.updateState("dateStatusUpdated", java.time.LocalDate.now().toString());
                 scout.persistentState.clear(); //Not totally sure if this is kosher
                 break;
 
@@ -201,7 +197,10 @@ public class Controller implements IView, IModel {
 
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setContentText("Scout status set to Inactive");
-                alert.showAndWait();
+                Optional<ButtonType> confirm = alert.showAndWait();
+                if(confirm.get() == ButtonType.OK){
+                    this.stateChangeRequest("Cancel",null);
+                }
                 break;
 
             //***************
