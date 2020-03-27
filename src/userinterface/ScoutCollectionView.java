@@ -18,7 +18,8 @@ import java.util.Vector;
 
 public class ScoutCollectionView extends View{
     protected TableView<ScoutTableModel> tableOfScouts;
-    protected ScoutTableModel selection;
+    protected ScoutTableModel selection; //Selected scout
+    Scout scout = new Scout();
 
     public ScoutCollectionView(IModel model) {
         super(model, "ScoutCollectionView");
@@ -49,19 +50,23 @@ public class ScoutCollectionView extends View{
         tableOfScouts.setOnMousePressed(e ->{
             if (e.isPrimaryButtonDown() && e.getClickCount() >= 2){
                 selection = tableOfScouts.getSelectionModel().getSelectedItem();
+                scout.updateState("id",selection.getId());
                 //processScoutSelected();
             }
         });
 
         addContent(tableOfScouts);
 
-        footButt(makeButt("Update",e ->
-            errorMessage(String.format("You've clicked update on %s! I am a placeholder!", tableOfScouts.getSelectionModel().getSelectedItem().getId()))
-        ));
+        footButt(makeButt("Update",e ->{
+            errorMessage(String.format("You've clicked update on %s! I am a placeholder!",
+                    selection.getId()));
+        }));
 
-        footButt(makeButt("Delete",e->
-            errorMessage(String.format("You've clicked delete on %s! I am a placeholder!", tableOfScouts.getSelectionModel().getSelectedItem().getId()))
-        ));
+        footButt(makeButt("Delete",e-> {
+            errorMessage(String.format("You've clicked delete on %s! I am a placeholder!",
+                    selection.getId()));
+            scout.updateState("status","Inactive");
+        }));
 
         cancelButton();
 

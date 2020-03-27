@@ -126,6 +126,10 @@ public class Scout extends EntityBase implements IView, IModel {
         }else if(value instanceof String){
             String val = (String) value;
             persistentState.setProperty(key, val);
+            Debug.logMsg(String.format("Updating state \"%s\" to value \"%s\"",
+                    key,val));
+
+            this.update();
         }
         myRegistry.updateSubscribers(key, this);
     }
