@@ -200,7 +200,7 @@ abstract public class Persistable {
             Statement theStatement = theDBConnection.createStatement();
 
             // Stop Runaway Queries
-            theStatement.setMaxRows(MAX_ROWS);
+            //theStatement.setMaxRows(MAX_ROWS);
 
             // The method executeQuery executes a query on the database. The
             // return result is of type ResultSet which is one or more rows in
@@ -281,7 +281,7 @@ abstract public class Persistable {
             Statement theStatement = theDBConnection.createStatement();
 
             // Stop Runaway Queries
-            theStatement.setMaxRows(MAX_ROWS);
+            //theStatement.setMaxRows(MAX_ROWS);
 
             // The method executeQuery executes a query on the database. The
             // return result is of type ResultSet which is one or more rows in
@@ -538,7 +538,7 @@ abstract public class Persistable {
             Statement theStatement = theDBConnection.createStatement();
 
             // Stop Runaway Queries
-            theStatement.setMaxRows(MAX_ROWS);
+            //theStatement.setMaxRows(MAX_ROWS);
 
             // The method executeUpdate executes a query on the database. The
             // return result is of type integer which indicates the number of rows updated
