@@ -19,13 +19,18 @@ public class Debug {
      * @param msg Message to append to stack trace
      */
     public static void logErr(String msg) { log(msg,true); }
-
+    public static void logErr(String format, String... replacements){
+        log(String.format(format, (Object[]) replacements), true);
+    }
     /**
      * Prints the class and method name this function is called from, plus a message
      *
      * @param msg Message to append to stack trace
      */
     public static void logMsg(String msg) { log(msg,false); }
+    public static void logMsg(String format, String... replacements){
+        log(String.format(format, (Object[]) replacements), false);
+    }
 
     private static void log(String msg, Boolean isError){
         if(!debug) return;
