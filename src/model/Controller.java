@@ -130,7 +130,7 @@ public class Controller implements IView, IModel {
             //***************
             // Updates
             //***************
-            case "ScoutUpdateSubmit":
+            case "ScoutSearch":
                 Properties props = (Properties)value;
                 Vector<Scout> scouts = null;
 
@@ -155,12 +155,6 @@ public class Controller implements IView, IModel {
                 createAndShowView("ScoutCollectionView");
                 break;
 
-            //***************
-            // Deletions
-            //***************
-            case "ScoutDeleteSubmit":
-
-                break;
             //***************
             // Add Tree Type
             //***************

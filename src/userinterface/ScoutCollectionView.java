@@ -3,6 +3,7 @@ package userinterface;
 import impresario.IModel;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -17,6 +18,8 @@ import java.util.Vector;
 
 public class ScoutCollectionView extends View{
     protected TableView<ScoutTableModel> tableOfScouts;
+    protected ScoutTableModel selection;
+
     public ScoutCollectionView(IModel model) {
         super(model, "ScoutCollectionView");
         setTitle("Search results");
@@ -44,12 +47,21 @@ public class ScoutCollectionView extends View{
         tableOfScouts.getColumns().addAll(tableColumns);
         tableOfScouts.setOnMousePressed(e ->{
             if (e.isPrimaryButtonDown() && e.getClickCount() >= 2){
-                processScoutSelected();
+                selection = tableOfScouts.getSelectionModel().getSelectedItem();
+                //processScoutSelected();
             }
         });
 
-        //addContent("christ",tableOfScouts);
         addContent(tableOfScouts);
+
+        footButt(makeButt("Update",e ->{
+            errorMessage("You've clicked submit! I am a placeholder!");
+        }));
+
+        footButt(makeButt("Delete",e->{
+            errorMessage("You've clicked delete! I am a placeholder!");
+        }));
+
         cancelButton();
 
         getEntryTableModelValues();
@@ -66,10 +78,6 @@ public class ScoutCollectionView extends View{
         }
 
         tableOfScouts.setItems(tableData);
-    }
-
-    public void processScoutSelected(){
-
     }
 
     @Override

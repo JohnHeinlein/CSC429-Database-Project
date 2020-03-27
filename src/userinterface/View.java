@@ -384,7 +384,7 @@ public abstract class View extends Group implements IView, IControl {
                     Debug.logErr("Unsupported Control type " + control.getClass().toString());
                     errorMessage("Unsupported Control type, enable debugging");
             }
-            if (safe == true && data.equals("") || data == null) {
+            if (safe && data.equals("") || data == null) {
                 errorMessage("All fields must be entered!");
                 Debug.logErr("Empty fields, returning false");
                 return false;
