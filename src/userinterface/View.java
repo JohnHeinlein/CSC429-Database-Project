@@ -290,17 +290,27 @@ public abstract class View extends Group implements IView, IControl {
     public DatePicker makeDatePicker() {
         DatePicker picker = new DatePicker();
 
-        picker.setConverter(new StringConverter<>() {
-            private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-
-            @Override
-            public String toString(LocalDate localDate) {
-                return localDate == null ? "" : dateTimeFormatter.format(localDate);
+        picker.setConverter(new StringConverter<LocalDate>() {
+            String pattern = "yyyy-MM-dd";
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(pattern);
+            {
+                picker.setPromptText(pattern.toLowerCase());
             }
 
-            @Override
-            public LocalDate fromString(String dateString) {
-                return (dateString == null || dateString.trim().isEmpty()) ? null : LocalDate.parse(dateString, dateTimeFormatter);
+            @Override public String toString(LocalDate date) {
+                if (date != null) {
+                    return dateFormatter.format(date);
+                } else {
+                    return "";
+                }
+            }
+
+            @Override public LocalDate fromString(String string) {
+                if (string != null && !string.isEmpty()) {
+                    return LocalDate.parse(string, dateFormatter);
+                } else {
+                    return null;
+                }
             }
         });
 
@@ -419,6 +429,28 @@ public abstract class View extends Group implements IView, IControl {
         }
     }
 
+    protected void setValue(Control control, String value) {
+        Debug.logMsg(String.format("Updating %s to value %s",control,value));
+        switch (control.getClass().toString()) {
+            case "class javafx.scene.control.ComboBox":
+                ((ComboBox<String>) control).getSelectionModel().select(value);
+                break;
+            case "class javafx.scene.control.DatePicker":
+                DatePicker picker = ((DatePicker) control);
+                StringConverter<LocalDate> converter = picker.getConverter();
+                picker.setValue(converter.fromString(value));
+                break;
+            case "class javafx.scene.control.TextField":
+                ((TextField) control).setText(value);
+                break;
+            case "class javafx.scene.control.TextArea":
+                ((TextArea) control).setText(value);
+                break;
+            default:
+                Debug.logErr("Unsupported control: " + control.getClass());
+        }
+    }
+
     // ***************
     // Data manipulation methods
     // ***************
@@ -449,13 +481,27 @@ public abstract class View extends Group implements IView, IControl {
         Debug.logMsg("(" + viewName + ") Cleared fields");
     }
 
-    public void errorMessage(String msg) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
+    public void errorMessage(String msg){
+       makeAlert(msg, Alert.AlertType.ERROR);
+    }
+    public void makeAlert(String msg, Alert.AlertType type){
+        Alert alert = new Alert(type);
         alert.setHeaderText(null);
         alert.setGraphic(null);
-        alert.setContentText("Error: " + msg);
-
+        switch(type){
+            case ERROR:
+                alert.setTitle("Error");
+                alert.setContentText("Error: " + msg);
+                break;
+            case WARNING:
+                alert.setTitle("Warning");
+                alert.setContentText(msg);
+                break;
+            case INFORMATION:
+                alert.setTitle("Information");
+                alert.setContentText(msg);
+                break;
+        }
         alert.showAndWait();
     }
 
