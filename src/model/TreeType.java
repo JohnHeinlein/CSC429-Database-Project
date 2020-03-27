@@ -10,7 +10,7 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Vector;
 
-public class TreeType extends EntityBase implements IModel, IView {
+public class TreeType extends EntityBase implements IView {
 
     private static final String myTableName = "treeType";
     private static Vector<Properties> table;
@@ -40,9 +40,7 @@ public class TreeType extends EntityBase implements IModel, IView {
             int size = allDataRetrieved.size();
 
             // There should be EXACTLY one account. More than that is an error
-            if (size != 1) {
-                throw new InvalidPrimaryKeyException("Multiple accounts matching Prefix : " + BarcodePrefix + " found.");
-            } else {
+            if (size == 1) {
                 // copy all the retrieved data into persistent state
                 Properties retrievedTreeTypeData = allDataRetrieved.elementAt(0);
                 persistentState = new Properties();
@@ -56,6 +54,8 @@ public class TreeType extends EntityBase implements IModel, IView {
                         persistentState.setProperty(nextKey, nextValue);
                     }
                 }
+            } else {
+                throw new InvalidPrimaryKeyException("Multiple accounts matching Prefix : " + BarcodePrefix + " found.");
             }
         }
         // If no treetype found for this user name, throw an exception
@@ -85,7 +85,7 @@ public class TreeType extends EntityBase implements IModel, IView {
                 {
                     Integer TreeTypeId =
                             insertAutoIncrementalPersistentState(mySchema, persistentState);
-                    persistentState.setProperty("id", "" + TreeTypeId.intValue());
+                    persistentState.setProperty("id", String.valueOf(TreeTypeId));
                     updateStatusMessage = "Account data for new account : " +  persistentState.getProperty("id")
                             + "installed successfully in database!";
                 }

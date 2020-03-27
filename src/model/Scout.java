@@ -1,7 +1,6 @@
 package model;
 
 import exception.InvalidPrimaryKeyException;
-import impresario.IModel;
 import impresario.IView;
 import utilities.Debug;
 
@@ -10,7 +9,7 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Vector;
 
-public class Scout extends EntityBase implements IView, IModel {
+public class Scout extends EntityBase implements IView {
 
     private static final String myTableName = "scout";
 
@@ -33,9 +32,7 @@ public class Scout extends EntityBase implements IView, IModel {
             int size = allDataRetrieved.size();
 
             // There should be EXACTLY one account. More than that is an error
-            if (size != 1) {
-                throw new InvalidPrimaryKeyException("Multiple accounts matching id : " + ScoutId + " found.");
-            } else {
+            if (size == 1) {
                 // copy all the retrieved data into persistent state
                 Properties retrievedScoutData = allDataRetrieved.elementAt(0);
                 persistentState = new Properties();
@@ -50,6 +47,8 @@ public class Scout extends EntityBase implements IView, IModel {
                         persistentState.setProperty(nextKey, nextValue);
                     }
                 }
+            } else {
+                throw new InvalidPrimaryKeyException("Multiple accounts matching id : " + ScoutId + " found.");
             }
         }
         // If no Scout found for this user name, throw an exception
