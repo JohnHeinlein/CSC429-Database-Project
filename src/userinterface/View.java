@@ -135,31 +135,26 @@ public abstract class View extends Group implements IView, IControl {
             boolean isControl = false; //debug purposes
 
             switch (control.getClass().toString()) {
-                case "class javafx.scene.control.ComboBox":
-                case "class javafx.scene.control.DatePicker":
-                    controlList.put(
-                            propertyName,
+                case "class javafx.scene.control.ComboBox", "class javafx.scene.control.DatePicker" -> {
+                    controlList.put(propertyName,
                             (Control) control);
                     props.put(propertyName, "");
                     isControl = true; //Debugging
-                    break;
-
-                case "class userinterface.View$TextFieldWrapper":
+                }
+                case "class userinterface.View$TextFieldWrapper" -> {
                     TextField textfield = ((TextFieldWrapper) control).getField();
-                    controlList.put(
-                            Utilities.toCamelCase(textfield.getPromptText()),
+                    controlList.put(Utilities.toCamelCase(textfield.getPromptText()),
                             textfield);
                     props.put(Utilities.toCamelCase(textfield.getPromptText()), "");
                     isControl = true; //Debugging
-                    break;
+                }
 
-                case "class userinterface.View$NotesFieldWrapper":
-                    controlList.put(
-                            propertyName,
+                case "class userinterface.View$NotesFieldWrapper" -> {
+                    controlList.put(propertyName,
                             ((NotesFieldWrapper) control).getField());
-                    props.put(propertyName,"");
+                    props.put(propertyName, "");
                     isControl = true; //Debugging
-                    break;
+                }
             }
 
             // Print content that was added
@@ -383,21 +378,14 @@ public abstract class View extends Group implements IView, IControl {
             Control control = controlList.get(field);
             String data = "";
             switch (control.getClass().toString()) {
-                case "class javafx.scene.control.ComboBox":
-                    data = ((ComboBox<String>) control).getValue();
-                    break;
-                case "class javafx.scene.control.DatePicker":
-                    data = ((DatePicker) control).getValue().toString();
-                    break;
-                case "class javafx.scene.control.TextField":
-                    data = ((TextField) control).getText();
-                    break;
-                case "class javafx.scene.control.TextArea":
-                    data = ((TextArea) control).getText();
-                    break;
-                default:
+                case "class javafx.scene.control.ComboBox" -> data = ((ComboBox<String>) control).getValue();
+                case "class javafx.scene.control.DatePicker" -> data = ((DatePicker) control).getValue().toString();
+                case "class javafx.scene.control.TextField" -> data = ((TextField) control).getText();
+                case "class javafx.scene.control.TextArea" -> data = ((TextArea) control).getText();
+                default -> {
                     Debug.logErr("Unsupported Control type " + control.getClass().toString());
                     errorMessage("Unsupported Control type, enable debugging");
+                }
             }
             if (safe && data.equals("") || data == null) {
                 errorMessage("All fields must be entered!");
@@ -407,52 +395,48 @@ public abstract class View extends Group implements IView, IControl {
                 props.put(field, data);
             }
         }
-        Debug.logMsg("("+viewName+")"+
-                "\n\tFields queried:\n\t\t"
-                        + controlList.toString()
+        Debug.logMsg(
+                """
+                (%s)
+                    Fields queried:
+                        %s
+                    Properties retrieved:
+                        %s
+                """,
+                viewName,
+                controlList.toString()
                         .replaceAll(",", ",\n\t\t")
-                        .replaceAll("@[^},]*", "") + //Exclude memory address (trust me)
-                        "\n\tProperties retrieved:\n\t\t"
-                        + props.toString().replaceAll(",", ",\n\t\t")
-        );
+                        .replaceAll("@[^},]*", ""), //Exclude memory address (trust me)
+                props.toString().replaceAll(",", ",\n\t\t")
+                );
         return true;
     }
 
     protected String getValue(Control control) {
-        switch (control.getClass().toString()) {
-            case "class javafx.scene.control.ComboBox":
-                return ((ComboBox<String>) control).getValue();
-            case "class javafx.scene.control.DatePicker":
-                return ((DatePicker) control).getConverter().toString();
-            case "class javafx.scene.control.TextField":
-                return ((TextField) control).getText();
-            case "class javafx.scene.control.TextArea":
-                return ((TextArea) control).getText();
-            default:
+        return switch (control.getClass().toString()) {
+            case "class javafx.scene.control.ComboBox"  -> ((ComboBox<String>) control).getValue();
+            case "class javafx.scene.control.DatePicker"-> ((DatePicker) control).getConverter().toString();
+            case "class javafx.scene.control.TextField" -> ((TextField) control).getText();
+            case "class javafx.scene.control.TextArea"  -> ((TextArea) control).getText();
+            default -> {
                 Debug.logErr("Unsupported control: " + control.getClass());
-                return null;
-        }
+                yield null;
+            }
+        };
     }
 
     protected void setValue(Control control, String value) {
         Debug.logMsg(String.format("Updating %s to value %s",control,value));
         switch (control.getClass().toString()) {
-            case "class javafx.scene.control.ComboBox":
-                ((ComboBox<String>) control).getSelectionModel().select(value);
-                break;
-            case "class javafx.scene.control.DatePicker":
+            case "class javafx.scene.control.DatePicker" -> {
                 DatePicker picker = ((DatePicker) control);
                 StringConverter<LocalDate> converter = picker.getConverter();
                 picker.setValue(converter.fromString(value));
-                break;
-            case "class javafx.scene.control.TextField":
-                ((TextField) control).setText(value);
-                break;
-            case "class javafx.scene.control.TextArea":
-                ((TextArea) control).setText(value);
-                break;
-            default:
-                Debug.logErr("Unsupported control: " + control.getClass());
+            }
+            case "class javafx.scene.control.ComboBox"  -> ((ComboBox<String>) control).getSelectionModel().select(value);
+            case "class javafx.scene.control.TextField" -> ((TextField) control).setText(value);
+            case "class javafx.scene.control.TextArea"  -> ((TextArea) control).setText(value);
+            default -> Debug.logErr("Unsupported control: " + control.getClass());
         }
     }
 
@@ -466,19 +450,19 @@ public abstract class View extends Group implements IView, IControl {
         Alert alert = new Alert(type);
         alert.setHeaderText(null);
         alert.setGraphic(null);
-        switch(type){
-            case ERROR:
+        switch (type) {
+            case ERROR -> {
                 alert.setTitle("Error");
                 alert.setContentText("Error: " + msg);
-                break;
-            case WARNING:
+            }
+            case WARNING -> {
                 alert.setTitle("Warning");
                 alert.setContentText(msg);
-                break;
-            case INFORMATION:
+            }
+            case INFORMATION -> {
                 alert.setTitle("Information");
                 alert.setContentText(msg);
-                break;
+            }
         }
         alert.showAndWait();
     }

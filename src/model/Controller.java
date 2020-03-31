@@ -91,13 +91,11 @@ public class Controller implements IView, IModel {
 
     @Override
     public Object getState(String key) {
-        switch (key) {
-            case "ScoutList":
-                return scoutCollection;
-            case "Scout":
-                return scout;
-            default: return null;
-        }
+        return switch (key) {
+            case "ScoutList" -> scoutCollection;
+            case "Scout" -> scout;
+            default -> null;
+        };
     }
 
     @Override
@@ -105,110 +103,99 @@ public class Controller implements IView, IModel {
         Properties props;
 
         switch (key) {
-            case "ScoutRegister":
-            case "ScoutUpdateDelete":
-
-            case "TreeAdd":
-            case "TreeUpdateDelete":
-            case "TreeUpdate":
-            case "TreeDelete":
-
-            case "TreeTypeAdd":
-            case "TreeTypeUpdate":
-
-            case "TreeSell":
-
-            case "ShiftOpen":
-            case "ShiftClose":
-
+            case
+            /*Scout*/   "ScoutRegister", "ScoutUpdateDelete",
+            /*Tree*/    "TreeAdd", "TreeUpdateDelete", "TreeUpdate", "TreeDelete",
+            /*TreeType*/"TreeTypeAdd", "TreeTypeUpdate",
+            /*Sales*/   "TreeSell",
+            /*Shifts*/  "ShiftOpen", "ShiftClose",
             // Case when no other processing is needed
-            case "Generic":
-                createAndShowView(key + "View");
-                break;
+            "Generic" -> createAndShowView(key + "View");
 
             //***************
             // Insertions
             //***************
-            case "ScoutRegisterSubmit":
+            case "ScoutRegisterSubmit" -> {
                 Debug.logMsg("Processing scout registration");
-                props = (Properties)value;
+                props = (Properties) value;
                 scout = new Scout();
                 scout.persistentState = props;
                 scout.updateState("dateStatusUpdated", java.time.LocalDate.now().toString());
                 scout.persistentState.clear(); //Not totally sure if this is kosher
-                break;
+            }
 
             //***************
-            // Updates
+            // Scout updates
             //***************
-            case "ScoutSearch":
+            case "ScoutSearch" -> {
                 //TODO: Allow user to specify which field they are going to search for
-                props = (Properties)value;
+                // It's not currently obvious that you can input any field optionally
+                props = (Properties) value;
                 Vector<Scout> scouts = null;
 
-                String firstName = (String)props.get("firstName");
-                String lastName = (String)props.get("lastName");
-                String email = (String)props.get("email");
+                String firstName = (String) props.get("firstName");
+                String lastName = (String) props.get("lastName");
+                String email = (String) props.get("email");
 
                 scoutCollection = new ScoutCollection();
 
-                if(firstName != null){
+                if (firstName != null) {
                     scouts = scoutCollection.findScoutsWithFirstName(firstName);
-                }else if(lastName != null){
+                } else if (lastName != null) {
                     scouts = scoutCollection.findScoutsWithLastName(lastName);
-                }else if(email != null){
+                } else if (email != null) {
                     scouts = scoutCollection.findScoutsWithEmail(email);
-                }else{
+                } else {
                     Debug.logErr("(" + key + ")" + "No valid field retrieved");
                 }
-                scoutCollection.updateState("Scouts",scouts);
+                scoutCollection.updateState("Scouts", scouts);
 
                 Debug.logMsg("Created scout collection with scouts: " + Arrays.deepToString(scouts.toArray()));
 
                 createAndShowView("ScoutCollectionView");
-                break;
+            }
 
-            case "ScoutUpdate":
-                try{
-                    scout = new Scout((String)value);
-                }catch(InvalidPrimaryKeyException ex){
-                    Debug.logErr(String.format("(%s) Invalid scout ID",key));
+            case "ScoutUpdate" -> {
+                try {
+                    scout = new Scout((String) value);
+                } catch (InvalidPrimaryKeyException ex) {
+                    Debug.logErr(String.format("(%s) Invalid scout ID", key));
                 }
                 createAndShowView("ScoutUpdateView");
-                break;
+            }
 
-            case "ScoutUpdateSubmit":
+            case "ScoutUpdateSubmit" -> {
                 Debug.logMsg("(" + key + ") Processing scout registration");
                 props = (Properties) value;
-                for(Object field : props.keySet()){
+                for (Object field : props.keySet()) {
                     scout.persistentState.setProperty(
-                            (String)field,
-                            (String)props.get(field));
+                            (String) field,
+                            (String) props.get(field));
                 }
                 scout.updateState("dateStatusUpdated", java.time.LocalDate.now().toString()); //Internally calls update()
-                break;
+            }
 
-            case "ScoutDelete":
-                try{
-                    scout = new Scout((String)value);
-                }catch(InvalidPrimaryKeyException ex){
-                    Debug.logErr(String.format("(%s) Invalid scout ID",key));
+            case "ScoutDelete" -> {
+                try {
+                    scout = new Scout((String) value);
+                } catch (InvalidPrimaryKeyException ex) {
+                    Debug.logErr(String.format("(%s) Invalid scout ID", key));
                 }
-                scout.updateState("status","Inactive");
+                scout.updateState("status", "Inactive");
                 scout.updateState("dateStatusUpdated", java.time.LocalDate.now().toString());
 
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setContentText("Scout status set to Inactive");
                 Optional<ButtonType> confirm = alert.showAndWait();
-                if(confirm.get() == ButtonType.OK){
-                    this.stateChangeRequest("Cancel",null);
+                if (confirm.get() == ButtonType.OK) {
+                    this.stateChangeRequest("Cancel", null);
                 }
-                break;
+            }
 
             //***************
             // Add Tree Type
             //***************
-            case "TreeTypeAddSubmit":
+            case "TreeTypeAddSubmit" -> {
                 Debug.logMsg("Processing Tree Type Add");
                 try {
                     props = (Properties) value;
@@ -220,10 +207,10 @@ public class Controller implements IView, IModel {
                     treeType.update();
                     treeType.persistentState.clear();
                 }
-                break;
+            }
 
-            case "TreeAddSubmit":
-                Debug.logMsg(String.format("(%s) Processing Tree Insertion",key));
+            case "TreeAddSubmit" -> {
+                Debug.logMsg(String.format("(%s) Processing Tree Insertion", key));
                 props = (Properties) value;
                 try {
                     tree = new Tree(props.getProperty("barcode"));
@@ -235,14 +222,11 @@ public class Controller implements IView, IModel {
                     tree.update("Insert");
                     tree.persistentState.clear();
                 }
-                break;
+            }
 
-            case "Cancel":
-                createAndShowView("ControllerView");
-                break;
-            default:
-                Debug.logErr("Invalid key " + key);
-                break;
+            case "Cancel" -> createAndShowView("ControllerView");
+
+            default -> Debug.logErr("Invalid key " + key);
         }
     }
 }
