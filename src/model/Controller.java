@@ -124,7 +124,7 @@ public class Controller implements IView, IModel {
                 scout.updateState("dateStatusUpdated", java.time.LocalDate.now().toString());
                 scout.persistentState.clear(); //Not totally sure if this is kosher
 
-                Alerts.infoMessage("Scout registered successfully!");
+                Alerts.infoMessage("Scout registered successfully!",this);
             }
 
             //***************
@@ -176,6 +176,8 @@ public class Controller implements IView, IModel {
                             (String) props.get(field));
                 }
                 scout.updateState("dateStatusUpdated", java.time.LocalDate.now().toString()); //Internally calls update()
+
+                Alerts.infoMessage("Scout updated!",this);
             }
 
             case "ScoutDelete" -> {
@@ -187,12 +189,7 @@ public class Controller implements IView, IModel {
                 scout.updateState("status", "Inactive");
                 scout.updateState("dateStatusUpdated", java.time.LocalDate.now().toString());
 
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setContentText("Scout status set to Inactive");
-                Optional<ButtonType> confirm = alert.showAndWait();
-                if (confirm.get() == ButtonType.OK) {
-                    this.stateChangeRequest("Cancel", null);
-                }
+                Alerts.infoMessage("Scout deleted!",this);
             }
 
             //***************
@@ -210,6 +207,8 @@ public class Controller implements IView, IModel {
                     treeType.update();
                     treeType.persistentState.clear();
                 }
+
+                Alerts.infoMessage("Tree type added!",this);
             }
 
             case "TreeAddSubmit" -> {
@@ -225,6 +224,8 @@ public class Controller implements IView, IModel {
                     tree.update("Insert");
                     tree.persistentState.clear();
                 }
+
+                Alerts.infoMessage("Tree added!",this);
             }
 
             case "Cancel" -> createAndShowView("ControllerView");
