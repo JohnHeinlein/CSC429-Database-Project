@@ -28,7 +28,7 @@ public class Debug {
      * @param msg Message to append to stack trace
      */
     public static void logMsg(String msg) { log(msg,false); }
-    public static void logMsg(String format, String... replacements){
+    public static void logMsg(String format, Object... replacements){
         log(String.format(format, (Object[]) replacements), false);
     }
 
