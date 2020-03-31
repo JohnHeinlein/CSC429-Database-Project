@@ -15,6 +15,8 @@ import java.util.Optional;
 import java.util.Vector;
 
 public class ScoutCollectionView extends View{
+    protected final int COL_WIDTH = 100;
+
     protected TableView<ScoutTableModel> tableOfScouts;
     protected ScoutTableModel selection; //Selected scout
 
@@ -26,7 +28,7 @@ public class ScoutCollectionView extends View{
         tableOfScouts.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
         List<TableColumn<ScoutTableModel, String>> tableColumns = Arrays.asList(
-                new TableColumn<>("Id"),
+                //new TableColumn<>("Id"),
                 new TableColumn<>("Last Name"),
                 new TableColumn<>("First Name"),
                 new TableColumn<>("Middle Name"),
@@ -39,7 +41,7 @@ public class ScoutCollectionView extends View{
         );
 
         tableColumns.forEach(column ->{
-           column.setMinWidth(100.0);
+           column.setMinWidth(COL_WIDTH);
            column.setCellValueFactory(new PropertyValueFactory<>(Utilities.toCamelCase(column.getText())));
         });
 
@@ -67,12 +69,10 @@ public class ScoutCollectionView extends View{
                 Optional<ButtonType> confirmation = confirmMessage("Are you sure you want to delete Scout " +  selection.getFirstName() + " " + selection.getLastName() + "?");
                 if (confirmation.get() == ButtonType.OK){
                     myModel.stateChangeRequest("ScoutDelete",selection.getId());
-                } else {
-
                 }
-
             }
         }));
+
         cancelButton();
 
         getEntryTableModelValues();

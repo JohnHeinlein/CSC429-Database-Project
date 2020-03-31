@@ -36,7 +36,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.Vector;
 
 public abstract class View extends Group implements IView, IControl {
     private final String DEFAULT_FONT = "Comic Sans MS";
@@ -175,9 +174,15 @@ public abstract class View extends Group implements IView, IControl {
         GridPane.setHalignment(label, HPos.RIGHT);
         GridPane.setValignment(label, VPos.TOP);
     }
-    public void addContent(TableView table){
-        table.setPrefWidth(1000);
+    public void addContent(TableView<?> table){
+        int col_count = table.getColumns().size();
+        double col_width = table.getColumns().get(0).getWidth();
+        double width =  col_count * col_width;
+
+        container.setPrefWidth(width);
         container.setCenter(table);
+
+        Debug.logMsg("Set width: %s, actual width: %s", width, container.getWidth());
     }
 
     // ***************
