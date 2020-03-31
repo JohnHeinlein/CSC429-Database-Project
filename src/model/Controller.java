@@ -131,7 +131,9 @@ public class Controller implements IView, IModel {
             //***************
             case "ScoutRegisterSubmit":
                 Debug.logMsg("Processing scout registration");
-                scout.persistentState = (Properties) value;
+                props = (Properties)value;
+                scout = new Scout();
+                scout.persistentState = props;
                 scout.updateState("dateStatusUpdated", java.time.LocalDate.now().toString());
                 scout.persistentState.clear(); //Not totally sure if this is kosher
                 break;
@@ -213,6 +215,7 @@ public class Controller implements IView, IModel {
                     treeType = new TreeType(props.getProperty("barcodePrefix"));
                     Debug.logMsg("Tree Type With barcode prefix: " + props.getProperty("barcodePrefix") + " Already Exists");
                 } catch (InvalidPrimaryKeyException IPKE) {
+                    treeType = new TreeType();
                     treeType.persistentState = (Properties) value;
                     treeType.update();
                     treeType.persistentState.clear();

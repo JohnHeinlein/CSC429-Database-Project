@@ -64,7 +64,7 @@ public class ScoutCollectionView extends View{
             if(selection == null) {
                 errorMessage("Must select a scout!");
             }else {
-                Optional<ButtonType> confirmation = confirmMessage("Are you sure you want to delete Scout " +  selection.getId() + "?");
+                Optional<ButtonType> confirmation = confirmMessage("Are you sure you want to delete Scout " +  selection.getFirstName() + " " + selection.getLastName() + "?");
                 if (confirmation.get() == ButtonType.OK){
                     myModel.stateChangeRequest("ScoutDelete",selection.getId());
                 } else {
