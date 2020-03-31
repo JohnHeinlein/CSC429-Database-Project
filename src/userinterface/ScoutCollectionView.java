@@ -7,6 +7,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import model.Scout;
 import model.ScoutCollection;
+import utilities.Alerts;
 import utilities.Utilities;
 
 import java.util.Arrays;
@@ -56,7 +57,7 @@ public class ScoutCollectionView extends View{
 
         footButt(makeButt("Update",e ->{
             if(selection == null){
-                errorMessage("Must select a scout!");
+                Alerts.errorMessage("Must select a scout!");
             }else {
                 myModel.stateChangeRequest("ScoutUpdate", selection.getId());
             }
@@ -64,9 +65,9 @@ public class ScoutCollectionView extends View{
 
         footButt(makeButt("Delete",e-> {
             if(selection == null) {
-                errorMessage("Must select a scout!");
+                Alerts.errorMessage("Must select a scout!");
             }else {
-                Optional<ButtonType> confirmation = confirmMessage("Are you sure you want to delete Scout " +  selection.getFirstName() + " " + selection.getLastName() + "?");
+                Optional<ButtonType> confirmation = Alerts.confirmMessage("Are you sure you want to delete Scout " +  selection.getFirstName() + " " + selection.getLastName() + "?");
                 if (confirmation.get() == ButtonType.OK){
                     myModel.stateChangeRequest("ScoutDelete",selection.getId());
                 }

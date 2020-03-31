@@ -11,6 +11,7 @@ import userinterface.MainStageContainer;
 import userinterface.View;
 import userinterface.ViewFactory;
 import userinterface.WindowPosition;
+import utilities.Alerts;
 import utilities.Debug;
 
 import model.Scout;
@@ -122,6 +123,8 @@ public class Controller implements IView, IModel {
                 scout.persistentState = props;
                 scout.updateState("dateStatusUpdated", java.time.LocalDate.now().toString());
                 scout.persistentState.clear(); //Not totally sure if this is kosher
+
+                Alerts.infoMessage("Scout registered successfully!");
             }
 
             //***************

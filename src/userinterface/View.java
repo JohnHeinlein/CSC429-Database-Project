@@ -28,6 +28,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.util.StringConverter;
+import utilities.Alerts;
 import utilities.Debug;
 import utilities.Utilities;
 
@@ -148,7 +149,6 @@ public abstract class View extends Group implements IView, IControl {
                     props.put(Utilities.toCamelCase(textfield.getPromptText()), "");
                     isControl = true; //Debugging
                 }
-
                 case "class userinterface.View$NotesFieldWrapper" -> {
                     controlList.put(propertyName,
                             ((NotesFieldWrapper) control).getField());
@@ -384,11 +384,11 @@ public abstract class View extends Group implements IView, IControl {
                 case "class javafx.scene.control.TextArea" -> data = ((TextArea) control).getText();
                 default -> {
                     Debug.logErr("Unsupported Control type " + control.getClass().toString());
-                    errorMessage("Unsupported Control type, enable debugging");
+                    Alerts.errorMessage("Unsupported Control type, enable debugging");
                 }
             }
             if (safe && data.equals("") || data == null) {
-                errorMessage("All fields must be entered!");
+                Alerts.errorMessage("All fields must be entered!");
                 Debug.logErr("Empty fields, returning false");
                 return false;
             } else {
@@ -408,7 +408,7 @@ public abstract class View extends Group implements IView, IControl {
                         .replaceAll(",", ",\n\t\t")
                         .replaceAll("@[^},]*", ""), //Exclude memory address (trust me)
                 props.toString().replaceAll(",", ",\n\t\t")
-                );
+        );
         return true;
     }
 
@@ -438,41 +438,6 @@ public abstract class View extends Group implements IView, IControl {
             case "class javafx.scene.control.TextArea"  -> ((TextArea) control).setText(value);
             default -> Debug.logErr("Unsupported control: " + control.getClass());
         }
-    }
-
-    // ***************
-    // Pre-configured Alert boxes
-    // ***************
-    public void errorMessage(String msg){
-       makeAlert(msg, Alert.AlertType.ERROR);
-    }
-    public void makeAlert(String msg, Alert.AlertType type){
-        Alert alert = new Alert(type);
-        alert.setHeaderText(null);
-        alert.setGraphic(null);
-        switch (type) {
-            case ERROR -> {
-                alert.setTitle("Error");
-                alert.setContentText("Error: " + msg);
-            }
-            case WARNING -> {
-                alert.setTitle("Warning");
-                alert.setContentText(msg);
-            }
-            case INFORMATION -> {
-                alert.setTitle("Information");
-                alert.setContentText(msg);
-            }
-        }
-        alert.showAndWait();
-    }
-    public Optional<ButtonType> confirmMessage(String msg){
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setHeaderText(null);
-        alert.setGraphic(null);
-        alert.setTitle("Confirm Action");
-        alert.setContentText(msg);
-        return alert.showAndWait();
     }
 
     public void setRegistry(ControlRegistry registry) {

@@ -95,11 +95,11 @@ public class ScoutCollection extends EntityBase implements IView {
 //    }
 
     public Object getState(String key){
-        switch(key){
-            case "Scouts":   return scoutList;
-            case "ScoutList":return this;
-            default:         return null;
-        }
+        return switch(key){
+            case "Scouts" -> scoutList;
+            case "ScoutList" -> this;
+            default -> null;
+        };
     }
 
     public void stateChangeRequest(String key, Object value){
