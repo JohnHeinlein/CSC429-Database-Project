@@ -7,6 +7,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import model.Scout;
 import model.ScoutCollection;
+import model.ScoutTableModel;
 import utilities.Alerts;
 import utilities.Utilities;
 

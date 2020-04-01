@@ -41,7 +41,7 @@ public class Alerts {
     public static void infoMessage(String msg, IModel model){
         Alert alert = makeAlert(msg,Alert.AlertType.INFORMATION);
         if(alert.showAndWait().get() == ButtonType.OK){
-            model.stateChangeRequest("cancel",null);
+            model.stateChangeRequest("Cancel",null);
         }
     }
 

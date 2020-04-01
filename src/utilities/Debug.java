@@ -19,7 +19,7 @@ public class Debug {
      * @param msg Message to append to stack trace
      */
     public static void logErr(String msg) { log(msg,true); }
-    public static void logErr(String format, String... replacements){
+    public static void logErr(String format, Object... replacements){
         log(String.format(format, (Object[]) replacements), true);
     }
     /**
