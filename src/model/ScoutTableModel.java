@@ -1,4 +1,4 @@
-package userinterface;
+package model;
 
 import javafx.beans.property.SimpleStringProperty;
 import model.Scout;
@@ -24,7 +24,7 @@ public class ScoutTableModel {
         email = new SimpleStringProperty(scoutData.elementAt(6));
         troopId = new SimpleStringProperty(scoutData.elementAt(7));
         status = new SimpleStringProperty(scoutData.elementAt(8));
-        dateStatusUpdated = new SimpleStringProperty(scoutData.elementAt(9));;
+        dateStatusUpdated = new SimpleStringProperty(scoutData.elementAt(9));
     }
     public String getId(){ return id.get();}
     public void setId(String id){this.id.set(id);}
