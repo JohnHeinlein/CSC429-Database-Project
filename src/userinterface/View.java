@@ -72,7 +72,7 @@ public abstract class View extends Group implements IView, IControl {
 
         //Header
         header.setAlignment(Pos.CENTER);
-        header.setPadding(new Insets(5, 5, 5, 5));
+        header.setPadding(new Insets(0, 0, 0, 0));
 
         //Footer
         footer.setAlignment(Pos.CENTER);
@@ -87,6 +87,27 @@ public abstract class View extends Group implements IView, IControl {
         container.setTop(header);
         container.setCenter(content);
         container.setBottom(footer);
+
+        if(Debug.debug){
+            //Create menu bar
+            MenuBar mb = new MenuBar();
+            Menu mDatabase = new Menu("Database");
+
+            MenuItem mDatabaseBrowser = new MenuItem("Browser");
+            mDatabaseBrowser.setOnAction(e -> {
+                new DebugBrowser();
+            });
+
+            mb.setUseSystemMenuBar(true);
+
+            mDatabase.getItems().add(mDatabaseBrowser);
+            mb.getMenus().add(mDatabase);
+
+            // Reformat view to fit menu bar
+            //VBox = new VBox();
+            //bigboy.getChildren().addAll(mb, container);
+            header.getChildren().add(mb);
+        }
         getChildren().add(container);
     }
 
