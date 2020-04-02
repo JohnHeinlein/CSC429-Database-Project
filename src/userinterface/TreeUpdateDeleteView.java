@@ -13,14 +13,9 @@ public class TreeUpdateDeleteView extends View {
                 makeField("Barcode"));
 
 
-        footButt(makeButt("Update",e->{
+        footButt(makeButt("Search",e->{
             scrapeFields();
-            myModel.stateChangeRequest("TreeUpdate",props);
-        }));
-
-        footButt(makeButt("Delete",e->{
-            scrapeFields();
-            myModel.stateChangeRequest("TreeDelete",props);
+            myModel.stateChangeRequest("TreeSearch",props);
         }));
 
         cancelButton();

@@ -60,6 +60,23 @@ public class Tree extends EntityBase implements IModel, IView {
         }
     }
 
+    public Tree(Properties props){
+        super(myTableName);
+        setDependencies();
+
+        persistentState = new Properties();
+        Enumeration allKeys = props.propertyNames();
+        while (allKeys.hasMoreElements()) {
+            String nextKey = (String)allKeys.nextElement();
+            String nextValue = props.getProperty(nextKey);
+
+            if (nextValue != null)
+            {
+                persistentState.setProperty(nextKey, nextValue);
+            }
+        }
+    }
+
     //-Because we Deserve nice things
     public void update(String key) {
         updateStateInDatabase(key);
@@ -119,5 +136,17 @@ public class Tree extends EntityBase implements IModel, IView {
         dependencies = new Properties();
 
         myRegistry.setDependencies(dependencies);
+    }
+
+    public Vector<String> getEntryListView() {
+        Vector<String> v = new Vector<>();
+
+        v.addElement(persistentState.getProperty("barcode"));
+        v.addElement(persistentState.getProperty("treeType"));
+        v.addElement(persistentState.getProperty("notes"));
+        v.addElement(persistentState.getProperty("status"));
+        v.addElement(persistentState.getProperty("dateStatusUpdated"));
+
+        return v;
     }
 }

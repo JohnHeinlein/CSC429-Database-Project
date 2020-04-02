@@ -32,7 +32,10 @@ public class Controller implements IView, IModel {
     private Scout scout;
 
     private Tree tree;
+    private TreeCollection treeCollection;
+
     private TreeType treeType;
+    private TreeTypeCollection treeTypeCollection;
 
     public Controller() {
         myStage = MainStageContainer.getInstance();
@@ -96,6 +99,10 @@ public class Controller implements IView, IModel {
         return switch (key) {
             case "ScoutList" -> scoutCollection;
             case "Scout" -> scout;
+
+            case "TreeList" -> treeCollection;
+            case "Tree" -> tree;
+
             default -> null;
         };
     }
@@ -129,7 +136,7 @@ public class Controller implements IView, IModel {
             }
 
             //***************
-            // Scout updates
+            // Scout
             //***************
             case "ScoutSearch" -> {
                 Pair<String,String> pair = (Pair<String,String>) value;
@@ -185,6 +192,24 @@ public class Controller implements IView, IModel {
                 scout.updateState("dateStatusUpdated", java.time.LocalDate.now().toString());
 
                 Alerts.infoMessage("Scout deleted!",this);
+            }
+            //***************
+            // Tree
+            //***************
+            case "TreeSearch" ->{
+                String barcode = (String)((Properties)value).get("barcode");
+                if(barcode == null){
+                    Debug.logErr("No barcode retrieved");
+                    return;
+                }
+                treeCollection = new TreeCollection();
+
+                Vector<Tree> trees = treeCollection.findTrees(barcode);
+                treeCollection.updateState("Trees",trees);
+
+                Debug.logMsg("Created tree collection with trees: " + Arrays.deepToString(trees.toArray()));
+
+                createAndShowView("TreeCollectionView");
             }
 
             //***************
