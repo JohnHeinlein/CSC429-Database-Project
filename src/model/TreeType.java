@@ -64,6 +64,25 @@ public class TreeType extends EntityBase implements IModel, IView {
         }
     }
 
+    public TreeType (Properties props)
+    {
+        super(myTableName);
+
+        setDependencies();
+        persistentState = new Properties();
+        Enumeration allKeys = props.propertyNames();
+        while (allKeys.hasMoreElements())
+        {
+            String nextKey = (String)allKeys.nextElement();
+            String nextValue = props.getProperty(nextKey);
+
+            if (nextValue != null)
+            {
+                persistentState.setProperty(nextKey, nextValue);
+            }
+        }
+    }
+
     //-Because we Deserve nice things
     public void update() {
         updateStateInDatabase();
@@ -96,6 +115,18 @@ public class TreeType extends EntityBase implements IModel, IView {
             }
             //DEBUG System.out.println("updateStateInDatabase " + updateStatusMessage);
         }
+
+    // For table Views
+    public Vector<String> getEntryListView() {
+        Vector<String> v = new Vector<>();
+
+        v.addElement(persistentState.getProperty("id"));
+        v.addElement(persistentState.getProperty("typeDescription"));
+        v.addElement(persistentState.getProperty("cost"));
+        v.addElement(persistentState.getProperty("barcodePrefix"));
+
+        return v;
+    }
 
     /**
      * Update the singleton table with values from the database
@@ -133,7 +164,10 @@ public class TreeType extends EntityBase implements IModel, IView {
         if (key.equals("getId")) {
             return persistentState.getProperty("id");
         }
-        return null;
+        else {
+            Debug.logMsg(persistentState.getProperty(key));
+            return persistentState.getProperty(key);
+        }
     }
 
     @Override

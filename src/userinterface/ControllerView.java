@@ -14,7 +14,7 @@ public class ControllerView extends View{
                 makeButt("Sell","TreeSell",null));
 
         addContent("Tree Type",
-                makeButt("Update", "TreeTypeUpdate",null),
+                makeButt("Update", "TreeTypeCollection",null),
                 makeButt("Add","TreeTypeAdd",null));
 
         addContent("Tree",
