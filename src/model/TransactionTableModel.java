@@ -18,17 +18,17 @@ public class TransactionTableModel{
 
     public TransactionTableModel(Vector<String> data){
         id = data.get(0);
-        sessionId = data.get(0);
-        transactionType = data.get(0);
-        barcode = data.get(0);
-        transactionAmount = data.get(0);
-        paymentMethod = data.get(0);
-        customerName = data.get(0);
-        customerPhone = data.get(0);
-        customerEmail = data.get(0);
-        transactionDate = data.get(0);
-        transactionTime = data.get(0);
-        dateStatusUpdated = data.get(0);
+        sessionId = data.get(1);
+        transactionType = data.get(2);
+        barcode = data.get(3);
+        transactionAmount = data.get(4);
+        paymentMethod = data.get(5);
+        customerName = data.get(6);
+        customerPhone = data.get(7);
+        customerEmail = data.get(8);
+        transactionDate = data.get(9);
+        transactionTime = data.get(10);
+        dateStatusUpdated = data.get(11);
     }
     public String getId(){ return id; }
     public void setId(String newVal){id = newVal;}

@@ -14,13 +14,13 @@ public class SessionTableModel{
 
     public SessionTableModel(Vector<String> data){
         id = data.get(0);
-        startDate = data.get(0);
-        startTime = data.get(0);
-        endTime = data.get(0);
-        startingCash = data.get(0);
-        endingCash = data.get(0);
-        totalCheckTransactionsAmount = data.get(0);
-        notes = data.get(0);
+        startDate = data.get(1);
+        startTime = data.get(2);
+        endTime = data.get(3);
+        startingCash = data.get(4);
+        endingCash = data.get(5);
+        totalCheckTransactionsAmount = data.get(6);
+        notes = data.get(7);
     }
     public String getId(){ return id; }
     public void setId(String newVal){id = newVal;}

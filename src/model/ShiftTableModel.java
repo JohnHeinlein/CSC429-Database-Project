@@ -13,12 +13,12 @@ public class ShiftTableModel{
 
     public ShiftTableModel(Vector<String> data){
         id = data.get(0);
-        sessionId = data.get(0);
-        scoutId = data.get(0);
-        companionName = data.get(0);
-        startTime = data.get(0);
-        endTime = data.get(0);
-        companionHours = data.get(0);
+        sessionId = data.get(1);
+        scoutId = data.get(2);
+        companionName = data.get(3);
+        startTime = data.get(4);
+        endTime = data.get(5);
+        companionHours = data.get(6);
     }
     public String getId(){ return id; }
     public void setId(String newVal){id = newVal;}

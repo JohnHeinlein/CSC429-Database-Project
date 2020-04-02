@@ -11,10 +11,10 @@ public class TreeTableModel{
 
     public TreeTableModel(Vector<String> data){
         barcode = data.get(0);
-        treeType = data.get(0);
-        notes = data.get(0);
-        status = data.get(0);
-        dateStatusUpdated = data.get(0);
+        treeType = data.get(1);
+        notes = data.get(2);
+        status = data.get(3);
+        dateStatusUpdated = data.get(4);
     }
     public String getBarcode(){ return barcode; }
     public void setBarcode(String newVal){barcode = newVal;}
