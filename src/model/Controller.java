@@ -114,7 +114,7 @@ public class Controller implements IView, IModel {
         switch (key) {
             case
             /*Scout*/   "ScoutRegister", "ScoutUpdateDelete",
-            /*Tree*/    "TreeAdd", "TreeUpdateDelete", "TreeUpdate", "TreeDelete",
+            /*Tree*/    "TreeAdd",
             /*TreeType*/"TreeTypeAdd", "TreeTypeUpdate",
             /*Sales*/   "TreeSell",
             /*Shifts*/  "ShiftOpen", "ShiftClose",
@@ -196,20 +196,18 @@ public class Controller implements IView, IModel {
             //***************
             // Tree
             //***************
-            case "TreeSearch" ->{
-                String barcode = (String)((Properties)value).get("barcode");
-                if(barcode == null){
-                    Debug.logErr("No barcode retrieved");
-                    return;
-                }
-                treeCollection = new TreeCollection();
+            case "TreeUpdateDelete" ->{
+                createAndShowView("TreeUpdateDeleteView");
+            }
 
-                Vector<Tree> trees = treeCollection.findTrees(barcode);
-                treeCollection.updateState("Trees",trees);
+            case "TreeUpdate" ->{
+                tree = (Tree)value;
+                createAndShowView("TreeUpdateView");
+            }
 
-                Debug.logMsg("Created tree collection with trees: " + Arrays.deepToString(trees.toArray()));
+            case "TreeDelete" -> {
+                tree = (Tree)value;
 
-                createAndShowView("TreeCollectionView");
             }
 
             //***************
