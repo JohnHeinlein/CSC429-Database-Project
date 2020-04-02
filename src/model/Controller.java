@@ -7,6 +7,7 @@ import impresario.ModelRegistry;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 import userinterface.MainStageContainer;
 import userinterface.View;
 import userinterface.ViewFactory;
@@ -131,26 +132,20 @@ public class Controller implements IView, IModel {
             // Scout updates
             //***************
             case "ScoutSearch" -> {
-                //TODO: Allow user to specify which field they are going to search for
-                // It's not currently obvious that you can input any field optionally
-                props = (Properties) value;
-                Vector<Scout> scouts = null;
-
-                String firstName = (String) props.get("firstName");
-                String lastName = (String) props.get("lastName");
-                String email = (String) props.get("email");
+                Pair<String,String> pair = (Pair<String,String>) value;
+                Vector<Scout> scouts;
 
                 scoutCollection = new ScoutCollection();
 
-                if (firstName != null) {
-                    scouts = scoutCollection.findScoutsWithFirstName(firstName);
-                } else if (lastName != null) {
-                    scouts = scoutCollection.findScoutsWithLastName(lastName);
-                } else if (email != null) {
-                    scouts = scoutCollection.findScoutsWithEmail(email);
-                } else {
-                    Debug.logErr("(" + key + ")" + "No valid field retrieved");
-                }
+                scouts = switch(pair.getKey()){
+                    case "firstName" -> scoutCollection.findScoutsWithFirstName(pair.getValue());
+                    case "lastName" -> scoutCollection.findScoutsWithLastName(pair.getValue());
+                    case "email" -> scoutCollection.findScoutsWithEmail(pair.getValue());
+                    default -> {
+                        Debug.logErr("(" + key + ")" + "No valid field retrieved");
+                        yield null;
+                    }
+                };
                 scoutCollection.updateState("Scouts", scouts);
 
                 Debug.logMsg("Created scout collection with scouts: " + Arrays.deepToString(scouts.toArray()));
