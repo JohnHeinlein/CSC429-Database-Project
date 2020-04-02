@@ -50,12 +50,12 @@ public abstract class View extends Group implements IView, IControl {
     protected Properties props; //Collects information from input fields for submission
     protected HashMap<String, Control> controlList; //Keeps track of what content is a control
 
-    private BorderPane container;
-    private VBox header;
-    private HBox footer;
-    private GridPane content;
+    private final BorderPane container;
+    private final VBox header;
+    private final HBox footer;
+    private final GridPane content;
 
-    private String viewName; //Debugging purposes
+    private final String viewName; //Debugging purposes
 
     public View(IModel model, String classname) {
         myModel = model;
@@ -150,6 +150,8 @@ public abstract class View extends Group implements IView, IControl {
 
         // Controls/Fields
         HBox controlBox = new HBox();
+        controlBox.setSpacing(5);
+
         for (Region control : controls) {
             control.setPrefWidth(FIELD_WIDTH / controls.length); //Scale width to fill space
             controlBox.getChildren().add(control);
@@ -476,8 +478,8 @@ public abstract class View extends Group implements IView, IControl {
     }
 
     protected class TextFieldWrapper extends VBox {
-        private TextField field;
-        private MessageView message;
+        private final TextField field;
+        private final MessageView message;
 
         public TextFieldWrapper(String prompt) {
             field = new TextField();
@@ -525,8 +527,8 @@ public abstract class View extends Group implements IView, IControl {
     }
 
     protected class NotesFieldWrapper extends VBox {
-        private TextArea field;
-        private Label label;
+        private final TextArea field;
+        private final Label label;
 
         public NotesFieldWrapper(String prompt, int maxLength) {
             label = new Label();
