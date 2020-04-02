@@ -39,6 +39,7 @@ public class DebugBrowser {
         Browser browserView = new Browser();
         Scene newScene = new Scene(browserView);
 
+        mainStage.setTitle("Debuging Database Browser");
         mainStage.setScene(newScene);
         mainStage.show();
     }

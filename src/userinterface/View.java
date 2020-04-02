@@ -91,7 +91,7 @@ public abstract class View extends Group implements IView, IControl {
         if(Debug.debug){
             //Create menu bar
             MenuBar mb = new MenuBar();
-            Menu mDatabase = new Menu("Database");
+            Menu mDatabase = new Menu("Debug");
 
             MenuItem mDatabaseBrowser = new MenuItem("Browser");
             mDatabaseBrowser.setOnAction(e -> {
