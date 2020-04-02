@@ -31,6 +31,8 @@ public class Controller implements IView, IModel {
     private Scout scout;
 
     private Tree tree;
+
+    private TreeTypeCollection treeTypeCollection;
     private TreeType treeType;
 
     public Controller() {
@@ -95,6 +97,8 @@ public class Controller implements IView, IModel {
         return switch (key) {
             case "ScoutList" -> scoutCollection;
             case "Scout" -> scout;
+            case "TreeTypeList" -> treeTypeCollection;
+            case "TreeType" -> treeType;
             default -> null;
         };
     }
@@ -107,7 +111,7 @@ public class Controller implements IView, IModel {
             case
             /*Scout*/   "ScoutRegister", "ScoutUpdateDelete",
             /*Tree*/    "TreeAdd", "TreeUpdateDelete", "TreeUpdate", "TreeDelete",
-            /*TreeType*/"TreeTypeAdd", "TreeTypeUpdate",
+            /*TreeType*/"TreeTypeAdd",
             /*Sales*/   "TreeSell",
             /*Shifts*/  "ShiftOpen", "ShiftClose",
             // Case when no other processing is needed
@@ -211,6 +215,44 @@ public class Controller implements IView, IModel {
                 Alerts.infoMessage("Tree type added!",this);
             }
 
+            //***********************************
+            //  Showing all Tree Types to Select
+            //***********************************
+            case "TreeTypeCollection" -> {
+                treeTypeCollection = new TreeTypeCollection();
+                treeTypeCollection.lookupAll();
+
+                createAndShowView("TreeTypeCollectionView");
+            }
+
+            //*************************************
+            //  Upon hitting submit in the table
+            //*************************************
+            case "TreeTypeCollectionSubmit" -> {
+                try {
+                    treeType = new TreeType((String) value);
+                } catch (InvalidPrimaryKeyException ex) {
+                    Debug.logErr(String.format("(%s) Invalid tree type ID", key));
+                }
+                createAndShowView("TreeTypeUpdateView");
+            }
+
+            case "TreeTypeUpdateSubmit" -> {
+                Debug.logMsg("(" + key + ") Processing tree Type registration");
+                props = (Properties) value;
+                for (Object field : props.keySet()) {
+                    treeType.persistentState.setProperty(
+                            (String) field,
+                            (String) props.get(field));
+                }
+
+                treeType.update();
+                Alerts.infoMessage("Tree Type updated!",this);
+            }
+
+            //****************************
+            //  Add A Tree
+            //****************************
             case "TreeAddSubmit" -> {
                 Debug.logMsg(String.format("(%s) Processing Tree Insertion", key));
                 props = (Properties) value;
