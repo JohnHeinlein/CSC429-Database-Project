@@ -22,10 +22,7 @@ public class ScoutCollection extends EntityBase implements IView {
     private static final String myTableName = "scout";
     private Vector<Scout> scoutList;
 
-    public ScoutCollection(){
-        this(new Vector<Scout>());
-    }
-
+    public ScoutCollection(){ this(new Vector<Scout>()); }
     public ScoutCollection(Vector<Scout> scouts){
         super(myTableName);
         scoutList = scouts;
@@ -54,8 +51,8 @@ public class ScoutCollection extends EntityBase implements IView {
         }else {
             Debug.logMsg("Found scouts: " + Arrays.deepToString(allDataRetrieved.toArray()));
         }
-        for (int x = 0; x < allDataRetrieved.size(); x++) {
-            Scout scout = new Scout(allDataRetrieved.get(x));
+        for (Properties properties : allDataRetrieved) {
+            Scout scout = new Scout(properties);
             //scoutList.insertElementAt(scout, findIndexToAdd(scout));
             scoutList.add(scout);
         }
