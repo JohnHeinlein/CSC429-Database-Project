@@ -11,13 +11,10 @@ import java.util.Properties;
 import java.util.Vector;
 
 public class Scout extends EntityBase implements IView, IModel {
-
     private static final String myTableName = "scout";
-
     protected Properties dependencies;
 
     // GUI Components
-
     private String updateStatusMessage = "";
 
     // Our [B]onstructor
@@ -101,37 +98,30 @@ public class Scout extends EntityBase implements IView, IModel {
 
     @Override
     public Object getState(String key) {
-        if (key.equals("UpdateStatusMessage"))
-            return updateStatusMessage;
-        return persistentState.getProperty(key);
+        return switch(key){
+            case "UpdateStatusMessage" -> updateStatusMessage;
+            case "schema" -> {
+                if(mySchema == null) initializeSchema(myTableName);
+                yield mySchema;
+            }
+            default -> persistentState.getProperty(key);
+        };
     }
 
     @Override
-    public void stateChangeRequest(String key, Object value) {
+    public void stateChangeRequest(String key, Object value){
         if (key.equals("InsertScout")) {
             Properties data = (Properties) value;
-            persistentState.setProperty("firstName", data.getProperty("firstName"));
-            persistentState.setProperty("lastName", data.getProperty("lastName"));
-            persistentState.setProperty("middleName", data.getProperty("middleName"));
-            persistentState.setProperty("dateOfBirth", data.getProperty("dateOfBirth"));
-            persistentState.setProperty("phoneNumber", data.getProperty("phoneNumber"));
-            persistentState.setProperty("email", data.getProperty("email"));
-            persistentState.setProperty("troopId", data.getProperty("troopId"));
-            persistentState.setProperty("status", data.getProperty("status"));
-            persistentState.setProperty("dateStatusUpdated", data.getProperty("dateStatusUpdated"));
-
-            this.update();
-
-            persistentState.clear();
-
-        }else if(value instanceof String){
-            String val = (String) value;
+            for(String s : new String[] {"firstName","middleName","lastName", "dateOfBirth", "phoneNumber", "email", "troopId", "status", "dateStatusUpdated"}){
+                persistentState.setProperty(s,data.getProperty(s));
+            }
+        }else if(value instanceof String val){
             persistentState.setProperty(key, val);
             Debug.logMsg(String.format("Updating state \"%s\" to value \"%s\"",
                     key,val));
-
-            this.update();
         }
+        this.updateStateInDatabase();
+        persistentState.clear();
         myRegistry.updateSubscribers(key, this);
     }
 
@@ -148,7 +138,7 @@ public class Scout extends EntityBase implements IView, IModel {
     //////////////////////////////////////////////////////////////////////////////////
 
     //Updating Database State
-    private void updateStateInDatabase() {
+    private void updateStateInDatabase(){
         Debug.logMsg("Updating scout ID " + persistentState.getProperty("id"));
         try {
             if (persistentState.getProperty("id") != null) {
@@ -175,12 +165,8 @@ public class Scout extends EntityBase implements IView, IModel {
 
         } catch (SQLException ex) {
             updateStatusMessage = "Error in installing Scout data in database!";
+            ex.printStackTrace();
         }
-    }
-
-    //-Because we Deserve nice things
-    public void update() {
-        updateStateInDatabase();
     }
 
     private void setDependencies() {

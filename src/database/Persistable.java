@@ -70,11 +70,9 @@ abstract public class Persistable {
             // get the names of the columns from the database
             ResultSet columnInfo = dbMetaData.getColumns(null, null, tableName, null);
             while (columnInfo.next()) {
-                String typeValue = columnInfo.getString(6);
+                String typeValue = columnInfo.getString(6).toLowerCase();
 
-                typeValue = typeValue.toLowerCase();
-                typeValue = (typeValue.startsWith("smallint")) || (typeValue.startsWith("mediumint")) ||
-                        (typeValue.startsWith("int")) ? "numeric" : "text";
+                typeValue = (typeValue.startsWith("smallint") || typeValue.startsWith("mediumint") || typeValue.startsWith("int")) ? "numeric" : "text";
 
                 // add the column / field name and type to the return props
                 valToReturn.setProperty(columnInfo.getString(4), typeValue);

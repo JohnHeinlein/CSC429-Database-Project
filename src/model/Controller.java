@@ -5,7 +5,6 @@ import impresario.IModel;
 import impresario.IView;
 import impresario.ModelRegistry;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import userinterface.MainStageContainer;
@@ -63,6 +62,9 @@ public class Controller implements IView, IModel {
 //        swapToView(currentScene);
         View newView = ViewFactory.createView(viewName,this);
         Scene newScene = new Scene(newView);
+
+        myViews.put(viewName,newScene);
+
         swapToView(newScene);
     }
 
@@ -96,6 +98,10 @@ public class Controller implements IView, IModel {
 
     @Override
     public Object getState(String key) {
+        if(key.substring(key.length() - 3).equals("View")){
+            return myViews.get(key);
+        }
+
         return switch (key) {
             case "ScoutList" -> scoutCollection;
             case "Scout" -> scout;
@@ -120,9 +126,8 @@ public class Controller implements IView, IModel {
             /*Tree*/    "TreeAdd",
             /*TreeType*/"TreeTypeAdd",
             /*Sales*/   "TreeSell",
-            /*Shifts*/  "ShiftOpen", "ShiftClose",
-            // Case when no other processing is needed
-            "Generic" -> createAndShowView(key + "View");
+            /*Shifts*/  "ShiftOpen", "ShiftClose"
+                        -> createAndShowView(key + "View");
 
             //***************
             // Insertions
@@ -130,8 +135,10 @@ public class Controller implements IView, IModel {
             case "ScoutRegisterSubmit" -> {
                 Debug.logMsg("Processing scout registration");
                 props = (Properties) value;
+
                 scout = new Scout();
                 scout.persistentState = props;
+
                 scout.updateState("dateStatusUpdated", java.time.LocalDate.now().toString());
                 scout.persistentState.clear(); //Not totally sure if this is kosher
 
