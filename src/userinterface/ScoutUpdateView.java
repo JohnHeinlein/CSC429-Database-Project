@@ -2,15 +2,13 @@
 package userinterface;
 
 // system imports
-import javafx.geometry.Insets;
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
 
-
-// project imports
 import impresario.IModel;
+import javafx.scene.control.Control;
 import model.Scout;
 import utilities.Debug;
+
+// project imports
 
 public class ScoutUpdateView extends View {
     private Scout scout;
@@ -24,21 +22,21 @@ public class ScoutUpdateView extends View {
 
         // create our GUI components, add them to this Container
         addContent("First Name",
-                makeField("First name"),
-                makeField("Middle name"),
-                makeField("Last name"));
+                makeField("First name",25),
+                makeField("Middle name",25),
+                makeField("Last name",25));
 
         addContent("Date of Birth",
                 makeDatePicker());
 
         addContent("Phone Number",
-                makeField("Phone Number"));
+                makeField("Phone Number",30));
 
         addContent("Email",
-                makeField("Email"));
+                makeField("Email",30));
 
         addContent("Troop ID",
-                makeField("Troop ID"));
+                makeField("Troop ID",10));
 
         addContent("Status",
                 makeComboBox("Active","Inactive"));
@@ -47,7 +45,7 @@ public class ScoutUpdateView extends View {
         cancelButton();
 
         for(String field : controlList.keySet()){
-            setValue(controlList.get(field), (String)scout.getState(field));
+            setValue((Control)controlList.get(field), (String)scout.getState(field));
         }
         //myModel.subscribe("UpdateStatusMessage", this);
     }

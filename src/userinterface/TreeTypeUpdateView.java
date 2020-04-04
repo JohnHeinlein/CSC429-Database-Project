@@ -1,22 +1,16 @@
 package userinterface;
 
 // system imports
+
 import exception.InvalidPrimaryKeyException;
-import javafx.geometry.Insets;
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
-
-
-// project imports
 import impresario.IModel;
-import model.Scout;
 import model.TreeType;
 import utilities.Debug;
 
-import java.util.Properties;
+// project imports
 
 public class TreeTypeUpdateView extends View {
-    private TreeType treeType;
+    private final TreeType treeType;
 
     public TreeTypeUpdateView (IModel myModel) {
         super(myModel, "TreeTypeAddView");
@@ -45,7 +39,7 @@ public class TreeTypeUpdateView extends View {
     public void submit(){
         if(scrapeFields()) {
             try {
-                if (((String)treeType.getState("barcodePrefix")).equals(props.getProperty("barcodePrefix")) == false) {
+                if (!((String) treeType.getState("barcodePrefix")).equals(props.getProperty("barcodePrefix"))) {
                     TreeType tType = new TreeType(props.getProperty("barcodePrefix"));
                     Debug.logMsg("Tree Type With barcode prefix: " + props.getProperty("barcodePrefix") + " Already Exists");
                 }
@@ -53,6 +47,7 @@ public class TreeTypeUpdateView extends View {
                     myModel.stateChangeRequest("TreeTypeUpdateSubmit", props);
                 }
             } catch (InvalidPrimaryKeyException IPKE) {
+                Debug.logErr("Invalid primary key exception caught");
                 myModel.stateChangeRequest("TreeTypeUpdateSubmit", props);
             }
         }else{

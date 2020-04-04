@@ -1,17 +1,12 @@
-// specify the package
 package userinterface;
 
-// system imports
+import impresario.IModel;
 import javafx.geometry.Insets;
 import javafx.scene.layout.VBox;
 
 
-// project imports
-import impresario.IModel;
-import utilities.Debug;
-
 public class ScoutRegisterView extends View {
-    public ScoutRegisterView(IModel scout) {
+    public ScoutRegisterView(IModel scout){
         super(scout, "ScoutRegisterView");
 
         // create a container for showing the contents
@@ -22,45 +17,43 @@ public class ScoutRegisterView extends View {
         setTitle("Insert Scout Data");
 
         // create our GUI components, add them to this Container
-        addContent("First Name",
-                makeField("First name"),
-                makeField("Middle name"),
-                makeField("Last name"));
+        addContent("Name",
+                makeField("First name",  25),
+                makeField("Middle name", 25),
+                makeField("Last name",   25));
 
         addContent("Date of Birth",
                 makeDatePicker());
 
         addContent("Phone Number",
-                makeField("Phone Number"));
+                makeField("Phone Number",30));
 
         addContent("Email",
-                makeField("Email"));
+                makeField("Email",30));
 
         addContent("Troop ID",
-                makeField("Troop ID"));
+                makeField("Troop ID",10));
 
         addContent("Status",
                 makeComboBox("Active","Inactive"));
 
         submitButton();
         cancelButton();
-        myModel.subscribe("UpdateStatusMessage", this);
+        //myModel.subscribe("UpdateStatusMessage", this);
     }
 
-    @Override
-    public void submit(){
-        if(scrapeFields()) {
-            myModel.stateChangeRequest("ScoutRegisterSubmit", props);
-        }else{
-            Debug.logErr("Failed submission: scrapeFields failed");
-        }
-    }
+//    @Override
+//    public void submit(){
+//        if(scrapeFields()) {
+//            myModel.stateChangeRequest("ScoutRegisterSubmit", props);
+//        }else{
+//            Debug.logErr("Failed submission: scrapeFields failed");
+//        }
+//    }
+
     public void updateState(String key, Object value) {
-        // STEP 6: Be sure to finish the end of the 'perturbation'
-        // by indicating how the view state gets updated.
         if (key.equals("InsertScout")) {
 
         }
-
     }
 }

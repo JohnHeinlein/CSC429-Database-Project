@@ -26,7 +26,10 @@ import javafx.geometry.VPos;
 import javafx.scene.Group;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.util.StringConverter;
 import utilities.Alerts;
 import utilities.Debug;
@@ -35,7 +38,6 @@ import utilities.Utilities;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.Properties;
 
 public abstract class View extends Group implements IView, IControl {
@@ -48,7 +50,7 @@ public abstract class View extends Group implements IView, IControl {
     protected ControlRegistry myRegistry;
 
     protected Properties props; //Collects information from input fields for submission
-    protected HashMap<String, Control> controlList; //Keeps track of what content is a control
+    protected HashMap<String, Object> controlList; //Keeps track of what content is a control
 
     private final BorderPane container;
     private final VBox header;
@@ -168,7 +170,7 @@ public abstract class View extends Group implements IView, IControl {
                 case "class userinterface.View$TextFieldWrapper" -> {
                     TextField textfield = ((TextFieldWrapper) control).getField();
                     controlList.put(Utilities.toCamelCase(textfield.getPromptText()),
-                            textfield);
+                            ((TextFieldWrapper) control));
                     props.put(Utilities.toCamelCase(textfield.getPromptText()), "");
                     isControl = true; //Debugging
                 }
@@ -181,9 +183,11 @@ public abstract class View extends Group implements IView, IControl {
             }
 
             // Print content that was added
-            Debug.logMsg("(" + viewName + ") Added "
-                    + ((isControl)? "control #" + controlList.size(): "button")
-                    + " from section \"" + name + "\"");
+            Debug.logMsg("(%s) Added %s from \"%s\"",viewName,
+                    isControl?
+                            String.format("control #%d (%s)",controlList.size(),control.getClass()):
+                            "button",
+                    name);
         }
 
         content.addColumn(0, label);
@@ -209,20 +213,38 @@ public abstract class View extends Group implements IView, IControl {
     /**
      * Adds a submit button to footer to return to ControllerView
      */
-    public void submitButton() {
-        Button submitButton = makeButt("Submit", e -> {
-            submit();
+//    public void submitButton() {
+//        Button submitButton = makeButt("Submit", e -> {
+//            submit();
+//        });
+//        submitButton.setStyle("-fx-background-color: lightgreen");
+//        footButt(submitButton);
+//    }
+
+    public void submitButton(String state){
+        Button submitButton = makeButt("Submit", e ->{
+            submit(state);
         });
         submitButton.setStyle("-fx-background-color: lightgreen");
         footButt(submitButton);
+    }
+    public void submitButton(){
+        submitButton(viewName.substring(0,viewName.length() - 4) + "Submit");
     }
 
     /**
      * Overridden to allow submitting data
      */
-    protected void submit() {
-        scrapeFields();
+    //protected void submit() { scrapeFields(); }
+
+    protected void submit(String state){
+        if(scrapeFields()){
+            myModel.stateChangeRequest(state, props);
+        }else{
+            Debug.logErr("Submission failed for " + viewName);
+        }
     }
+    protected void submit(){ submit(viewName + "Submit"); }
 
     /**
      * Adds a cancel button to footer to return to ControllerView
@@ -238,9 +260,7 @@ public abstract class View extends Group implements IView, IControl {
     /**
      * Adds button to leftmost of footer
      */
-    public void footButt(Button butt) {
-        footer.getChildren().add(footer.getChildren().size(), butt);
-    }
+    public void footButt(Button butt) { footer.getChildren().add(footer.getChildren().size(), butt); }
 
     // ***************
     // Buttons
@@ -281,9 +301,12 @@ public abstract class View extends Group implements IView, IControl {
 
     public TextFieldWrapper makeField(String prompt, boolean editable) {
         TextFieldWrapper field = new TextFieldWrapper(prompt);
-        field.setEditable(editable);
+        field.getField().setEditable(editable);
         field.setDisable(!editable);
         return field;
+    }
+    public TextFieldWrapper makeField(String prompt, int maxLength){
+        return new TextFieldWrapper(prompt, maxLength);
     }
 
     public NotesFieldWrapper makeNotesField(String prompt, int maxLength) {
@@ -359,37 +382,18 @@ public abstract class View extends Group implements IView, IControl {
         return scrollPane;
     }
 
-    // ***************
-    // Public-facing region getters
-    // ***************
-    public HBox footer() {
-        return footer;
-    }
-
-    public VBox header() {
-        return header;
-    }
-
-    public GridPane content() {
-        return content;
-    }
-
     /**
      * Scrapes the fields into the local Properties object.
      * Shows error dialogue if a field is empty.
      * @return Whether scrape was successful or not
      */
-    public Boolean scrapeFields(){
-        return scrapeFields(true);
-    }
+    public Boolean scrapeFields(){ return scrapeFields(true); }
 
     /**
      * Scrapes fields into the local Properties object
      * @return Whether scrape was successful or not (always true for unsafe)
      */
-    public Boolean scrapeFieldsUnsafe(){
-        return scrapeFields(false);
-    }
+    public void scrapeFieldsUnsafe(){ scrapeFields(false); }
 
     /**
      * Scrapes the fields into the local Properties object.
@@ -398,25 +402,38 @@ public abstract class View extends Group implements IView, IControl {
      */
     private Boolean scrapeFields(Boolean safe) {
         for (String field : controlList.keySet()) {
-            Control control = controlList.get(field);
+            Object control = controlList.get(field);
             String data = "";
+            boolean textFieldErr = false;
+
             switch (control.getClass().toString()) {
                 case "class javafx.scene.control.ComboBox" -> data = ((ComboBox<String>) control).getValue();
                 case "class javafx.scene.control.DatePicker" -> data = ((DatePicker) control).getValue().toString();
-                case "class javafx.scene.control.TextField" -> data = ((TextField) control).getText();
                 case "class javafx.scene.control.TextArea" -> data = ((TextArea) control).getText();
+                case "class userinterface.View$TextFieldWrapper" -> {
+                    TextFieldWrapper foo = (TextFieldWrapper)control;
+                    data = foo.getText();
+
+                    if(foo.isErr()) textFieldErr = true;
+                }
                 default -> {
-                    Debug.logErr("Unsupported Control type " + control.getClass().toString());
                     Alerts.errorMessage("Unsupported Control type, enable debugging");
+                    Debug.logErr("Unsupported Control type " + control.getClass().toString());
+                    return false;
                 }
             }
-            if (safe && data.equals("") || data == null) {
-                Alerts.errorMessage("All fields must be entered!");
-                Debug.logErr("Empty fields, returning false");
-                return false;
-            } else {
-                props.put(field, data);
+            if(safe){
+                if(data.equals("")){
+                    Alerts.errorMessage("All fields must be entered!");
+                    Debug.logErr("Empty fields, returning false");
+                    return false;
+                }else if(textFieldErr){
+                    Alerts.errorMessage("Field entered incorrectly!");
+                    Debug.logErr("Text field error");
+                    return false;
+                }
             }
+            props.put(field, data);
         }
         Debug.logMsg(
                 """
@@ -435,11 +452,11 @@ public abstract class View extends Group implements IView, IControl {
         return true;
     }
 
-    protected String getValue(Control control) {
+    protected String getValue(Object control) {
         return switch (control.getClass().toString()) {
             case "class javafx.scene.control.ComboBox"  -> ((ComboBox<String>) control).getValue();
             case "class javafx.scene.control.DatePicker"-> ((DatePicker) control).getConverter().toString();
-            case "class javafx.scene.control.TextField" -> ((TextField) control).getText();
+            case "class userinterface.View$TextFieldWrapper" -> ((TextFieldWrapper) control).getText();
             case "class javafx.scene.control.TextArea"  -> ((TextArea) control).getText();
             default -> {
                 Debug.logErr("Unsupported control: " + control.getClass());
@@ -448,7 +465,7 @@ public abstract class View extends Group implements IView, IControl {
         };
     }
 
-    protected void setValue(Control control, String value) {
+    protected void setValue(Object control, String value) {
         Debug.logMsg(String.format("Updating %s to value %s",control,value));
         switch (control.getClass().toString()) {
             case "class javafx.scene.control.DatePicker" -> {
@@ -457,7 +474,7 @@ public abstract class View extends Group implements IView, IControl {
                 picker.setValue(converter.fromString(value));
             }
             case "class javafx.scene.control.ComboBox"  -> ((ComboBox<String>) control).getSelectionModel().select(value);
-            case "class javafx.scene.control.TextField" -> ((TextField) control).setText(value);
+            case "class userinterface.View$TextFieldWrapper" -> ((TextFieldWrapper) control).setText(value);
             case "class javafx.scene.control.TextArea"  -> ((TextArea) control).setText(value);
             default -> Debug.logErr("Unsupported control: " + control.getClass());
         }
@@ -479,50 +496,94 @@ public abstract class View extends Group implements IView, IControl {
 
     protected class TextFieldWrapper extends VBox {
         private final TextField field;
-        private final MessageView message;
+        private final Text errMsg;
 
-        public TextFieldWrapper(String prompt) {
+        private final String defStyle;
+        private final String errStyle = "-fx-text-box-border: #ff4040 ; -fx-focus-color: #ff4040 ;";
+        private final String acceptStyle = "-fx-text-box-border: #30ff30 ; -fx-focus-color: #30ff30 ;";
+
+        protected final String errLong = "Too long!";
+        protected final String errShort = "Too short!";
+
+        private Integer minLen;
+        private Integer maxLen;
+
+        private Boolean tooLong = false;
+        private Boolean tooShort = false;
+        private Boolean badContent = false;
+
+        public TextFieldWrapper(String prompt){ this(prompt, null, null); }
+        public TextFieldWrapper(String prompt, Integer maxLen){ this(prompt, maxLen, null); }
+        public TextFieldWrapper(String prompt, Integer maxLen, Integer minLen) {
+            this.maxLen = maxLen;
+            this.minLen = minLen;
+
             field = new TextField();
             field.setPromptText(prompt);
-            field.setOnAction(e -> submit());
             field.setStyle("-fx-font-family: " + DEFAULT_FONT);
+            field.textProperty().addListener((o, s, t1) -> {
+                checkLength();
+            });
+            defStyle = field.getStyle();
 
-            message = new MessageView("");
+            errMsg = new Text("");
+            errMsg.setFont(Font.font(DEFAULT_FONT,12));
+            errMsg.setFill(Color.RED);
+            errMsg.setTextAlignment(TextAlignment.LEFT);
 
-            getChildren().addAll(field, message);
+            getChildren().addAll(field, errMsg);
             setAlignment(Pos.CENTER_LEFT);
         }
 
-        public void setListener(ChangeListener<? super String> listener) {
+        // Override constructor
+        protected void setListener(ChangeListener<? super String> listener) {
             field.textProperty().addListener(listener);
         }
 
-        public TextField getField() {
+        protected TextField getField() {
             return field;
         }
+        protected String getText() { return field.getText(); }
+        protected void setText(String s){ field.setText(s); }
 
-        public void message(String text) {
-            message.displayMessage(text);
+        protected void styleErr(String msg){
+            errMsg.setText(msg);
+            field.setStyle(errStyle);
+            badContent = true;
+        }
+        protected void styleErr(){
+            styleErr("");
+        }
+        protected void styleAccept(){
+            errMsg.setText("");
+            field.setStyle(acceptStyle);
+            badContent = false;
+        }
+        protected void styleClear(){
+            errMsg.setText("");
+            field.setStyle(defStyle);
+            badContent = false;
         }
 
-        public void error(String err) {
-            message.displayErrorMessage(err);
-        }
+        protected void setMin(int min){ minLen = min; }
+        protected void setMax(int max){ maxLen = max; }
 
-        //Pass to field so we don't need to chain getField().setEditable();
-        public void setEditable(Boolean flag) {
-            field.setEditable(flag);
-        }
+        protected Boolean isErr(){return tooShort || tooLong || badContent;}
 
-        public String getText() {
-            return field.getText();
-        }
-
-        public void clear() {
-            message.clearErrorMessage();
-            message.setText("");
-
-            field.clear();
+        public void checkLength(){
+            int fieldLen = field.getText().length();
+            if(minLen != null && fieldLen < minLen){
+                tooLong = false; tooShort = true;
+                styleErr(errShort);
+            }
+            else if(maxLen != null && fieldLen > maxLen) {
+                tooLong = true; tooShort = false;
+                styleErr(errLong);
+            }
+            else{
+                tooLong = false; tooShort = false;
+                styleClear();
+            }
         }
     }
 

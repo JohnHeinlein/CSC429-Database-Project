@@ -1,10 +1,7 @@
 package userinterface;
 
 import impresario.IModel;
-import javafx.scene.control.Button;
 import javafx.util.Pair;
-
-import java.util.Properties;
 
 public class ScoutUpdateDeleteView extends View {
 
@@ -13,7 +10,7 @@ public class ScoutUpdateDeleteView extends View {
         setTitle("Update or Delete a Scout");
 
         addContent("First name",
-                makeField("First Name"),
+                makeField("First Name",25),
                 makeButt("Search", e ->{
                     scrapeFieldsUnsafe();
                     myModel.stateChangeRequest(
@@ -22,7 +19,7 @@ public class ScoutUpdateDeleteView extends View {
                 }));
 
         addContent("Last name",
-                makeField("Last Name"),
+                makeField("Last Name",25),
                 makeButt("Search", e ->{
                     scrapeFieldsUnsafe();
                     myModel.stateChangeRequest(
@@ -31,7 +28,7 @@ public class ScoutUpdateDeleteView extends View {
                 }));
 
         addContent("Email",
-                makeField("Email"),
+                makeField("Email",25),
                 makeButt("Search", e ->{
                     scrapeFieldsUnsafe();
                     myModel.stateChangeRequest(

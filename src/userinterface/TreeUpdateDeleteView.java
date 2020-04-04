@@ -5,10 +5,7 @@ import impresario.IModel;
 import model.Tree;
 import utilities.Debug;
 
-import java.util.Properties;
-
 public class TreeUpdateDeleteView extends View {
-    private Tree tree;
 
     public TreeUpdateDeleteView(IModel model) {
         super(model, "TreeUpdateDeleteView");
@@ -21,31 +18,32 @@ public class TreeUpdateDeleteView extends View {
 
         footButt(makeButt("Update",e->{
             getTree();
-            myModel.stateChangeRequest("TreeUpdate",tree);
+            myModel.stateChangeRequest("TreeUpdate",getTree());
         }));
 
         footButt(makeButt("Delete",e->{
             getTree();
-            myModel.stateChangeRequest("TreeDelete",tree);
+            myModel.stateChangeRequest("TreeDelete",getTree());
         }));
 
         cancelButton();
     }
 
-    public void getTree(){
+    public Tree getTree(){
         scrapeFields();
 
         String barcode = (String)props.get("barcode");
 
         if(barcode == null){
             Debug.logErr("No barcode retrieved");
-            return;
+            return null;
         }
         try {
-            tree = new Tree(barcode);
+            return new Tree(barcode);
         }catch(InvalidPrimaryKeyException ex){
             Debug.logErr(String.format("(%s) Invalid barcode", barcode));
         }
+        return null;
     }
 
     @Override

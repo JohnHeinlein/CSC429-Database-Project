@@ -1,0 +1,12 @@
+[4/2/20, 2:13 PM]|TreeCollection|getSelectQueryResult|Error|NOTAG|null<SQL Exception: 1064: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '%123%' at line 1>
+[4/4/20, 10:45 AM]|Scout|insertAutoIncrementalPersistentState|Error|NOTAG|null<SQL Exception: 0: Data truncation: Data too long for column 'firstName' at row 1>
+[4/4/20, 11:07 AM]|Scout|updatePersistentState|Error|NOTAG|null<SQL Exception: 0: Data truncation: Data too long for column 'firstName' at row 1>
+[4/4/20, 11:08 AM]|Scout|insertAutoIncrementalPersistentState|Error|NOTAG|null<SQL Exception: 0: Data truncation: Data too long for column 'middleName' at row 1>
+[4/4/20, 11:11 AM]|Scout|insertAutoIncrementalPersistentState|Error|NOTAG|null<SQL Exception: 0: Data truncation: Data too long for column 'middleName' at row 1>
+[4/4/20, 11:12 AM]|Scout|insertAutoIncrementalPersistentState|Error|NOTAG|null<SQL Exception: 0: Data truncation: Data too long for column 'middleName' at row 1>
+[4/4/20, 11:16 AM]|Scout|insertAutoIncrementalPersistentState|Error|NOTAG|null<SQL Exception: 0: Data truncation: Data too long for column 'middleName' at row 1>
+[4/4/20, 11:17 AM]|Scout|insertAutoIncrementalPersistentState|Error|NOTAG|null<SQL Exception: 0: Data truncation: Data too long for column 'firstName' at row 1>
+[4/4/20, 11:18 AM]|Scout|insertAutoIncrementalPersistentState|Error|NOTAG|null<SQL Exception: 0: Data truncation: Data too long for column 'firstName' at row 1>
+[4/4/20, 11:20 AM]|Scout|insertAutoIncrementalPersistentState|Error|NOTAG|null<SQL Exception: 0: Data truncation: Data too long for column 'middleName' at row 1>
+[4/4/20, 11:49 AM]|Scout|getSchemaInfo|Error|NOTAG|null<SQL Exception: 0: Column Index out of range, 0 < 1.>
+[4/4/20, 11:51 AM]|Scout|getSchemaInfo|Error|NOTAG|null<SQL Exception: 0: Column Index out of range, 0 < 1.>
