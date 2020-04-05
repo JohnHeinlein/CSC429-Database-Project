@@ -35,6 +35,7 @@ import utilities.Alerts;
 import utilities.Debug;
 import utilities.Utilities;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -97,7 +98,11 @@ public abstract class View extends Group implements IView, IControl {
 
             MenuItem mDatabaseBrowser = new MenuItem("Browser");
             mDatabaseBrowser.setOnAction(e -> {
-                new DebugBrowser();
+                if (new File("dbConfig.ini").exists()) {
+                    new DebugBrowser();
+                } else {
+                    Alerts.errorMessage("No database config file found.");
+                }
             });
 
             mb.setUseSystemMenuBar(true);
