@@ -114,20 +114,20 @@ public class ModelRegistry extends Registry {
             }
 
             // see if we have multiple subscribers
-            if (tempObj instanceof Vector) {
+            if (tempObj instanceof Vector vector) {
                 // get the list of elements
-                ((Vector) tempObj).forEach(subscriber -> {
+                vector.forEach(subscriber -> {
                     // update via a key-value pair
-                    if (subscriber instanceof IView) {
-                        ((IView) subscriber).updateState(dependProperty, client.getState(dependProperty));
+                    if (subscriber instanceof IView view) {
+                        view.updateState(dependProperty, client.getState(dependProperty));
                     } else {
                         new Event(Event.getLeafLevelClassName(this), "UpdateSubscribers", "EVT_InvalidSubscriber", "Vector Invalid Subscriber: " + subscriber.getClass(), Event.WARNING);
                     }
                 });
             } else {    // we must have a single subscriber
                 // If not, use the standard update via a key-value pair
-                if (tempObj instanceof IView) {
-                    ((IView) tempObj).updateState(dependProperty, client.getState(dependProperty));
+                if (tempObj instanceof IView view) {
+                    view.updateState(dependProperty, client.getState(dependProperty));
                 } else {
                     new Event(Event.getLeafLevelClassName(this), "UpdateSubscribers", "EVT_InvalidSubscriber", "Invalid Subscriber: " + tempObj.getClass(), Event.WARNING);
                 }

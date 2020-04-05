@@ -55,9 +55,8 @@ abstract public class Persistable {
     }
 
     protected Properties getSchemaInfo(String tableName) {
-        try {
+        try (Connection theDBConnection = myBroker.getConnection()) {
             // Create a connection to the database
-            Connection theDBConnection = myBroker.getConnection();
 
             // extract the metadata from the database
             DatabaseMetaData dbMetaData = theDBConnection.getMetaData();

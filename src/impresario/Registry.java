@@ -62,11 +62,11 @@ public abstract class Registry {
         if (mySubscribers.containsKey(key)) {
             // pull the current object and see if it's a Vector
             Object tempObj = mySubscribers.get(key);
-            if (tempObj instanceof Vector) {
+            if (tempObj instanceof Vector vector) {
                 // SANDEEP: FIRST CHECK IF subscriber IS ALREADY IN THIS Vector. IF SO, DON'T ADD subscriber
                 // add this object to the existing list - i.e.,
                 // if (((Vector)tempObj).contains(subcriber) == false)
-                ((Vector) tempObj).addElement(subscriber);
+                vector.addElement(subscriber);
             } else {
                 // if not a Vector, must be a single subscriber so convert to a list
                 // SANDEEP: FIRST CHECK IF subscriber AND tempObj ARE THE SAME. IF SO, DON'T ADD subscriber
@@ -82,10 +82,10 @@ public abstract class Registry {
             }
         } else {
             // install as a single subscriber if not a Vector
-            if (subscriber instanceof Vector) {
+            if (subscriber instanceof Vector vector) {
                 // create a new vector to hold our subscriber list
                 Vector tempVector = new Vector();
-                tempVector.addElement(subscriber);
+                tempVector.addElement(vector);
                 mySubscribers.put(key, tempVector);
             } else {
                 mySubscribers.put(key, subscriber);
@@ -105,9 +105,9 @@ public abstract class Registry {
         if (mySubscribers.containsKey(key)) {
             // pull the current object and see if it's a Vector
             Object tempObj = mySubscribers.get(key);
-            if (tempObj instanceof Vector) {
+            if (tempObj instanceof Vector vector) {
                 // remove this object from the existing list
-                ((Vector) tempObj).removeElement(subscriber);
+                vector.removeElement(subscriber);
             } else {
                 // if not a Vector, must be a single subscriber so just remove it
                 // remove the original key and subscriber from the hashtable
