@@ -222,7 +222,7 @@ public class Controller implements IView, IModel {
                     Debug.logErr(String.format("(%s) Invalid scout ID", key));
                 }
                 scout.updateState("status", "Inactive");
-                scout.updateState("dateStatusUpdated", java.time.LocalDate.now().toString());
+                scout.updateState("dateStatusUpdated", LocalDate.now().toString());
 
                 Alerts.infoMessage("Scout deleted!",this);
             }
@@ -238,9 +238,31 @@ public class Controller implements IView, IModel {
                 createAndShowView("TreeUpdateView");
             }
 
-            case "TreeDelete" -> {
-                tree = (Tree)value;
+            case "TreeUpdateSubmit" -> {
+                Debug.logMsg("(" + key + ") Processing tree registration");
+                props = (Properties) value;
+                for (Map.Entry<Object, Object> entry : props.entrySet()) {
+                    tree.persistentState.setProperty(
+                            (String) entry.getKey(),
+                            (String) entry.getValue());
+                }
+                tree.updateState("dateStatusUpdated", LocalDate.now().toString());
+                tree.update("update");
 
+                Alerts.infoMessage("Tree " + tree.getState("barcode") + " updated!", this);
+            }
+
+            case "TreeDelete" -> {
+                tree = (Tree) value;
+
+                if (tree == null) {
+                    Debug.logErr("(%s) Invalid tree barcode", key);
+                } else {
+                    String barcode = (String) tree.getState("barcode");
+                    tree.update("delete");
+
+                    Alerts.infoMessage("Tree " + barcode + " deleted!", this);
+                }
             }
 
             //***************

@@ -39,7 +39,7 @@ public class TreeTypeUpdateView extends View {
     public void submit(){
         if(scrapeFields()) {
             try {
-                if (!((String) treeType.getState("barcodePrefix")).equals(props.getProperty("barcodePrefix"))) {
+                if (!treeType.getState("barcodePrefix").equals(props.getProperty("barcodePrefix"))) {
                     TreeType tType = new TreeType(props.getProperty("barcodePrefix"));
                     Debug.logMsg("Tree Type With barcode prefix: " + props.getProperty("barcodePrefix") + " Already Exists");
                 }

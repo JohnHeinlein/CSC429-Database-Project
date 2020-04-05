@@ -1,14 +1,14 @@
 package model;
 
+import exception.InvalidPrimaryKeyException;
+import impresario.IModel;
+import impresario.IView;
+import utilities.Debug;
+
 import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Vector;
-
-import exception.InvalidPrimaryKeyException;
-import impresario.IView;
-import impresario.IModel;
-import utilities.Debug;
 
 public class Tree extends EntityBase implements IModel, IView {
 
@@ -17,7 +17,7 @@ public class Tree extends EntityBase implements IModel, IView {
     private TreeType myType;
     private String updateStatusMessage = "";
 
-    public Tree(){
+    public Tree() {
         super(myTableName);
         setDependencies();
         persistentState = new Properties();
@@ -60,18 +60,17 @@ public class Tree extends EntityBase implements IModel, IView {
         }
     }
 
-    public Tree(Properties props){
+    public Tree(Properties props) {
         super(myTableName);
         setDependencies();
 
         persistentState = new Properties();
         Enumeration allKeys = props.propertyNames();
         while (allKeys.hasMoreElements()) {
-            String nextKey = (String)allKeys.nextElement();
+            String nextKey = (String) allKeys.nextElement();
             String nextValue = props.getProperty(nextKey);
 
-            if (nextValue != null)
-            {
+            if (nextValue != null) {
                 persistentState.setProperty(nextKey, nextValue);
             }
         }
@@ -84,25 +83,23 @@ public class Tree extends EntityBase implements IModel, IView {
 
     //Updating Database State
     private void updateStateInDatabase(String key) {
-        try
-        {
-            if (key.equals("update")||key.equals("Update"))
-            {
+        try {
+            if (key.equalsIgnoreCase("update")) {
                 Properties whereClause = new Properties();
-                whereClause.setProperty("id",
-                        persistentState.getProperty("id"));
+                whereClause.setProperty("barcode", persistentState.getProperty("barcode"));
                 updatePersistentState(mySchema, persistentState, whereClause);
-                updateStatusMessage = "Tree data for id number : " + persistentState.getProperty("id") + " updated successfully in database!";
-            }
-            else if (key.equals("Insert") || key.equals("insert"))
-            {
+                updateStatusMessage = "Tree data for barcode number : " + persistentState.getProperty("barcode") + " updated successfully in database!";
+            } else if (key.equalsIgnoreCase("insert")) {
                 insertPersistentState(mySchema, persistentState);
-                updateStatusMessage = "Tree data for new account : " +  persistentState.getProperty("barcode")
+                updateStatusMessage = "Tree data for new account : " + persistentState.getProperty("barcode")
                         + "installed successfully in database!";
+            } else if (key.equalsIgnoreCase("delete")) {
+                Properties whereClause = new Properties();
+                whereClause.setProperty("barcode", persistentState.getProperty("barcode"));
+
+                deletePersistentState(mySchema, whereClause);
             }
-        }
-        catch (SQLException ex)
-        {
+        } catch (SQLException ex) {
             updateStatusMessage = "Error in installing Tree data in database!";
         }
         //DEBUG System.out.println("updateStateInDatabase " + updateStatusMessage);
@@ -110,13 +107,23 @@ public class Tree extends EntityBase implements IModel, IView {
 
     @Override
     public Object getState(String key) {
-
-        return null;
+        return persistentState.getProperty(key);
     }
 
     @Override
     public void stateChangeRequest(String key, Object value) {
-
+        if (key.equals("InsertTree")) {
+            Properties data = (Properties) value;
+            for (String s : new String[]{"barcode", "treeType", "notes", "status", "dateStatusUpdated"}) {
+                persistentState.setProperty(s, data.getProperty(s));
+            }
+        } else if (value instanceof String val) {
+            persistentState.setProperty(key, val);
+            Debug.logMsg(String.format("Updating state \"%s\" to value \"%s\"", key, val));
+        }
+        updateStateInDatabase(key);
+//        persistentState.clear();
+        myRegistry.updateSubscribers(key, this);
     }
 
     @Override

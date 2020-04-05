@@ -22,8 +22,6 @@
  */
 /** @version $Revision: 168 $ */
 /** @version $Revision: timmullins,2008-02-20 $ */
-
-// specify the package
 package database;
 
 import utilities.Debug;
@@ -80,16 +78,12 @@ public class JDBCBroker {
 
     /** Create a connection to the database */
     public Connection getConnection() {
-        if (myInstance != null
-                && theDBConnection == null
-                && (dbName != null) && (username != null) && (password != null)) {
+        if (myInstance != null && theDBConnection == null && dbName != null && username != null && password != null) {
             try {
                 Debug.logMsg("Connecting to database at " + server);
-                theDBConnection = theDriver.connect(
-                        "jdbc:mysql://"+server+":3306/" + dbName +
-                                "?user=" + username
-                                + "&password=" + password,
-                        null);
+                theDBConnection =
+                        theDriver.connect(String.format("jdbc:mysql://%s/%s?user=%s&password=%s",
+                                server, dbName, username, password), null);
                 if (theDBConnection == null)
                     Debug.logErr("Could not connect to database!");
             } catch (SQLException exc) {

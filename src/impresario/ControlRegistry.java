@@ -21,8 +21,6 @@
  * @author $Author: tomb $  @version	$Revision: 1.4 $
  */
 /** @version $Revision: 1.4 $ */
-
-// specify the package
 package impresario;
 
 import event.Event;
@@ -63,11 +61,11 @@ public class ControlRegistry extends Registry {
         }
 
         // see if we have multiple subscribers
-        if (tempObj instanceof Vector) {
-            ((Vector) tempObj).forEach(subscriber -> {
+        if (tempObj instanceof Vector vector) {
+            vector.forEach(subscriber -> {
                 // update via a key-value pair
-                if (subscriber instanceof IModel) {
-                    ((IModel) subscriber).stateChangeRequest(key, value);
+                if (subscriber instanceof IModel model) {
+                    model.stateChangeRequest(key, value);
                 } else {
                     new Event(Event.getLeafLevelClassName(this), "UpdateSubscribers", "EVT_InvalidSubscriber", "Vector Invalid Subscriber: " + subscriber.getClass(), Event.WARNING);
                     System.err.println("ControlRegistry.updateSubscribers - Invalid Subscriber type!");
@@ -75,9 +73,9 @@ public class ControlRegistry extends Registry {
             });
         } else {   // we must have a single subscriber
             // If not, use the standard update via a key-value pair
-            if (tempObj instanceof IModel) {
+            if (tempObj instanceof IModel model) {
                 // DEBUG: System.out.println("Changeable [" + key + "] " + dependProperty + ": " + client.getValue(dependProperty));
-                ((IModel) tempObj).stateChangeRequest(key, value);
+                model.stateChangeRequest(key, value);
             } else {
                 new Event(Event.getLeafLevelClassName(this), "UpdateSubscribers", "EVT_InvalidSubscriber", "Invalid Subscriber: " + tempObj.getClass(), Event.WARNING);
                 System.err.println("ControlRegistry.updateSubscribers - Invalid Subscriber type!");

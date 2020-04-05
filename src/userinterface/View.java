@@ -9,7 +9,6 @@
 // the express written consent of The College at Brockport.
 //************************************************************
 //
-// specify the package
 package userinterface;
 
 import impresario.ControlRegistry;
@@ -35,6 +34,7 @@ import utilities.Alerts;
 import utilities.Debug;
 import utilities.Utilities;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -97,7 +97,11 @@ public abstract class View extends Group implements IView, IControl {
 
             MenuItem mDatabaseBrowser = new MenuItem("Browser");
             mDatabaseBrowser.setOnAction(e -> {
-                new DebugBrowser();
+                if (new File("dbConfig.ini").exists()) {
+                    new DebugBrowser();
+                } else {
+                    Alerts.errorMessage("No database config file found.");
+                }
             });
 
             mb.setUseSystemMenuBar(true);
@@ -162,21 +166,18 @@ public abstract class View extends Group implements IView, IControl {
 
             switch (control.getClass().toString()) {
                 case "class javafx.scene.control.ComboBox", "class javafx.scene.control.DatePicker" -> {
-                    controlList.put(propertyName,
-                            (Control) control);
+                    controlList.put(propertyName, control);
                     props.put(propertyName, "");
                     isControl = true; //Debugging
                 }
                 case "class userinterface.View$TextFieldWrapper" -> {
                     TextField textfield = ((TextFieldWrapper) control).getField();
-                    controlList.put(Utilities.toCamelCase(textfield.getPromptText()),
-                            ((TextFieldWrapper) control));
+                    controlList.put(Utilities.toCamelCase(textfield.getPromptText()), control);
                     props.put(Utilities.toCamelCase(textfield.getPromptText()), "");
                     isControl = true; //Debugging
                 }
                 case "class userinterface.View$NotesFieldWrapper" -> {
-                    controlList.put(propertyName,
-                            ((NotesFieldWrapper) control).getField());
+                    controlList.put(propertyName, ((NotesFieldWrapper) control).getField());
                     props.put(propertyName, "");
                     isControl = true; //Debugging
                 }

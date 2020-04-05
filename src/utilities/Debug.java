@@ -20,7 +20,7 @@ public class Debug {
      */
     public static void logErr(String msg) { log(msg,true); }
     public static void logErr(String format, Object... replacements){
-        log(String.format(format, (Object[]) replacements), true);
+        log(String.format(format, replacements), true);
     }
     /**
      * Prints the class and method name this function is called from, plus a message
@@ -29,7 +29,7 @@ public class Debug {
      */
     public static void logMsg(String msg) { log(msg,false); }
     public static void logMsg(String format, Object... replacements){
-        log(String.format(format, (Object[]) replacements), false);
+        log(String.format(format, replacements), false);
     }
 
     private static void log(String msg, Boolean isError){

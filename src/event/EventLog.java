@@ -19,8 +19,6 @@
  * @author $Author: smitra $  @version	$Revision: 1.1 $
  */
 /** @version $Revision: 1.1 $ */
-
-// specify the package
 package event;
 
 import common.StringList;
@@ -218,7 +216,7 @@ public class EventLog {
         // of elements it has
         StringList paramStringList = new StringList(paramList);
         while (paramStringList.hasMoreElements()) {
-            String dum = paramStringList.nextElement();
+            paramStringList.nextElement();
             numOfParams++;
         }
 
@@ -388,14 +386,10 @@ public class EventLog {
             // add it to the log file
             if (allowWrites) {
                 // we do this only if we are allowed to write
-                try {
-                    FileOutputStream filestream = new FileOutputStream(LogFile, true);
-                    OutputStreamWriter outstream = new OutputStreamWriter(filestream);
-                    String eventstring = event.toString() + "\r\n";
-
-                    outstream.write(eventstring, 0, eventstring.length());
-                    outstream.close();
-                    filestream.close();
+                try (FileOutputStream fileOutputStream = new FileOutputStream(LogFile, true);
+                     OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream)) {
+                    String eventString = event.toString() + "\r\n";
+                    outputStreamWriter.write(eventString, 0, eventString.length());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
