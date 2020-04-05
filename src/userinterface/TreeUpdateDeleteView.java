@@ -3,6 +3,7 @@ package userinterface;
 import exception.InvalidPrimaryKeyException;
 import impresario.IModel;
 import javafx.scene.control.ButtonType;
+import model.ScoutTableModel;
 import model.Tree;
 import utilities.Alerts;
 import utilities.Debug;
@@ -10,6 +11,8 @@ import utilities.Debug;
 import java.util.Optional;
 
 public class TreeUpdateDeleteView extends View {
+
+    protected ScoutTableModel selection; //Selected scout
 
     public TreeUpdateDeleteView(IModel model) {
         super(model, "TreeUpdateDeleteView");
@@ -19,10 +22,12 @@ public class TreeUpdateDeleteView extends View {
         addContent("Barcode",
                 makeField("Barcode"));
 
-
         footButt(makeButt("Update",e->{
-//            getTree();
-            myModel.stateChangeRequest("TreeUpdate",getTree());
+            Tree tree = getTree();
+
+            if (tree != null) {
+                myModel.stateChangeRequest("TreeUpdate", tree);
+            }
         }));
 
         // TODO: Currently says it deletes the tree, but doesn't actually.

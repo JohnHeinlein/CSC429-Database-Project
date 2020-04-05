@@ -215,16 +215,30 @@ public class Controller implements IView, IModel {
                 createAndShowView("TreeUpdateView");
             }
 
+            case "TreeUpdateSubmit" -> {
+                Debug.logMsg("(" + key + ") Processing tree registration");
+                props = (Properties) value;
+                for (Map.Entry<Object, Object> entry : props.entrySet()) {
+                    tree.persistentState.setProperty(
+                            (String) entry.getKey(),
+                            (String) entry.getValue());
+                }
+                tree.updateState("dateStatusUpdated", LocalDate.now().toString());
+                tree.update("update");
+
+                Alerts.infoMessage("Tree " + tree.getState("barcode") + " updated!", this);
+            }
+
             case "TreeDelete" -> {
-                tree = (Tree)value;
+                tree = (Tree) value;
 
                 if (tree == null) {
-                    Debug.logErr("(%s) Invalid tree ID", key);
+                    Debug.logErr("(%s) Invalid tree barcode", key);
                 } else {
-                    tree.updateState("status", "Inactive");
-                    tree.updateState("dateStatusUpdated", LocalDate.now().toString());
+                    String barcode = (String) tree.getState("barcode");
+                    tree.update("delete");
 
-                    Alerts.infoMessage("Tree deleted!", this);
+                    Alerts.infoMessage("Tree " + barcode + " deleted!", this);
                 }
             }
 

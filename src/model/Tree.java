@@ -86,13 +86,18 @@ public class Tree extends EntityBase implements IModel, IView {
         try {
             if (key.equalsIgnoreCase("update")) {
                 Properties whereClause = new Properties();
-                whereClause.setProperty("id", persistentState.getProperty("id"));
+                whereClause.setProperty("barcode", persistentState.getProperty("barcode"));
                 updatePersistentState(mySchema, persistentState, whereClause);
-                updateStatusMessage = "Tree data for id number : " + persistentState.getProperty("id") + " updated successfully in database!";
+                updateStatusMessage = "Tree data for barcode number : " + persistentState.getProperty("barcode") + " updated successfully in database!";
             } else if (key.equalsIgnoreCase("insert")) {
                 insertPersistentState(mySchema, persistentState);
                 updateStatusMessage = "Tree data for new account : " + persistentState.getProperty("barcode")
                         + "installed successfully in database!";
+            } else if (key.equalsIgnoreCase("delete")) {
+                Properties whereClause = new Properties();
+                whereClause.setProperty("barcode", persistentState.getProperty("barcode"));
+
+                deletePersistentState(mySchema, whereClause);
             }
         } catch (SQLException ex) {
             updateStatusMessage = "Error in installing Tree data in database!";
@@ -116,8 +121,8 @@ public class Tree extends EntityBase implements IModel, IView {
             persistentState.setProperty(key, val);
             Debug.logMsg(String.format("Updating state \"%s\" to value \"%s\"", key, val));
         }
-        this.updateStateInDatabase(key);
-        persistentState.clear();
+        updateStateInDatabase(key);
+//        persistentState.clear();
         myRegistry.updateSubscribers(key, this);
     }
 
