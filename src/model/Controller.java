@@ -14,10 +14,10 @@ import userinterface.WindowPosition;
 import utilities.Alerts;
 import utilities.Debug;
 
-import model.Scout;
-
-import java.util.*;
-import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.Properties;
+import java.util.Vector;
 
 public class Controller implements IView, IModel {
 
@@ -93,7 +93,27 @@ public class Controller implements IView, IModel {
 
     @Override
     public void updateState(String key, Object value) {
+        switch(key) {
+            case "ScoutList" -> scoutCollection = (ScoutCollection) value;
+            case "Scout" -> scout = (Scout) value;
 
+            case "TreeList" -> treeCollection = (TreeCollection)value;
+            case "Tree" -> tree = (Tree)value;
+
+            case "TreeTypeList" -> treeTypeCollection = (TreeTypeCollection)value;
+            case "TreeType" -> {
+                if(value instanceof String){ //Provided barcode prefix
+                    String pref = ((String) value).substring(0,1);
+                    try {
+                        treeType = new TreeType("pref");
+                    }catch(InvalidPrimaryKeyException ex){
+                        treeType = null; //Invalid key
+                    }
+                }else if(value instanceof TreeType) {
+                    treeType = (TreeType) value;
+                }
+            }
+        }
     }
 
     @Override
@@ -110,7 +130,10 @@ public class Controller implements IView, IModel {
             case "Tree" -> tree;
 
             case "TreeTypeList" -> treeTypeCollection;
-            case "TreeType" -> treeType;
+            case "TreeType" -> {
+                if(treeType == null) treeType = new TreeType();
+                yield treeType;
+            }
 
             default -> null;
         };

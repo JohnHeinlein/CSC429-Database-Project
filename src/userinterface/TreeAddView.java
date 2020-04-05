@@ -1,11 +1,10 @@
 package userinterface;
 
-import exception.InvalidPrimaryKeyException;
 import impresario.IModel;
 import model.TreeType;
-import utilities.Debug;
 
 public class TreeAddView extends View {
+    TreeType type = (TreeType)myModel.getState("TreeType");
 
     public TreeAddView(IModel model) {
         super (model, "TreeAddView");
@@ -14,15 +13,17 @@ public class TreeAddView extends View {
 
         TextFieldWrapper barcodeField = makeField("Barcode",20);
         TextFieldWrapper typeField = makeField("Tree Type",false);
+        typeField.setText("Enter a barcode"); //initial value
+
 
         barcodeField.setListener(((observableValue, oldVal, newVal) -> {
             barcodeField.checkLength();
 
             if(newVal.length() == 2){
-                // TODO: This certainly breaks spec. Fix it later.
-                typeField.setText(TreeType.getType(newVal));
+                type.setType(newVal);
+                typeField.setText((String)type.getState("typeDescription"));
             }else if(newVal.length() < 2){
-                typeField.setText("");
+                typeField.setText("Enter a barcode");
             }
         }));
 
@@ -52,16 +53,23 @@ public class TreeAddView extends View {
         cancelButton();
     }
 
+//    @Override
+//    public void submit(){
+//        if(scrapeFields()) {
+//            try {
+//                TreeType check = new TreeType(props.getProperty("barcode").substring(0, 2));
+//                props.setProperty("treeType", (String) check.getState("getId"));
+//                myModel.stateChangeRequest("TreeAddSubmit", props.getProperty("barcode"));
+//            } catch (InvalidPrimaryKeyException IPKE) {
+//                Debug.logErr("Error Instantiating Tree Type With Barcode prefix: " + props.getProperty("barcode").substring(0, 2));
+//            }
+//        }
+//    }
     @Override
     public void submit(){
-        if(scrapeFields()) {
-            try {
-                TreeType check = new TreeType(props.getProperty("barcode").substring(0, 2));
-                props.setProperty("treeType", (String) check.getState("getId"));
-                myModel.stateChangeRequest("TreeAddSubmit", props);
-            } catch (InvalidPrimaryKeyException IPKE) {
-                Debug.logErr("Error Instantiating Tree Type With Barcode prefix: " + props.getProperty("barcode").substring(0, 2));
-            }
+        if (scrapeFields()) {
+            props.setProperty("treeType",(String)type.getState("id"));
+            myModel.stateChangeRequest("TreeAddSubmit", props);
         }
     }
 

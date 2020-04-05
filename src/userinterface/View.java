@@ -57,7 +57,7 @@ public abstract class View extends Group implements IView, IControl {
     private final HBox footer;
     private final GridPane content;
 
-    private final String viewName; //Debugging purposes
+    protected final String viewName; //Debugging purposes
 
     public View(IModel model, String classname) {
         myModel = model;
@@ -229,14 +229,19 @@ public abstract class View extends Group implements IView, IControl {
         footButt(submitButton);
     }
     public void submitButton(){
-        submitButton(viewName.substring(0,viewName.length() - 4) + "Submit");
+        Button submitButton = makeButt("Submit", e->{
+            submit();
+        });
+        submitButton.setStyle("-fx-background-color: lightgreen");
+        footButt(submitButton);
     }
 
     /**
      * Overridden to allow submitting data
      */
-    //protected void submit() { scrapeFields(); }
-
+    protected void submit(){
+        submit(viewName.substring(0,viewName.length() - 4) + "Submit");
+    }
     protected void submit(String state){
         if(scrapeFields()){
             myModel.stateChangeRequest(state, props);
@@ -244,7 +249,6 @@ public abstract class View extends Group implements IView, IControl {
             Debug.logErr("Submission failed for " + viewName);
         }
     }
-    protected void submit(){ submit(viewName + "Submit"); }
 
     /**
      * Adds a cancel button to footer to return to ControllerView

@@ -1,9 +1,9 @@
 package model;
 
 import exception.InvalidPrimaryKeyException;
+import impresario.IModel;
 import impresario.IView;
 import utilities.Debug;
-import impresario.IModel;
 
 import java.sql.SQLException;
 import java.util.Enumeration;
@@ -143,7 +143,7 @@ public class TreeType extends EntityBase implements IModel, IView {
      * @param barcodeId
      * @return
      */ //TODO: Turn me into a getState request?
-    public static String getType(String barcodeId) {
+    public String getType(String barcodeId) {
         if (table == null) {
             Debug.logErr("No table found, generating...");
             new TreeType().updateTable();
@@ -153,21 +153,29 @@ public class TreeType extends EntityBase implements IModel, IView {
 
         for (Properties prop : table) {
             if (((String) prop.get("barcodePrefix")).startsWith(barcodeId)) {
+                this.persistentState = prop;
                 return (String) prop.get("typeDescription");
             }
         }
         return "Invalid barcode";
     }
 
+    public void setType(String barcodeId) {
+        try{
+            this.persistentState = new TreeType(barcodeId).persistentState;
+        }catch(InvalidPrimaryKeyException ex){
+            this.persistentState = null;
+        }
+    }
+
     @Override
     public Object getState(String key) {
-        if (key.equals("getId")) {
-            return persistentState.getProperty("id");
+        if(table == null){
+            Debug.logErr("No table found, generating...");
+            this.updateTable();
         }
-        else {
-            Debug.logMsg(persistentState.getProperty(key));
-            return persistentState.getProperty(key);
-        }
+        Debug.logMsg("Got \"%s\" for key  \"s\"",persistentState.get(key),key);
+        return persistentState.get(key);
     }
 
     @Override
