@@ -199,7 +199,7 @@ public class Controller implements IView, IModel {
                     Debug.logErr(String.format("(%s) Invalid scout ID", key));
                 }
                 scout.updateState("status", "Inactive");
-                scout.updateState("dateStatusUpdated", java.time.LocalDate.now().toString());
+                scout.updateState("dateStatusUpdated", LocalDate.now().toString());
 
                 Alerts.infoMessage("Scout deleted!",this);
             }
@@ -218,6 +218,14 @@ public class Controller implements IView, IModel {
             case "TreeDelete" -> {
                 tree = (Tree)value;
 
+                if (tree == null) {
+                    Debug.logErr("(%s) Invalid tree ID", key);
+                } else {
+                    tree.updateState("status", "Inactive");
+                    tree.updateState("dateStatusUpdated", LocalDate.now().toString());
+
+                    Alerts.infoMessage("Tree deleted!", this);
+                }
             }
 
             //***************
