@@ -1,3 +1,5 @@
 dbConfig.ini
+ErrorLog.txt
 /Project\ Artifacts/*lock*
 /.idea/
+/out/
