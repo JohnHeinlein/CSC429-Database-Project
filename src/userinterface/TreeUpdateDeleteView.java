@@ -2,8 +2,12 @@ package userinterface;
 
 import exception.InvalidPrimaryKeyException;
 import impresario.IModel;
+import javafx.scene.control.ButtonType;
 import model.Tree;
+import utilities.Alerts;
 import utilities.Debug;
+
+import java.util.Optional;
 
 public class TreeUpdateDeleteView extends View {
 
@@ -17,13 +21,21 @@ public class TreeUpdateDeleteView extends View {
 
 
         footButt(makeButt("Update",e->{
-            getTree();
+//            getTree();
             myModel.stateChangeRequest("TreeUpdate",getTree());
         }));
 
+        // TODO: Currently says it deletes the tree, but doesn't actually.
         footButt(makeButt("Delete",e->{
-            getTree();
-            myModel.stateChangeRequest("TreeDelete",getTree());
+            Tree tree = getTree();
+
+            if (tree != null) {
+                Optional<ButtonType> confirmation = Alerts.confirmMessage("Confirm delete of tree " + tree.getState("barcode") + "?");
+
+                if (confirmation.get() == ButtonType.OK) {
+                    myModel.stateChangeRequest("TreeDelete", tree);
+                }
+            }
         }));
 
         cancelButton();
