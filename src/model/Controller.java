@@ -14,10 +14,9 @@ import userinterface.WindowPosition;
 import utilities.Alerts;
 import utilities.Debug;
 
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.Properties;
-import java.util.Vector;
+import java.time.LocalDate;
+import java.util.*;
+
 
 public class Controller implements IView, IModel {
 
@@ -158,6 +157,7 @@ public class Controller implements IView, IModel {
             case "ScoutRegisterSubmit" -> {
                 Debug.logMsg("Processing scout registration");
                 props = (Properties) value;
+                props.setProperty("status","Active");
 
                 scout = new Scout();
                 scout.persistentState = props;

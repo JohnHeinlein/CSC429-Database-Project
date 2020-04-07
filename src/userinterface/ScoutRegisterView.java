@@ -34,8 +34,8 @@ public class ScoutRegisterView extends View {
         addContent("Troop ID",
                 makeField("Troop ID",10));
 
-        addContent("Status",
-                makeComboBox("Active","Inactive"));
+//        addContent("Status",
+//                makeComboBox("Active","Inactive"));
 
         submitButton();
         cancelButton();
