@@ -66,20 +66,17 @@ public class Scout extends EntityBase implements IView, IModel {
     // Can also be used to create a NEW Scout (if the system it is part of
     // allows for a new Scout to be set up)
     //----------------------------------------------------------
-    public Scout (Properties props)
-    {
+    public Scout (Properties props) {
         super(myTableName);
 
         setDependencies();
         persistentState = new Properties();
         Enumeration allKeys = props.propertyNames();
-        while (allKeys.hasMoreElements())
-        {
+        while (allKeys.hasMoreElements()) {
             String nextKey = (String)allKeys.nextElement();
             String nextValue = props.getProperty(nextKey);
 
-            if (nextValue != null)
-            {
+            if (nextValue != null) {
                 persistentState.setProperty(nextKey, nextValue);
             }
         }
@@ -115,12 +112,13 @@ public class Scout extends EntityBase implements IView, IModel {
             for(String s : new String[] {"firstName","middleName","lastName", "dateOfBirth", "phoneNumber", "email", "troopId", "status", "dateStatusUpdated"}){
                 persistentState.setProperty(s,data.getProperty(s));
             }
+        }else if(key.equals("insert")){
+            this.updateStateInDatabase();
+            persistentState.clear();
         }else if(value instanceof String val){
             persistentState.setProperty(key, val);
             Debug.logMsg(String.format("Updating state \"%s\" to value \"%s  \"", key,val));
         }
-        this.updateStateInDatabase();
-        persistentState.clear();
         myRegistry.updateSubscribers(key, this);
     }
 

@@ -163,7 +163,8 @@ public class Controller implements IView, IModel {
                 scout.persistentState = props;
 
                 scout.updateState("dateStatusUpdated", java.time.LocalDate.now().toString());
-                scout.persistentState.clear(); //Not totally sure if this is kosher
+                scout.updateState("insert",null);
+                //scout.persistentState.clear(); //Not totally sure if this is kosher
 
                 Alerts.infoMessage("Scout registered successfully!",this);
             }
@@ -211,6 +212,7 @@ public class Controller implements IView, IModel {
                             (String) props.get(field));
                 }
                 scout.updateState("dateStatusUpdated", java.time.LocalDate.now().toString()); //Internally calls update()
+                scout.updateState("insert",null);
 
                 Alerts.infoMessage("Scout updated!",this);
             }
@@ -223,6 +225,7 @@ public class Controller implements IView, IModel {
                 }
                 scout.updateState("status", "Inactive");
                 scout.updateState("dateStatusUpdated", LocalDate.now().toString());
+                scout.updateState("insert",null);
 
                 Alerts.infoMessage("Scout deleted!",this);
             }
