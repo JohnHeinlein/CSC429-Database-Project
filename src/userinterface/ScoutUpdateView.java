@@ -4,7 +4,6 @@ package userinterface;
 // system imports
 
 import impresario.IModel;
-import javafx.scene.control.Control;
 import model.Scout;
 import utilities.Debug;
 
@@ -22,21 +21,21 @@ public class ScoutUpdateView extends View {
 
         // create our GUI components, add them to this Container
         addContent("First Name",
-                makeField("First name",25),
-                makeField("Middle name",25),
-                makeField("Last name",25));
+                makeField("First name",25,"alphabetic"),
+                makeField("Middle name",25,"alphabetic"),
+                makeField("Last name",25,"alphabetic"));
 
         addContent("Date of Birth",
                 makeDatePicker());
 
         addContent("Phone Number",
-                makeField("Phone Number",30));
+                makeField("Phone Number",30,"numeric"));
 
         addContent("Email",
-                makeField("Email",30));
+                makeField("Email",30,"email"));
 
         addContent("Troop ID",
-                makeField("Troop ID",10));
+                makeField("Troop ID",10,"numeric"));
 
         addContent("Status",
                 makeComboBox("Active","Inactive"));
@@ -45,11 +44,12 @@ public class ScoutUpdateView extends View {
         cancelButton();
 
         for(String field : controlList.keySet()){
-            setValue((Control)controlList.get(field), (String)scout.getState(field));
+            setValue(controlList.get(field), (String)scout.getState(field));
         }
         //myModel.subscribe("UpdateStatusMessage", this);
     }
 
+    //TODO: This does not deviate from View, why override?
     @Override
     public void submit(){
         if(scrapeFields()) {

@@ -16,30 +16,25 @@ public class ScoutRegisterView extends View {
         // Add a title for this panel
         setTitle("Insert Scout Data");
 
-        // create our GUI components, add them to this Container
         addContent("Name",
-                makeField("First name",  25),
-                makeField("Middle name", 25),
-                makeField("Last name",   25));
+                makeField("First name", 25,"alphabetic"),
+                makeField("Middle name", 25,"alphabetic"),
+                makeField("Last name", 25,"alphabetic"));
 
         addContent("Date of Birth",
                 makeDatePicker());
 
         addContent("Phone Number",
-                makeField("Phone Number",30));
+                makeField("Phone Number",30, "numeric"));
 
         addContent("Email",
-                makeField("Email",30));
+                makeField("Email",30,"email"));
 
         addContent("Troop ID",
-                makeField("Troop ID",10));
-
-//        addContent("Status",
-//                makeComboBox("Active","Inactive"));
+                makeField("Troop ID",10,"numeric"));
 
         submitButton();
         cancelButton();
-        //myModel.subscribe("UpdateStatusMessage", this);
     }
 
 //    @Override

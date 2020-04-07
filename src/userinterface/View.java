@@ -34,30 +34,29 @@ import utilities.Alerts;
 import utilities.Debug;
 import utilities.Utilities;
 
+import javax.management.AttributeList;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Properties;
 
 public abstract class View extends Group implements IView, IControl {
+    protected final String viewName; //Debugging purposes
     private final String DEFAULT_FONT = "Comic Sans MS";
     private final Font LABEL_FONT = new Font(DEFAULT_FONT, 18);
-    private final Font BUTTON_FONT = new Font(DEFAULT_FONT,14);
+    private final Font BUTTON_FONT = new Font(DEFAULT_FONT, 14);
     private final double FIELD_WIDTH = 300.0;
-
-    protected IModel myModel;
-    protected ControlRegistry myRegistry;
-
-    protected Properties props; //Collects information from input fields for submission
-    protected HashMap<String, Object> controlList; //Keeps track of what content is a control
-
     private final BorderPane container;
     private final VBox header;
     private final HBox footer;
     private final GridPane content;
-
-    protected final String viewName; //Debugging purposes
+    protected IModel myModel;
+    protected ControlRegistry myRegistry;
+    protected Properties props; //Collects information from input fields for submission
+    protected HashMap<String, Object> controlList; //Keeps track of what content is a control
+    private AttributeList ArrayUtils;
 
     public View(IModel model, String classname) {
         myModel = model;
@@ -90,7 +89,7 @@ public abstract class View extends Group implements IView, IControl {
         container.setCenter(content);
         container.setBottom(footer);
 
-        if(Debug.debug){
+        if (Debug.debug) {
             //Create menu bar
             MenuBar mb = new MenuBar();
             Menu mDatabase = new Menu("Debug");
@@ -184,9 +183,9 @@ public abstract class View extends Group implements IView, IControl {
             }
 
             // Print content that was added
-            Debug.logMsg("(%s) Added %s from \"%s\"",viewName,
-                    isControl?
-                            String.format("control #%d (%s)",controlList.size(),control.getClass()):
+            Debug.logMsg("(%s) Added %s from \"%s\"", viewName,
+                    isControl ?
+                            String.format("control #%d (%s)", controlList.size(), control.getClass()) :
                             "button",
                     name);
         }
@@ -197,10 +196,11 @@ public abstract class View extends Group implements IView, IControl {
         GridPane.setHalignment(label, HPos.RIGHT);
         GridPane.setValignment(label, VPos.TOP);
     }
-    public void addContent(TableView<?> table){
+
+    public void addContent(TableView<?> table) {
         int col_count = table.getColumns().size();
         double col_width = table.getColumns().get(0).getWidth();
-        double width =  col_count * col_width;
+        double width = col_count * col_width;
 
         container.setPrefWidth(width);
         container.setCenter(table);
@@ -211,6 +211,7 @@ public abstract class View extends Group implements IView, IControl {
     // ***************
     // Footer methods
     // ***************
+
     /**
      * Adds a submit button to footer to return to ControllerView
      */
@@ -221,16 +222,16 @@ public abstract class View extends Group implements IView, IControl {
 //        submitButton.setStyle("-fx-background-color: lightgreen");
 //        footButt(submitButton);
 //    }
-
-    public void submitButton(String state){
-        Button submitButton = makeButt("Submit", e ->{
+    public void submitButton(String state) {
+        Button submitButton = makeButt("Submit", e -> {
             submit(state);
         });
         submitButton.setStyle("-fx-background-color: lightgreen");
         footButt(submitButton);
     }
-    public void submitButton(){
-        Button submitButton = makeButt("Submit", e->{
+
+    public void submitButton() {
+        Button submitButton = makeButt("Submit", e -> {
             submit();
         });
         submitButton.setStyle("-fx-background-color: lightgreen");
@@ -240,13 +241,14 @@ public abstract class View extends Group implements IView, IControl {
     /**
      * Overridden to allow submitting data
      */
-    protected void submit(){
-        submit(viewName.substring(0,viewName.length() - 4) + "Submit");
+    protected void submit() {
+        submit(viewName.substring(0, viewName.length() - 4) + "Submit");
     }
-    protected void submit(String state){
-        if(scrapeFields()){
+
+    protected void submit(String state) {
+        if (scrapeFields()) {
             myModel.stateChangeRequest(state, props);
-        }else{
+        } else {
             Debug.logErr("Submission failed for " + viewName);
         }
     }
@@ -265,7 +267,9 @@ public abstract class View extends Group implements IView, IControl {
     /**
      * Adds button to leftmost of footer
      */
-    public void footButt(Button butt) { footer.getChildren().add(footer.getChildren().size(), butt); }
+    public void footButt(Button butt) {
+        footer.getChildren().add(footer.getChildren().size(), butt);
+    }
 
     // ***************
     // Buttons
@@ -301,17 +305,31 @@ public abstract class View extends Group implements IView, IControl {
     // Text Field
     // ***************
     public TextFieldWrapper makeField(String prompt) {
-        return makeField(prompt, true);
+        return new TextFieldWrapper(prompt, null, null);
     }
 
-    public TextFieldWrapper makeField(String prompt, boolean editable) {
-        TextFieldWrapper field = new TextFieldWrapper(prompt);
-        field.getField().setEditable(editable);
-        field.setDisable(!editable);
-        return field;
+    //    public TextFieldWrapper makeField(String prompt, boolean editable) {
+//        TextFieldWrapper field = new TextFieldWrapper(prompt,null,null);
+//        field.getField().setEditable(editable);
+//        field.setDisable(!editable);
+//        return field;
+//    }
+    public TextFieldWrapper makeField(String prompt, int maxLength) {
+        return new TextFieldWrapper(prompt, maxLength, null, "length");
     }
-    public TextFieldWrapper makeField(String prompt, int maxLength){
-        return new TextFieldWrapper(prompt, maxLength);
+
+    public TextFieldWrapper makeField(String prompt, int maxLength, String... constraints) {
+        return makeField(prompt, maxLength, null, constraints);
+    }
+
+    public TextFieldWrapper makeField(String prompt, int maxLength, Integer minLength, String... constraints) {
+        String[] cons = Arrays.copyOf(constraints, constraints.length + 1);
+        cons[constraints.length] = "length";
+        return new TextFieldWrapper(prompt, maxLength, minLength, cons);
+    }
+
+    public TextFieldWrapper makeField(String prompt, String... constraints) {
+        return new TextFieldWrapper(prompt, null, null, constraints);
     }
 
     public NotesFieldWrapper makeNotesField(String prompt, int maxLength) {
@@ -344,11 +362,13 @@ public abstract class View extends Group implements IView, IControl {
         picker.setConverter(new StringConverter<LocalDate>() {
             String pattern = "yyyy-MM-dd";
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(pattern);
+
             {
                 picker.setPromptText(pattern.toLowerCase());
             }
 
-            @Override public String toString(LocalDate date) {
+            @Override
+            public String toString(LocalDate date) {
                 if (date != null) {
                     return dateFormatter.format(date);
                 } else {
@@ -356,7 +376,8 @@ public abstract class View extends Group implements IView, IControl {
                 }
             }
 
-            @Override public LocalDate fromString(String string) {
+            @Override
+            public LocalDate fromString(String string) {
                 if (string != null && !string.isEmpty()) {
                     return LocalDate.parse(string, dateFormatter);
                 } else {
@@ -390,18 +411,25 @@ public abstract class View extends Group implements IView, IControl {
     /**
      * Scrapes the fields into the local Properties object.
      * Shows error dialogue if a field is empty.
+     *
      * @return Whether scrape was successful or not
      */
-    public Boolean scrapeFields(){ return scrapeFields(true); }
+    public Boolean scrapeFields() {
+        return scrapeFields(true);
+    }
 
     /**
      * Scrapes fields into the local Properties object
+     *
      * @return Whether scrape was successful or not (always true for unsafe)
      */
-    public void scrapeFieldsUnsafe(){ scrapeFields(false); }
+    public void scrapeFieldsUnsafe() {
+        scrapeFields(false);
+    }
 
     /**
      * Scrapes the fields into the local Properties object.
+     *
      * @param safe Whether or not all fields are required
      * @return Whether scrape succeeded or not
      */
@@ -416,10 +444,10 @@ public abstract class View extends Group implements IView, IControl {
                 case "class javafx.scene.control.DatePicker" -> data = ((DatePicker) control).getValue().toString();
                 case "class javafx.scene.control.TextArea" -> data = ((TextArea) control).getText();
                 case "class userinterface.View$TextFieldWrapper" -> {
-                    TextFieldWrapper foo = (TextFieldWrapper)control;
+                    TextFieldWrapper foo = (TextFieldWrapper) control;
                     data = foo.getText();
 
-                    if(foo.isErr()) textFieldErr = true;
+                    if (foo.isErr()) textFieldErr = true;
                 }
                 default -> {
                     Alerts.errorMessage("Unsupported Control type, enable debugging");
@@ -427,27 +455,29 @@ public abstract class View extends Group implements IView, IControl {
                     return false;
                 }
             }
-            if(safe){
-                if(data.equals("")){
+            if (safe) {
+                if (data.equals("")) {
                     Alerts.errorMessage("All fields must be entered!");
                     Debug.logErr("Empty fields, returning false");
                     return false;
-                }else if(textFieldErr){
+                } else if (textFieldErr) {
                     Alerts.errorMessage("Field entered incorrectly!");
                     Debug.logErr("Text field error");
                     return false;
+                } else {
+                    sanitize(field, data);
                 }
             }
             props.put(field, data);
         }
         Debug.logMsg(
                 """
-                (%s)
-                    Fields queried:
-                        %s
-                    Properties retrieved:
-                        %s
-                """,
+                        (%s)
+                            Fields queried:
+                                %s
+                            Properties retrieved:
+                                %s
+                        """,
                 viewName,
                 controlList.toString()
                         .replaceAll(",", ",\n\t\t")
@@ -457,12 +487,16 @@ public abstract class View extends Group implements IView, IControl {
         return true;
     }
 
+    protected boolean sanitize(String field, String data) {
+        return true;
+    }
+
     protected String getValue(Object control) {
         return switch (control.getClass().toString()) {
-            case "class javafx.scene.control.ComboBox"  -> ((ComboBox<String>) control).getValue();
-            case "class javafx.scene.control.DatePicker"-> ((DatePicker) control).getConverter().toString();
+            case "class javafx.scene.control.ComboBox" -> ((ComboBox<String>) control).getValue();
+            case "class javafx.scene.control.DatePicker" -> ((DatePicker) control).getConverter().toString();
             case "class userinterface.View$TextFieldWrapper" -> ((TextFieldWrapper) control).getText();
-            case "class javafx.scene.control.TextArea"  -> ((TextArea) control).getText();
+            case "class javafx.scene.control.TextArea" -> ((TextArea) control).getText();
             default -> {
                 Debug.logErr("Unsupported control: " + control.getClass());
                 yield null;
@@ -471,16 +505,16 @@ public abstract class View extends Group implements IView, IControl {
     }
 
     protected void setValue(Object control, String value) {
-        Debug.logMsg(String.format("Updating %s to value %s",control,value));
+        Debug.logMsg(String.format("Updating %s to value %s", control, value));
         switch (control.getClass().toString()) {
             case "class javafx.scene.control.DatePicker" -> {
                 DatePicker picker = ((DatePicker) control);
                 StringConverter<LocalDate> converter = picker.getConverter();
                 picker.setValue(converter.fromString(value));
             }
-            case "class javafx.scene.control.ComboBox"  -> ((ComboBox<String>) control).getSelectionModel().select(value);
+            case "class javafx.scene.control.ComboBox" -> ((ComboBox<String>) control).getSelectionModel().select(value);
             case "class userinterface.View$TextFieldWrapper" -> ((TextFieldWrapper) control).setText(value);
-            case "class javafx.scene.control.TextArea"  -> ((TextArea) control).setText(value);
+            case "class javafx.scene.control.TextArea" -> ((TextArea) control).setText(value);
             default -> Debug.logErr("Unsupported control: " + control.getClass());
         }
     }
@@ -507,40 +541,46 @@ public abstract class View extends Group implements IView, IControl {
         private final String errStyle = "-fx-text-box-border: #ff4040 ; -fx-focus-color: #ff4040 ;";
         private final String acceptStyle = "-fx-text-box-border: #30ff30 ; -fx-focus-color: #30ff30 ;";
 
-        protected final String errLong = "Too long!";
-        protected final String errShort = "Too short!";
-
         private Integer minLen;
         private Integer maxLen;
 
-        private Boolean tooLong = false;
-        private Boolean tooShort = false;
-        private Boolean badContent = false;
+        private HashMap<String, Boolean> errors;
 
-        public TextFieldWrapper(String prompt){ this(prompt, null, null); }
-        public TextFieldWrapper(String prompt, Integer maxLen){ this(prompt, maxLen, null); }
-        public TextFieldWrapper(String prompt, Integer maxLen, Integer minLen) {
+        public TextFieldWrapper(String prompt, Integer maxLen, Integer minLen, String... constraints) {
             this.maxLen = maxLen;
             this.minLen = minLen;
+            errors = new HashMap<String, Boolean>();
 
             field = new TextField();
             field.setPromptText(prompt);
             field.setStyle("-fx-font-family: " + DEFAULT_FONT);
-            field.textProperty().addListener((o, s, t1) -> {
-                checkLength();
-            });
             defStyle = field.getStyle();
 
             errMsg = new Text("");
-            errMsg.setFont(Font.font(DEFAULT_FONT,12));
+            errMsg.setFont(Font.font(DEFAULT_FONT, 12));
             errMsg.setFill(Color.RED);
             errMsg.setTextAlignment(TextAlignment.LEFT);
+
+            for (String constraint : constraints) {
+                addConstraint(constraint);
+            }
+            field.textProperty().addListener((o, s, t1) -> {
+                boolean err = false;
+                for (boolean state : errors.values()) {
+                    if (state) {
+                        err = true;
+                        break;
+                    }
+                }
+                if (!err) {
+                    styleClear();
+                }
+            });
 
             getChildren().addAll(field, errMsg);
             setAlignment(Pos.CENTER_LEFT);
         }
 
-        // Override constructor
         protected void setListener(ChangeListener<? super String> listener) {
             field.textProperty().addListener(listener);
         }
@@ -548,46 +588,101 @@ public abstract class View extends Group implements IView, IControl {
         protected TextField getField() {
             return field;
         }
-        protected String getText() { return field.getText(); }
-        protected void setText(String s){ field.setText(s); }
 
-        protected void styleErr(String msg){
+        protected String getText() {
+            return field.getText();
+        }
+
+        protected void setText(String s) {
+            field.setText(s);
+        }
+
+        // Styling
+        public void styleErr(String msg) {
             errMsg.setText(msg);
             field.setStyle(errStyle);
-            badContent = true;
         }
-        protected void styleErr(){
+
+        public void styleErr() {
             styleErr("");
         }
-        protected void styleAccept(){
+
+        public void styleAccept() {
             errMsg.setText("");
             field.setStyle(acceptStyle);
-            badContent = false;
         }
-        protected void styleClear(){
+
+        public void styleClear() {
             errMsg.setText("");
             field.setStyle(defStyle);
-            badContent = false;
         }
 
-        protected void setMin(int min){ minLen = min; }
-        protected void setMax(int max){ maxLen = max; }
-
-        protected Boolean isErr(){return tooShort || tooLong || badContent;}
-
-        public void checkLength(){
-            int fieldLen = field.getText().length();
-            if(minLen != null && fieldLen < minLen){
-                tooLong = false; tooShort = true;
-                styleErr(errShort);
+        protected Boolean isErr() {
+            for (boolean bool : errors.values()) {
+                if (bool) return true;
             }
-            else if(maxLen != null && fieldLen > maxLen) {
-                tooLong = true; tooShort = false;
-                styleErr(errLong);
-            }
-            else{
-                tooLong = false; tooShort = false;
-                styleClear();
+            return false;
+        }
+
+        // Every constraint is added as its own listener.
+        // Every listener registers the constraint with the Wrapper and can raise its own error.
+        // This allows us to perform certain actions depending on what permutation of error states we are in.
+        // For example, CSS stylings are only changed when all or none of the error states are active.
+        // scrapeFields() will check isErr(), which will return false when all of the added constraints pass.
+        public void addConstraint(String constraint) {
+            switch (constraint) {
+                case "alphabetic" -> {
+                    errors.put(constraint, false);
+                    field.textProperty().addListener((o, s, t1) -> {
+                        if (field.getText().length() > 0 && field.getText().matches(".*\\d.*")) {
+                            styleErr("No numbers!");
+                            errors.put(constraint, true);
+                        } else errors.put(constraint, false);
+                    });
+                }
+                case "numeric" -> field.textProperty().addListener((o, s, t1) -> {
+                    if (field.getText().length() > 0 && field.getText().matches(".*\\D.*")) {
+                        styleErr("No letters!");
+                        errors.put(constraint, true);
+                    } else errors.put(constraint, false);
+                });
+                case "email" -> field.textProperty().addListener((o, s, t1) -> {
+                    if (field.getText().length() > 0 && !field.getText().matches("\\w+@\\w+\\.\\w+")) {
+                        styleErr("Invalid email");
+                        errors.put(constraint, true);
+                    } else errors.put(constraint, false);
+                });
+                case "length" -> field.textProperty().addListener((o, s, t1) -> {
+                    int fieldLen = field.getText().length();
+                    if (minLen != null && fieldLen < minLen) {
+                        errors.put("long", false);
+                        errors.put("short", true);
+                        if (fieldLen == 0) {
+                            styleClear();
+                        } else {
+                            styleErr("Too short!");
+                        }
+                    } else if (maxLen != null && fieldLen > maxLen) {
+                        errors.put("long", true);
+                        errors.put("short", false);
+                        styleErr("Too long!");
+                    } else {
+                        errors.put("long", false);
+                        errors.put("short", false);
+                    }
+                });
+                case "barcode" -> field.textProperty().addListener((o, s, t1) -> {
+                    if (field.getText().equals("Invalid barcode")) {
+                        errors.put("barcode", true);
+                        styleErr();
+                    } else if (field.getText().equals("Enter a barcode")) {
+                        errors.put("barcode", true);
+                        styleClear();
+                    } else {
+                        errors.put("barcode", false);
+                        styleAccept();
+                    }
+                });
             }
         }
     }

@@ -10,7 +10,7 @@ public class ScoutUpdateDeleteView extends View {
         setTitle("Update or Delete a Scout");
 
         addContent("First name",
-                makeField("First Name",25),
+                makeField("First Name",25,"alphabetic"),
                 makeButt("Search", e ->{
                     scrapeFieldsUnsafe();
                     myModel.stateChangeRequest(
@@ -19,7 +19,7 @@ public class ScoutUpdateDeleteView extends View {
                 }));
 
         addContent("Last name",
-                makeField("Last Name",25),
+                makeField("Last Name",25,"alphabetic"),
                 makeButt("Search", e ->{
                     scrapeFieldsUnsafe();
                     myModel.stateChangeRequest(
@@ -28,7 +28,7 @@ public class ScoutUpdateDeleteView extends View {
                 }));
 
         addContent("Email",
-                makeField("Email",25),
+                makeField("Email",25,"email"),
                 makeButt("Search", e ->{
                     scrapeFieldsUnsafe();
                     myModel.stateChangeRequest(

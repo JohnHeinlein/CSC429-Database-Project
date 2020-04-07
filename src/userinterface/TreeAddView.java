@@ -1,5 +1,6 @@
 package userinterface;
 
+import exception.InvalidPrimaryKeyException;
 import impresario.IModel;
 import model.TreeType;
 
@@ -11,31 +12,34 @@ public class TreeAddView extends View {
 
         setTitle("Add a Tree");
 
-        TextFieldWrapper barcodeField = makeField("Barcode",20);
-        TextFieldWrapper typeField = makeField("Tree Type",false);
+        TextFieldWrapper barcodeField = makeField("Barcode",20, 3,"numeric");
+        TextFieldWrapper typeField = makeField("Tree Type","barcode");
         typeField.setText("Enter a barcode"); //initial value
+        typeField.getField().setEditable(false);
 
 
         barcodeField.setListener(((observableValue, oldVal, newVal) -> {
-            barcodeField.checkLength();
-
             if(newVal.length() == 2){
-                type.setType(newVal);
-                typeField.setText((String)type.getState("typeDescription"));
+                try {
+                    type = new TreeType(newVal);
+                    typeField.setText((String)type.getState("typeDescription"));
+                } catch (InvalidPrimaryKeyException e) {
+                    typeField.setText("Invalid barcode");
+                }
             }else if(newVal.length() < 2){
                 typeField.setText("Enter a barcode");
             }
         }));
 
-        typeField.setListener(((observableValue,oldVal,newVal) ->{
-            if(newVal.equals("Invalid barcode")){
-                typeField.styleErr();
-            }else if(newVal.equals("")){
-                typeField.styleClear();
-            }else{
-                typeField.styleAccept();
-            }
-        }));
+//        typeField.setListener(((observableValue,oldVal,newVal) ->{
+//            if(newVal.equals("Invalid barcode")){
+//                typeField.styleErr();
+//            }else if(newVal.equals("")){
+//                typeField.styleClear();
+//            }else{
+//                typeField.styleAccept();
+//            }
+//        }));
 
         addContent("Barcode",
                 barcodeField);
