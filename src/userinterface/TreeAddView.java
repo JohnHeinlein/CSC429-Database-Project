@@ -12,10 +12,11 @@ public class TreeAddView extends View {
 
         setTitle("Add a Tree");
 
-        TextFieldWrapper barcodeField = makeField("Barcode",20, 3,"numeric");
+        TextFieldWrapper barcodeField = makeField("Barcode",6, 6,"numeric");
         TextFieldWrapper typeField = makeField("Tree Type","barcode");
         typeField.setText("Enter a barcode"); //initial value
         typeField.getField().setEditable(false);
+        typeField.getField().setDisable(true);
 
 
         barcodeField.setListener(((observableValue, oldVal, newVal) -> {
@@ -50,8 +51,8 @@ public class TreeAddView extends View {
         addContent("Notes",
                 makeNotesField("Notes", 200));
 
-        addContent("Status",
-                makeComboBox("Available", "Sold", "Damaged"));
+//        addContent("Status",
+//                makeComboBox("Available", "Sold", "Damaged"));
 
         submitButton();
         cancelButton();
@@ -73,6 +74,7 @@ public class TreeAddView extends View {
     public void submit(){
         if (scrapeFields()) {
             props.setProperty("treeType",(String)type.getState("id"));
+            props.setProperty("status","Available");
             myModel.stateChangeRequest("TreeAddSubmit", props);
         }
     }

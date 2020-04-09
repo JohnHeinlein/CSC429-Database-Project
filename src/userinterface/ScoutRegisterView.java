@@ -31,7 +31,7 @@ public class ScoutRegisterView extends View {
                 makeField("Email",30,"email"));
 
         addContent("Troop ID",
-                makeField("Troop ID",10,"numeric"));
+                makeField("Troop ID",9,9,"numeric"));
 
         submitButton();
         cancelButton();

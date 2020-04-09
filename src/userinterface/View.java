@@ -538,8 +538,8 @@ public abstract class View extends Group implements IView, IControl {
         private final Text errMsg;
 
         private final String defStyle;
-        private final String errStyle = "-fx-text-box-border: #ff4040 ; -fx-focus-color: #ff4040 ;";
-        private final String acceptStyle = "-fx-text-box-border: #30ff30 ; -fx-focus-color: #30ff30 ;";
+        private final String errStyle = "-fx-text-box-border: #ff4040 ; -fx-focus-color: #ff4040";
+        private final String acceptStyle = "-fx-text-box-border: #30ff30 ; -fx-focus-color: #30ff30";
 
         private Integer minLen;
         private Integer maxLen;
@@ -547,14 +547,20 @@ public abstract class View extends Group implements IView, IControl {
         private HashMap<String, Boolean> errors;
 
         public TextFieldWrapper(String prompt, Integer maxLen, Integer minLen, String... constraints) {
+            if(minLen == null){
+                this.minLen = 1;
+            }else{
+                this.minLen = minLen;
+            }
             this.maxLen = maxLen;
-            this.minLen = minLen;
+            //this.minLen = minLen;
             errors = new HashMap<String, Boolean>();
 
             field = new TextField();
             field.setPromptText(prompt);
             field.setStyle("-fx-font-family: " + DEFAULT_FONT);
             defStyle = field.getStyle();
+            Debug.logMsg("defstyle %s", defStyle);
 
             errMsg = new Text("");
             errMsg.setFont(Font.font(DEFAULT_FONT, 12));
@@ -573,7 +579,8 @@ public abstract class View extends Group implements IView, IControl {
                     }
                 }
                 if (!err) {
-                    styleClear();
+                    styleAccept();
+                    //styleClear();
                 }
             });
 
@@ -581,18 +588,9 @@ public abstract class View extends Group implements IView, IControl {
             setAlignment(Pos.CENTER_LEFT);
         }
 
-        protected void setListener(ChangeListener<? super String> listener) {
-            field.textProperty().addListener(listener);
-        }
-
-        protected TextField getField() {
-            return field;
-        }
-
-        protected String getText() {
-            return field.getText();
-        }
-
+        protected void setListener(ChangeListener<? super String> listener) { field.textProperty().addListener(listener); }
+        protected TextField getField() { return field; }
+        protected String getText() { return field.getText(); }
         protected void setText(String s) {
             field.setText(s);
         }
@@ -632,7 +630,7 @@ public abstract class View extends Group implements IView, IControl {
         public void addConstraint(String constraint) {
             switch (constraint) {
                 case "alphabetic" -> {
-                    errors.put(constraint, false);
+                    //errors.put(constraint, false);
                     field.textProperty().addListener((o, s, t1) -> {
                         if (field.getText().length() > 0 && field.getText().matches(".*\\d.*")) {
                             styleErr("No numbers!");
@@ -671,6 +669,13 @@ public abstract class View extends Group implements IView, IControl {
                         errors.put("short", false);
                     }
                 });
+                case "phone" -> field.textProperty().addListener((o,s,t1) -> {
+                    if(!field.getText().matches("\\d\\d\\d-\\d\\d\\d-\\d\\d\\d\\d")){
+                        styleAccept();
+                    }else{
+                        styleErr("Must be form xxx-xxx-xxxx");
+                    }
+                });
                 case "barcode" -> field.textProperty().addListener((o, s, t1) -> {
                     if (field.getText().equals("Invalid barcode")) {
                         errors.put("barcode", true);
@@ -701,6 +706,7 @@ public abstract class View extends Group implements IView, IControl {
             field.setWrapText(true);
             field.setFont(new Font(DEFAULT_FONT, 12));
 
+            label.setText(field.getText().length() + "/" + maxLength); //Should be initialized as well
             field.textProperty().addListener((observableValue, s, t1) -> {
                 if (field.getText().length() >= maxLength)
                     field.setText(field.getText().substring(0, maxLength));
