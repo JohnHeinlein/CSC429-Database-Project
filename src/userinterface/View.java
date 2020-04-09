@@ -670,9 +670,11 @@ public abstract class View extends Group implements IView, IControl {
                     }
                 });
                 case "phone" -> field.textProperty().addListener((o,s,t1) -> {
-                    if(!field.getText().matches("\\d\\d\\d-\\d\\d\\d-\\d\\d\\d\\d")){
+                    if(field.getText().matches("\\d\\d\\d-\\d\\d\\d-\\d\\d\\d\\d")){
+                        errors.put("phone",false);
                         styleAccept();
                     }else{
+                        errors.put("phone",true);
                         styleErr("Must be form xxx-xxx-xxxx");
                     }
                 });

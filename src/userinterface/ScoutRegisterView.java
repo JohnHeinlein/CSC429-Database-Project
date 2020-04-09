@@ -25,7 +25,7 @@ public class ScoutRegisterView extends View {
                 makeDatePicker());
 
         addContent("Phone Number",
-                makeField("Phone Number",30, "numeric"));
+                makeField("Phone Number", "phone"));
 
         addContent("Email",
                 makeField("Email",30,"email"));
