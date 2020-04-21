@@ -4,7 +4,13 @@ import exception.InvalidPrimaryKeyException;
 import impresario.IModel;
 import impresario.IView;
 import impresario.ModelRegistry;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import userinterface.MainStageContainer;
@@ -13,6 +19,7 @@ import userinterface.ViewFactory;
 import userinterface.WindowPosition;
 import utilities.Alerts;
 import utilities.Debug;
+
 
 import java.time.LocalDate;
 import java.util.*;
@@ -34,6 +41,9 @@ public class Controller implements IView, IModel {
 
     private TreeType treeType;
     private TreeTypeCollection treeTypeCollection;
+
+    private Session session;
+    private Shift shift;
 
     public Controller() {
         myStage = MainStageContainer.getInstance();
@@ -150,7 +160,94 @@ public class Controller implements IView, IModel {
             /*Sales*/   "TreeSell",
             /*Shifts*/  "ShiftOpen", "ShiftClose"
                         -> createAndShowView(key + "View");
+            //************************************************
+            // Creation of a new session upon opening a shift
+            //************************************************
+            case "SessionCreate" -> {
+                Debug.logMsg("Processing session creation");
+                props = (Properties) value;
+                session = new Session();
+                if (session.checkIfActiveSession() == false) {
+                    props.setProperty("totalCheckTransactionsAmount", "0");
+                    props.setProperty("endingCash", "0");
+                    props.setProperty("startDate", java.time.LocalDate.now().toString());
+                    session.persistentState = props;
+                    session.update();
 
+                    //Getting List of all active scouts
+                    Debug.logMsg("Showing all scouts...");
+                    scoutCollection = new ScoutCollection();
+                    scoutCollection.findAll();
+                    createAndShowView("AllScoutsView");
+                }
+                else {
+                    Alerts.infoMessage("Session already in progress, please click 'Close shift' and close the open shift",this);
+                }
+
+            }
+
+            //*************************************************
+            //  After selecting scouts to work in this session
+            //*************************************************
+
+            case "OpenShifts" -> {
+                scoutCollection = (ScoutCollection) value;
+                Debug.logMsg("Requesting to open shifts for " + scoutCollection.size() + " scouts");
+
+                int completed = 0;
+                 while ( completed < scoutCollection.size() ) {
+                     Dialog<Vector<String>> dialog = new Dialog<>();
+                     dialog.setTitle("Enter Shift Data for " + scoutCollection.retrieve(0).getState("firstName") + " " + scoutCollection.retrieve(0).getState("lastName"));
+                     dialog.setHeaderText("Please Enter Shift Data");
+                     ButtonType nextButtonType = new ButtonType("Open Shift", ButtonBar.ButtonData.OK_DONE);
+                     dialog.getDialogPane().getButtonTypes().addAll(nextButtonType, ButtonType.CANCEL);
+
+                     GridPane grid = new GridPane();
+                     grid.setHgap(10);
+                     grid.setVgap(10);
+                     grid.setPadding(new Insets(20, 150, 10, 10));
+
+                     TextField companionName = new TextField();
+                     companionName.setPromptText("Enter Scout Companion Name");
+                     TextField companionHours = new TextField();
+                     companionHours.setPromptText("Enter Scout Companion Hours");
+                     TextField endtime = new TextField();
+                     endtime.setPromptText("Ending Time");
+
+                     grid.add(new Label("Companion Name:"), 0, 0);
+                     grid.add(companionName, 1, 0);
+                     grid.add(new Label("Companion Hours:"), 0, 1);
+                     grid.add(companionHours, 1, 1);
+                     grid.add(new Label("Ending Time:"), 0, 2);
+                     grid.add(endtime, 1, 2);
+
+                     dialog.getDialogPane().setContent(grid);
+
+                     dialog.setResultConverter(dialogButton -> {
+                         if (dialogButton == nextButtonType) {
+                             Vector<String> v = new Vector<String>();
+                             v.add(companionName.getText());
+                             v.add(companionHours.getText());
+                             v.add(endtime.getText());
+                             return v;
+                         }
+                         return null;
+                     });
+
+                     Optional<Vector<String>> result = dialog.showAndWait();
+                     System.out.println(result.get().toString());
+                     shift = new Shift();
+                     shift.persistentState.setProperty("sessionId" , (String)session.getState("id"));
+                     shift.persistentState.setProperty("scoutId" , (String)scoutCollection.retrieve(completed).getState("id"));
+                     shift.persistentState.setProperty("startTime" , (String)session.getState("startTime"));
+                     shift.persistentState.setProperty("companionName" , result.get().elementAt(0));
+                     shift.persistentState.setProperty("companionHours", result.get().elementAt(1));
+                     shift.persistentState.setProperty("endTime", result.get().elementAt(2));
+                     shift.update();
+                     completed++;
+                 }
+                Alerts.infoMessage("All Shift Openings Completed!",this);
+            }
             //***************
             // Insertions
             //***************

@@ -29,7 +29,7 @@ public class ScoutUpdateView extends View {
                 makeDatePicker());
 
         addContent("Phone Number",
-                makeField("Phone Number",30,"numeric"));
+                makeField("Phone Number",30,"phone"));
 
         addContent("Email",
                 makeField("Email",30,"email"));

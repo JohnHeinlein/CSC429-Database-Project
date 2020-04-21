@@ -3,20 +3,21 @@ package userinterface;
 import impresario.IModel;
 import model.Session;
 import model.Shift;
+import userinterface.View;
 import utilities.Debug;
 
-public class ShiftOpenView extends View {
-    public ShiftOpenView(IModel model) {
-        super(model, "ShiftOpenView");
+public class ShiftDataView extends View {
+    public ShiftDataView(IModel model) {
+        super(model, "ShiftDataView");
 
         setTitle("Open a Shift");
 
-        addContent("Times",
-                makeField("Start Time"),
-                makeField("End Time"));
+        addContent("Companion",
+                makeField("Companion Name"),
+                makeField("Companion Hours"));
 
-        addContent("Starting Cash",
-                makeField("Starting Cash"));
+        addContent("Ending Time",
+                makeField("Ending Time"));
 
         submitButton();
         cancelButton();
@@ -24,7 +25,7 @@ public class ShiftOpenView extends View {
     @Override
     public void submit () {
         if(scrapeFields()) {
-            myModel.stateChangeRequest("SessionCreate", props);
+            myModel.stateChangeRequest("abc", props);
         }else{
             Debug.logErr("Failed submission: scrapeFields failed");
         }

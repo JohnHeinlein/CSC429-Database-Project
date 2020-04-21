@@ -13,6 +13,8 @@ import event.Event;
 import database.*;
 
 import impresario.IView;
+import model.Shift;
+import model.Session;
 
 import userinterface.View;
 import userinterface.ViewFactory;
@@ -43,6 +45,48 @@ public class ScoutCollection extends EntityBase implements IView {
         return findScouts(query);
     }
 
+    public Vector<Scout> findAll() {
+        String query = "SELECT * FROM " + myTableName + " WHERE status = 'Active'";
+        return findScouts(query);
+    }
+
+    public boolean add(Scout s) {
+        if (scoutList.contains(s)) {
+            return false;
+        }
+        else {
+            this.scoutList.add(s);
+            return true;
+        }
+    }
+
+    public boolean isEmpty () {
+        if(scoutList.size() == 0) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public boolean contains (Scout isThisInList) {
+        for (Scout scouts : scoutList) {
+            if(scouts.getState("id").equals(isThisInList.getState("id"))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public String toString () {
+        return scoutList.toString();
+    }
+
+    public int size () {
+        return scoutList.size();
+    }
+
     private Vector<Scout> findScouts(String query) {
         Vector<Properties> allDataRetrieved = getSelectQueryResult(query);
         if(allDataRetrieved == null){
@@ -62,6 +106,7 @@ public class ScoutCollection extends EntityBase implements IView {
     public Integer insertScout(Properties properties) throws SQLException {
         return insertAutoIncrementalPersistentState(mySchema, properties);
     }
+
 
 //    private int findIndexToAdd(Scout b) {
 //        //users.add(u);
@@ -114,6 +159,10 @@ public class ScoutCollection extends EntityBase implements IView {
             }
         }
         return retValue;
+    }
+
+    protected Scout retrieve(int index) {
+        return scoutList.get(index);
     }
 
     public void updateState(String key, Object value){

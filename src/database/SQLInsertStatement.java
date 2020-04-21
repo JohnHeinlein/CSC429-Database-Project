@@ -66,7 +66,6 @@ public class SQLInsertStatement extends SQLStatement {
             String theColumnValue = insertEscapes(insertValues.getProperty(theColumnName));
             theColumnNamesList.append(theColumnName);
             String insertType = schema.getProperty(theColumnName);
-
             if (insertType.equals("numeric")) {
                 theValuesString.append(theColumnValue);
             } else {

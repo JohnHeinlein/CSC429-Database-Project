@@ -49,9 +49,9 @@ public class Session extends EntityBase implements IModel, IView {
                 }
             }
         }
-        // If no Scout found for this user name, throw an exception
+        // If no Session found for this id, throw an exception
         else {
-            throw new InvalidPrimaryKeyException("No account matching id : " + SessionId + " found.");
+            throw new InvalidPrimaryKeyException("No session matching id : " + SessionId + " found.");
         }
     }
 
@@ -62,6 +62,19 @@ public class Session extends EntityBase implements IModel, IView {
         setDependencies();
         persistentState = new Properties();
     }
+
+    public boolean checkIfActiveSession () {
+        String query = "SELECT  * FROM " + myTableName + " WHERE (endingCash = 0)";
+        Vector<Properties> allDataRetrieved = getSelectQueryResult(query);
+
+        if(allDataRetrieved.size() == 0) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
 
     // Can also be used to create a NEW Session (if the system it is part of
     // allows for a new Session to be set up)
@@ -133,7 +146,9 @@ public class Session extends EntityBase implements IModel, IView {
     // End Of Methods Compiler Screams about
     //
     //////////////////////////////////////////////////////////////////////////////////
-
+    public void update() {
+        this.updateStateInDatabase();
+    }
     //Updating Database State
     private void updateStateInDatabase(){
         Debug.logMsg("Updating Session ID " + persistentState.getProperty("id"));

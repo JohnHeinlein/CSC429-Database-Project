@@ -133,7 +133,9 @@ public class Shift extends EntityBase implements IView, IModel {
     // End Of Methods Compiler Screams about
     //
     //////////////////////////////////////////////////////////////////////////////////
-
+    public void update() {
+        this.updateStateInDatabase();
+    }
     //Updating Database State
     private void updateStateInDatabase(){
         Debug.logMsg("Updating Shift ID " + persistentState.getProperty("id"));

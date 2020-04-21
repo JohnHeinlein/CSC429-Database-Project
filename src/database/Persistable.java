@@ -480,7 +480,7 @@ abstract public class Persistable {
             // Only the Global Pool connection should be used!
             Statement theStatement = theDBConnection.createStatement();
 
-            // This hangs on my database for no fucking reason
+            // This hangs on my database for no good reason
             //theStatement.setMaxRows(20000);
 
             // The method executeUpdate executes a query on the database. The
