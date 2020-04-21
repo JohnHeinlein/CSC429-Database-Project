@@ -3,7 +3,10 @@ package userinterface;
 import impresario.IModel;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.*;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import model.Scout;
 import model.ScoutCollection;
@@ -16,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Vector;
 
-public class ScoutCollectionView extends View{
+public class ScoutCollectionView extends View {
     protected final int COL_WIDTH = 100;
 
     protected TableView<ScoutTableModel> tableOfScouts;
@@ -42,35 +45,35 @@ public class ScoutCollectionView extends View{
                 new TableColumn<>("Date Status Updated")
         );
 
-        tableColumns.forEach(column ->{
-           column.setMinWidth(COL_WIDTH);
-           column.setCellValueFactory(new PropertyValueFactory<>(Utilities.toCamelCase(column.getText())));
+        tableColumns.forEach(column -> {
+            column.setMinWidth(COL_WIDTH);
+            column.setCellValueFactory(new PropertyValueFactory<>(Utilities.toCamelCase(column.getText())));
         });
 
         tableOfScouts.getColumns().addAll(tableColumns);
-        tableOfScouts.setOnMousePressed(e ->{
-            if (e.isPrimaryButtonDown() && e.getClickCount() >= 2){
+        tableOfScouts.setOnMousePressed(e -> {
+            if (e.isPrimaryButtonDown() && e.getClickCount() >= 2) {
                 selection = tableOfScouts.getSelectionModel().getSelectedItem();
             }
         });
 
         addContent(tableOfScouts);
 
-        footButt(makeButt("Update",e ->{
-            if(selection == null){
+        footButt(makeButt("Update", e -> {
+            if (selection == null) {
                 Alerts.errorMessage("Must select a scout!");
-            }else {
+            } else {
                 myModel.stateChangeRequest("ScoutUpdate", selection.getId());
             }
         }));
 
-        footButt(makeButt("Delete",e-> {
-            if(selection == null) {
+        footButt(makeButt("Delete", e -> {
+            if (selection == null) {
                 Alerts.errorMessage("Must select a scout!");
-            }else {
-                Optional<ButtonType> confirmation = Alerts.confirmMessage("Are you sure you want to delete Scout " +  selection.getFirstName() + " " + selection.getLastName() + "?");
-                if (confirmation.get() == ButtonType.OK){
-                    myModel.stateChangeRequest("ScoutDelete",selection.getId());
+            } else {
+                Optional<ButtonType> confirmation = Alerts.confirmMessage("Are you sure you want to delete Scout " + selection.getFirstName() + " " + selection.getLastName() + "?");
+                if (confirmation.get() == ButtonType.OK) {
+                    myModel.stateChangeRequest("ScoutDelete", selection.getId());
                 }
             }
         }));
@@ -79,13 +82,14 @@ public class ScoutCollectionView extends View{
 
         getEntryTableModelValues();
     }
-    protected void getEntryTableModelValues(){
+
+    protected void getEntryTableModelValues() {
         ObservableList<ScoutTableModel> tableData = FXCollections.observableArrayList();
 
         ScoutCollection collection = (ScoutCollection) myModel.getState("ScoutList");
         Vector<Scout> entryList = (Vector<Scout>) collection.getState("Scouts");
 
-        for(Scout scout : entryList){
+        for (Scout scout : entryList) {
             tableData.add(new ScoutTableModel(scout.getEntryListView()));
         }
 

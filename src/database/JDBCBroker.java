@@ -19,14 +19,15 @@
  * @author $Author: tomb $  @version	$Revision: 168 $  @version	$Revision: timmullins,2008-02-20 $
  * @version $Revision: 168 $  @version $Revision: timmullins,2008-02-20 $
  * @version $Revision: 168 $  @version $Revision: timmullins,2008-02-20 $
+ * @version $Revision: 168 $  @version $Revision: timmullins,2008-02-20 $
  */
 /** @version $Revision: 168 $ */
 /** @version $Revision: timmullins,2008-02-20 $ */
 package database;
 
-import utilities.Debug;
 import common.PropertyFile;
 import event.Event;
+import utilities.Debug;
 
 import java.sql.Connection;
 import java.sql.Driver;

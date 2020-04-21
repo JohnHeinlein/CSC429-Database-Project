@@ -64,20 +64,17 @@ public class TreeType extends EntityBase implements IModel, IView {
         }
     }
 
-    public TreeType (Properties props)
-    {
+    public TreeType(Properties props) {
         super(myTableName);
 
         setDependencies();
         persistentState = new Properties();
         Enumeration allKeys = props.propertyNames();
-        while (allKeys.hasMoreElements())
-        {
-            String nextKey = (String)allKeys.nextElement();
+        while (allKeys.hasMoreElements()) {
+            String nextKey = (String) allKeys.nextElement();
             String nextValue = props.getProperty(nextKey);
 
-            if (nextValue != null)
-            {
+            if (nextValue != null) {
                 persistentState.setProperty(nextKey, nextValue);
             }
         }
@@ -90,31 +87,25 @@ public class TreeType extends EntityBase implements IModel, IView {
 
     //Updating Database State
     private void updateStateInDatabase() {
-            try
-            {
-                if (persistentState.getProperty("id") != null)
-                {
-                    Properties whereClause = new Properties();
-                    whereClause.setProperty("id",
-                            persistentState.getProperty("id"));
-                    updatePersistentState(mySchema, persistentState, whereClause);
-                    updateStatusMessage = "Tree type data for id number : " + persistentState.getProperty("id") + " updated successfully in database!";
-                }
-                else
-                {
-                    Integer TreeTypeId =
-                            insertAutoIncrementalPersistentState(mySchema, persistentState);
-                    persistentState.setProperty("id", "" + TreeTypeId.intValue());
-                    updateStatusMessage = "Account data for new account : " +  persistentState.getProperty("id")
-                            + "installed successfully in database!";
-                }
+        try {
+            if (persistentState.getProperty("id") != null) {
+                Properties whereClause = new Properties();
+                whereClause.setProperty("id",
+                        persistentState.getProperty("id"));
+                updatePersistentState(mySchema, persistentState, whereClause);
+                updateStatusMessage = "Tree type data for id number : " + persistentState.getProperty("id") + " updated successfully in database!";
+            } else {
+                Integer TreeTypeId =
+                        insertAutoIncrementalPersistentState(mySchema, persistentState);
+                persistentState.setProperty("id", "" + TreeTypeId.intValue());
+                updateStatusMessage = "Account data for new account : " + persistentState.getProperty("id")
+                        + "installed successfully in database!";
             }
-            catch (SQLException ex)
-            {
-                updateStatusMessage = "Error in installing Treetype data in database!";
-            }
-            //DEBUG System.out.println("updateStateInDatabase " + updateStatusMessage);
+        } catch (SQLException ex) {
+            updateStatusMessage = "Error in installing Treetype data in database!";
         }
+        //DEBUG System.out.println("updateStateInDatabase " + updateStatusMessage);
+    }
 
     // For table Views
     public Vector<String> getEntryListView() {
@@ -161,20 +152,20 @@ public class TreeType extends EntityBase implements IModel, IView {
     }
 
     public void setType(String barcodeId) {
-        try{
+        try {
             this.persistentState = new TreeType(barcodeId).persistentState;
-        }catch(InvalidPrimaryKeyException ex){
+        } catch (InvalidPrimaryKeyException ex) {
             this.persistentState = null;
         }
     }
 
     @Override
     public Object getState(String key) {
-        if(table == null){
+        if (table == null) {
             Debug.logErr("No table found, generating...");
             this.updateTable();
         }
-        Debug.logMsg("Got \"%s\" for key  \"s\"",persistentState.get(key),key);
+        Debug.logMsg("Got \"%s\" for key  \"s\"", persistentState.get(key), key);
         return persistentState.get(key);
     }
 

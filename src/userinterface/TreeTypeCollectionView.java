@@ -3,15 +3,18 @@ package userinterface;
 import impresario.IModel;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.*;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import model.*;
+import model.TreeType;
+import model.TreeTypeCollection;
+import model.TreeTypeTableModel;
 import utilities.Alerts;
 import utilities.Utilities;
 
 import java.util.Arrays;
-import java.util.*;
-import java.util.Optional;
+import java.util.List;
 import java.util.Vector;
 
 public class TreeTypeCollectionView extends View {
@@ -35,24 +38,24 @@ public class TreeTypeCollectionView extends View {
                 new TableColumn<>("Barcode Prefix")
         );
 
-        tableColumns.forEach(column ->{
+        tableColumns.forEach(column -> {
             column.setMinWidth(COL_WIDTH);
             column.setCellValueFactory(new PropertyValueFactory<>(Utilities.toCamelCase(column.getText())));
         });
 
         tableOfTypes.getColumns().addAll(tableColumns);
-        tableOfTypes.setOnMousePressed(e ->{
-            if (e.isPrimaryButtonDown() && e.getClickCount() >= 2){
+        tableOfTypes.setOnMousePressed(e -> {
+            if (e.isPrimaryButtonDown() && e.getClickCount() >= 2) {
                 selection = tableOfTypes.getSelectionModel().getSelectedItem();
             }
         });
 
         addContent(tableOfTypes);
 
-        footButt(makeButt("Update",e ->{
-            if(selection == null){
+        footButt(makeButt("Update", e -> {
+            if (selection == null) {
                 Alerts.errorMessage("Must double click a Tree Type!");
-            }else {
+            } else {
                 myModel.stateChangeRequest("TreeTypeCollectionSubmit", selection.getBarcodePrefix());
             }
         }));
@@ -63,13 +66,13 @@ public class TreeTypeCollectionView extends View {
 
     }
 
-    protected void getEntryTableModelValues(){
+    protected void getEntryTableModelValues() {
         ObservableList<TreeTypeTableModel> tableData = FXCollections.observableArrayList();
 
         TreeTypeCollection collection = (TreeTypeCollection) myModel.getState("TreeTypeList");
         Vector<TreeType> entryList = (Vector<TreeType>) collection.getState("TreeTypes");
 
-        for(TreeType type : entryList){
+        for (TreeType type : entryList) {
             tableData.add(new TreeTypeTableModel(type.getEntryListView()));
         }
 

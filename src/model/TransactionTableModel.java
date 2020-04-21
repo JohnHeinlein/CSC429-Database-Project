@@ -2,7 +2,7 @@ package model;
 
 import java.util.Vector;
 
-public class TransactionTableModel{
+public class TransactionTableModel {
     private String id;
     private String sessionId;
     private String transactionType;
@@ -16,7 +16,7 @@ public class TransactionTableModel{
     private String transactionTime;
     private String dateStatusUpdated;
 
-    public TransactionTableModel(Vector<String> data){
+    public TransactionTableModel(Vector<String> data) {
         id = data.get(0);
         sessionId = data.get(1);
         transactionType = data.get(2);
@@ -30,40 +30,101 @@ public class TransactionTableModel{
         transactionTime = data.get(10);
         dateStatusUpdated = data.get(11);
     }
-    public String getId(){ return id; }
-    public void setId(String newVal){id = newVal;}
 
-    public String getSessionId(){ return sessionId; }
-    public void setSessionId(String newVal){sessionId = newVal;}
+    public String getId() {
+        return id;
+    }
 
-    public String getTransactionType(){ return transactionType; }
-    public void setTransactionType(String newVal){transactionType = newVal;}
+    public void setId(String newVal) {
+        id = newVal;
+    }
 
-    public String getBarcode(){ return barcode; }
-    public void setBarcode(String newVal){barcode = newVal;}
+    public String getSessionId() {
+        return sessionId;
+    }
 
-    public String getTransactionAmount(){ return transactionAmount; }
-    public void setTransactionAmount(String newVal){transactionAmount = newVal;}
+    public void setSessionId(String newVal) {
+        sessionId = newVal;
+    }
 
-    public String getPaymentMethod(){ return paymentMethod; }
-    public void setPaymentMethod(String newVal){paymentMethod = newVal;}
+    public String getTransactionType() {
+        return transactionType;
+    }
 
-    public String getCustomerName(){ return customerName; }
-    public void setCustomerName(String newVal){customerName = newVal;}
+    public void setTransactionType(String newVal) {
+        transactionType = newVal;
+    }
 
-    public String getCustomerPhone(){ return customerPhone; }
-    public void setCustomerPhone(String newVal){customerPhone = newVal;}
+    public String getBarcode() {
+        return barcode;
+    }
 
-    public String getCustomerEmail(){ return customerEmail; }
-    public void setCustomerEmail(String newVal){customerEmail = newVal;}
+    public void setBarcode(String newVal) {
+        barcode = newVal;
+    }
 
-    public String getTransactionDate(){ return transactionDate; }
-    public void setTransactionDate(String newVal){transactionDate = newVal;}
+    public String getTransactionAmount() {
+        return transactionAmount;
+    }
 
-    public String getTransactionTime(){ return transactionTime; }
-    public void setTransactionTime(String newVal){transactionTime = newVal;}
+    public void setTransactionAmount(String newVal) {
+        transactionAmount = newVal;
+    }
 
-    public String getDateStatusUpdated(){ return dateStatusUpdated; }
-    public void setDateStatusUpdated(String newVal){dateStatusUpdated = newVal;}
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String newVal) {
+        paymentMethod = newVal;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String newVal) {
+        customerName = newVal;
+    }
+
+    public String getCustomerPhone() {
+        return customerPhone;
+    }
+
+    public void setCustomerPhone(String newVal) {
+        customerPhone = newVal;
+    }
+
+    public String getCustomerEmail() {
+        return customerEmail;
+    }
+
+    public void setCustomerEmail(String newVal) {
+        customerEmail = newVal;
+    }
+
+    public String getTransactionDate() {
+        return transactionDate;
+    }
+
+    public void setTransactionDate(String newVal) {
+        transactionDate = newVal;
+    }
+
+    public String getTransactionTime() {
+        return transactionTime;
+    }
+
+    public void setTransactionTime(String newVal) {
+        transactionTime = newVal;
+    }
+
+    public String getDateStatusUpdated() {
+        return dateStatusUpdated;
+    }
+
+    public void setDateStatusUpdated(String newVal) {
+        dateStatusUpdated = newVal;
+    }
 
 }

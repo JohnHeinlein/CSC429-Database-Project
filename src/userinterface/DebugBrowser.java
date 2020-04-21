@@ -18,7 +18,13 @@ import javafx.util.Callback;
 import utilities.Debug;
 
 import java.lang.reflect.InvocationTargetException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.Driver;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -45,7 +51,7 @@ public class DebugBrowser {
     }
 
     // Query database metadata for names of tables
-    private void getTableNames(){
+    private void getTableNames() {
         broker = new Broker();
         try {
             // Retrieve the metadata for the connection
@@ -59,7 +65,9 @@ public class DebugBrowser {
                 tableNames.add(tables.getString(3)); // The third column in the tables result is the name of the table
             }
             Debug.logMsg("Retrieved tables: " + Arrays.toString(tableNames.toArray()));
-        } catch (SQLException ex) { ex.printStackTrace(); }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @SuppressWarnings("SqlNoDataSourceInspection")
@@ -71,10 +79,10 @@ public class DebugBrowser {
 
             makeHeader();
 
-            try{
+            try {
                 makeLefter();
                 makeCenter();
-            }catch(SQLException ex){
+            } catch (SQLException ex) {
                 ex.printStackTrace();
             }
 
@@ -94,7 +102,7 @@ public class DebugBrowser {
 
         private void makeLefter() {
             TableView<String> table = new TableView<>();
-            TableColumn<String,String> col = new TableColumn<>("Tables");
+            TableColumn<String, String> col = new TableColumn<>("Tables");
 
             // I don't really know what this does
             col.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<String, String>, ObservableValue<String>>() {
@@ -111,9 +119,9 @@ public class DebugBrowser {
             table.setOnMousePressed(e -> {
                 if (e.isPrimaryButtonDown() && e.getClickCount() >= 2) {
                     selectedTable = table.getSelectionModel().getSelectedItem();
-                    try{
+                    try {
                         makeCenter();
-                    }catch(SQLException ex){
+                    } catch (SQLException ex) {
                         ex.printStackTrace();
                     }
                 }
@@ -132,7 +140,7 @@ public class DebugBrowser {
         private void makeCenter() throws SQLException {
             TableView<ArrayList<Object>> table = new TableView<>();
 
-            if(selectedTable == null){
+            if (selectedTable == null) {
                 content.setCenter(table);
                 return;
             }
@@ -148,27 +156,27 @@ public class DebugBrowser {
             int columnCount = rsMeta.getColumnCount();
 
             // Retrieve names of columns from table
-            for (int i = 1 ; i <= columnCount ; i++)
+            for (int i = 1; i <= columnCount; i++)
                 colNames.add(rsMeta.getColumnName(i));
             //Debug.logMsg("Retrieved column names %s", colNames.toString());
 
             // Iterate over results from SQL query, add each row to data
             while (rs.next()) {
                 ArrayList<Object> row = new ArrayList<>();
-                for (int i = 1 ; i <= columnCount ; i++)
+                for (int i = 1; i <= columnCount; i++)
                     row.add(rs.getObject(i));
                 data.add(row);
                 //Debug.logMsg("Got row " + row.toString());
             }
 
             // Create Table
-            for(int i=0; i < colNames.size(); i++){
+            for (int i = 0; i < colNames.size(); i++) {
                 //Debug.logMsg("Creating column for " + colNames.get(i));
-                TableColumn<ArrayList<Object>,Object> col = new TableColumn<>(colNames.get(i));
+                TableColumn<ArrayList<Object>, Object> col = new TableColumn<>(colNames.get(i));
 
                 int colIndex = i; // For lambda safety
                 col.setCellValueFactory(cellData ->
-                    new SimpleObjectProperty<>(cellData.getValue().get(colIndex))
+                        new SimpleObjectProperty<>(cellData.getValue().get(colIndex))
                 );
                 table.getColumns().add(col);
             }
@@ -188,19 +196,25 @@ public class DebugBrowser {
 
         public Broker() {
             PropertyFile props = new PropertyFile("dbConfig.ini");
-            dbName   = props.getProperty("dbName");
+            dbName = props.getProperty("dbName");
             username = props.getProperty("username");
             password = props.getProperty("password");
-            server   = props.getProperty("server");
+            server = props.getProperty("server");
             String driverClassName = "com.mysql.jdbc.Driver";
 
             try { // load and register the JDBC driver classes
                 dbDriver = (Driver) Class.forName(driverClassName).getDeclaredConstructor().newInstance();
-            } catch (ClassNotFoundException exc)    { Debug.logErr("Could not load driver class: ClassNotFoundException");
-            } catch (InstantiationException exc)    { Debug.logErr("Could not load driver class: InstantiationException");
-            } catch (IllegalAccessException exc)    { Debug.logErr("Could not load driver class: IllegalAccessException");
-            } catch (NoSuchMethodException exc)     { Debug.logErr("Could not load driver class: NoSuchMethodException");
-            } catch (InvocationTargetException exc) { Debug.logErr("Could not load driver class: InvocationTargetException"); }
+            } catch (ClassNotFoundException exc) {
+                Debug.logErr("Could not load driver class: ClassNotFoundException");
+            } catch (InstantiationException exc) {
+                Debug.logErr("Could not load driver class: InstantiationException");
+            } catch (IllegalAccessException exc) {
+                Debug.logErr("Could not load driver class: IllegalAccessException");
+            } catch (NoSuchMethodException exc) {
+                Debug.logErr("Could not load driver class: NoSuchMethodException");
+            } catch (InvocationTargetException exc) {
+                Debug.logErr("Could not load driver class: InvocationTargetException");
+            }
         }
 
         protected Connection getConnection() {
@@ -209,8 +223,8 @@ public class DebugBrowser {
                 try {
                     Debug.logMsg("Connecting to database at " + server);
                     dbConnection = dbDriver.connect(String.format("jdbc:mysql://%s:3306/%s?user=%s&password=%s",
-                                                        server, dbName, username, password),
-                                                    null);
+                            server, dbName, username, password),
+                            null);
                     if (dbConnection == null)
                         Debug.logErr("Could not connect to database!");
                 } catch (SQLException exc) {

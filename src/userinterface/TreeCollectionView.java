@@ -3,9 +3,14 @@ package userinterface;
 import impresario.IModel;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.*;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import model.*;
+import model.Tree;
+import model.TreeCollection;
+import model.TreeTableModel;
 import utilities.Alerts;
 import utilities.Debug;
 import utilities.Utilities;
@@ -15,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Vector;
 
-public class TreeCollectionView extends View{
+public class TreeCollectionView extends View {
     protected final int COL_WIDTH = 100;
 
     private TableView<TreeTableModel> tableOfTrees;
@@ -28,7 +33,7 @@ public class TreeCollectionView extends View{
         tableOfTrees = new TableView<>();
         tableOfTrees.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
-        List<TableColumn<TreeTableModel,String>> tableColumns = Arrays.asList(
+        List<TableColumn<TreeTableModel, String>> tableColumns = Arrays.asList(
                 new TableColumn<>("Barcode"),
                 new TableColumn<>("Tree Type"),
                 new TableColumn<>("Notes"),
@@ -36,36 +41,36 @@ public class TreeCollectionView extends View{
                 new TableColumn<>("Date Status Updated")
         );
 
-        tableColumns.forEach(column ->{
+        tableColumns.forEach(column -> {
             column.setMinWidth(COL_WIDTH);
             column.setCellValueFactory(new PropertyValueFactory<>(Utilities.toCamelCase(column.getText())));
-            Debug.logMsg("Factory  created for %s",Utilities.toCamelCase(column.getText()));
+            Debug.logMsg("Factory  created for %s", Utilities.toCamelCase(column.getText()));
         });
 
         tableOfTrees.getColumns().addAll(tableColumns);
-        tableOfTrees.setOnMousePressed(e ->{
-            if (e.isPrimaryButtonDown() && e.getClickCount() >= 2){
+        tableOfTrees.setOnMousePressed(e -> {
+            if (e.isPrimaryButtonDown() && e.getClickCount() >= 2) {
                 selection = tableOfTrees.getSelectionModel().getSelectedItem();
             }
         });
 
         addContent(tableOfTrees);
 
-        footButt(makeButt("Update",e ->{
-            if(selection == null){
+        footButt(makeButt("Update", e -> {
+            if (selection == null) {
                 Alerts.errorMessage("Must select a tree!");
-            }else {
+            } else {
                 myModel.stateChangeRequest("TreeUpdate", selection.getBarcode());
             }
         }));
 
-        footButt(makeButt("Delete",e-> {
-            if(selection == null) {
+        footButt(makeButt("Delete", e -> {
+            if (selection == null) {
                 Alerts.errorMessage("Must select a tree!");
-            }else {
-                Optional<ButtonType> confirmation = Alerts.confirmMessage("Are you sure you want to delete Tree " +  selection.getBarcode() + "?");
-                if (confirmation.get() == ButtonType.OK){
-                    myModel.stateChangeRequest("TreeDelete",selection.getBarcode());
+            } else {
+                Optional<ButtonType> confirmation = Alerts.confirmMessage("Are you sure you want to delete Tree " + selection.getBarcode() + "?");
+                if (confirmation.get() == ButtonType.OK) {
+                    myModel.stateChangeRequest("TreeDelete", selection.getBarcode());
                 }
             }
         }));
@@ -75,13 +80,13 @@ public class TreeCollectionView extends View{
         getEntryTableModelValues();
     }
 
-    protected void getEntryTableModelValues(){
+    protected void getEntryTableModelValues() {
         ObservableList<TreeTableModel> tableData = FXCollections.observableArrayList();
 
         TreeCollection collection = (TreeCollection) myModel.getState("TreeList");
         Vector<Tree> entryList = (Vector<Tree>) collection.getState("Trees");
 
-        for(Tree tree : entryList){
+        for (Tree tree : entryList) {
             tableData.add(new TreeTableModel(tree.getEntryListView()));
         }
 

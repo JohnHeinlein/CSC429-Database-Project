@@ -19,6 +19,7 @@
 // JavaDoc information
 /**
  * @author $Author: tomb $  @version	$Revision: 1.2 $
+ * @version $Revision: 1.2 $
  */
 /** @version $Revision: 1.2 $ */
 

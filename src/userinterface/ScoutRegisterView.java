@@ -6,7 +6,7 @@ import javafx.scene.layout.VBox;
 
 
 public class ScoutRegisterView extends View {
-    public ScoutRegisterView(IModel scout){
+    public ScoutRegisterView(IModel scout) {
         super(scout, "ScoutRegisterView");
 
         // create a container for showing the contents
@@ -17,9 +17,9 @@ public class ScoutRegisterView extends View {
         setTitle("Insert Scout Data");
 
         addContent("Name",
-                makeField("First name", 25,"alphabetic"),
-                makeField("Middle name", 25,"alphabetic"),
-                makeField("Last name", 25,"alphabetic"));
+                makeField("First name", 25, "alphabetic"),
+                makeField("Middle name", 25, "alphabetic"),
+                makeField("Last name", 25, "alphabetic"));
 
         addContent("Date of Birth",
                 makeDatePicker());
@@ -28,10 +28,10 @@ public class ScoutRegisterView extends View {
                 makeField("Phone Number", "phone"));
 
         addContent("Email",
-                makeField("Email",30,"email"));
+                makeField("Email", 30, "email"));
 
         addContent("Troop ID",
-                makeField("Troop ID",9,9,"numeric"));
+                makeField("Troop ID", 9, 9, "numeric"));
 
         submitButton();
         cancelButton();

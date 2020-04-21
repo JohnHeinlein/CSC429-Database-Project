@@ -23,8 +23,23 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -547,9 +562,9 @@ public abstract class View extends Group implements IView, IControl {
         private HashMap<String, Boolean> errors;
 
         public TextFieldWrapper(String prompt, Integer maxLen, Integer minLen, String... constraints) {
-            if(minLen == null){
+            if (minLen == null) {
                 this.minLen = 1;
-            }else{
+            } else {
                 this.minLen = minLen;
             }
             this.maxLen = maxLen;
@@ -588,9 +603,18 @@ public abstract class View extends Group implements IView, IControl {
             setAlignment(Pos.CENTER_LEFT);
         }
 
-        protected void setListener(ChangeListener<? super String> listener) { field.textProperty().addListener(listener); }
-        protected TextField getField() { return field; }
-        protected String getText() { return field.getText(); }
+        protected void setListener(ChangeListener<? super String> listener) {
+            field.textProperty().addListener(listener);
+        }
+
+        protected TextField getField() {
+            return field;
+        }
+
+        protected String getText() {
+            return field.getText();
+        }
+
         protected void setText(String s) {
             field.setText(s);
         }
@@ -669,12 +693,12 @@ public abstract class View extends Group implements IView, IControl {
                         errors.put("short", false);
                     }
                 });
-                case "phone" -> field.textProperty().addListener((o,s,t1) -> {
-                    if(field.getText().matches("\\d\\d\\d-\\d\\d\\d-\\d\\d\\d\\d")){
-                        errors.put("phone",false);
+                case "phone" -> field.textProperty().addListener((o, s, t1) -> {
+                    if (field.getText().matches("\\d\\d\\d-\\d\\d\\d-\\d\\d\\d\\d")) {
+                        errors.put("phone", false);
                         styleAccept();
-                    }else{
-                        errors.put("phone",true);
+                    } else {
+                        errors.put("phone", true);
                         styleErr("Must be form xxx-xxx-xxxx");
                     }
                 });

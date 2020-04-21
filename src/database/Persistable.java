@@ -17,6 +17,7 @@
 
 /**
  * @author $Author: pwri0503 $  @version	$Revision: 1.1.1.2 $
+ * @version $Revision: 1.1.1.2 $
  */
 /** @version $Revision: 1.1.1.2 $ */
 
@@ -24,18 +25,17 @@
 // specify the package
 package database;
 
-import java.util.Properties;
-import java.util.Vector;
+import event.Event;
+import utilities.Debug;
 
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.sql.DatabaseMetaData;
-
-import utilities.Debug;
-import event.Event;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Properties;
+import java.util.Vector;
 
 abstract public class Persistable {
 
@@ -84,7 +84,7 @@ abstract public class Persistable {
         } catch (SQLException sqle) {
             new Event(Event.getLeafLevelClassName(this), "getSchemaInfo", "SQL Exception: " + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
             return null;
-        } catch(NullPointerException npe){
+        } catch (NullPointerException npe) {
             Debug.logErr("No connection to database");
             return null;
         }
@@ -97,7 +97,7 @@ abstract public class Persistable {
      * Returns a Vector with each element being a Properties object
      * containing the columnName=columnValue mappings
      */
-    protected Vector<Properties> getPersistentState(Properties schema, Properties where){
+    protected Vector<Properties> getPersistentState(Properties schema, Properties where) {
         int numRSColumns;            // number of columns in ResultSet
         Vector<String> namesRSColumns;    // names of columns in ResultSet
         ResultSet theResultSet;            // the resultset from the SQLStatement execution
@@ -456,12 +456,12 @@ abstract public class Persistable {
      * Returns an int indicating the auto-incremental id from SQL INSERT statement
      */
     protected Integer insertAutoIncrementalPersistentState(
-            Properties schema, 		// the table schema
+            Properties schema,        // the table schema
             Properties insertValues)// the values to update
             throws SQLException {
 
-        int autoIncKey = -1; 			// auto-increment key extracted from ResultSet
-        ResultSet theResultSet = null;	// auto-increment key in ResultSet
+        int autoIncKey = -1;            // auto-increment key extracted from ResultSet
+        ResultSet theResultSet = null;    // auto-increment key in ResultSet
 
         try {
             theDBConnection = myBroker.getConnection();
@@ -497,15 +497,13 @@ abstract public class Persistable {
             }
 
             return autoIncKey;
-        }
-        catch (SQLException sqle) {
-            Debug.logErr( "An SQL Error Occurred: SQL State: " + sqle.getSQLState() + "; Error Code = " + sqle.getErrorCode() + "; Message: " + sqle.getMessage() + "\n" + sqle);
+        } catch (SQLException sqle) {
+            Debug.logErr("An SQL Error Occurred: SQL State: " + sqle.getSQLState() + "; Error Code = " + sqle.getErrorCode() + "; Message: " + sqle.getMessage() + "\n" + sqle);
             new Event(Event.getLeafLevelClassName(this), "insertAutoIncrementalPersistentState", "SQL Exception: "
                     + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
             throw sqle;
 
-        }
-        finally {
+        } finally {
             if (theResultSet != null)
                 theResultSet.close();
             closeStatement();

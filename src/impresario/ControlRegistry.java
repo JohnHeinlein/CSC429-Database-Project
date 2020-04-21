@@ -19,13 +19,13 @@
 // JavaDoc information
 /**
  * @author $Author: tomb $  @version	$Revision: 1.4 $
+ * @version $Revision: 1.4 $
  */
 /** @version $Revision: 1.4 $ */
 package impresario;
 
 import event.Event;
 
-import java.util.Enumeration;
 import java.util.Vector;
 
 /**

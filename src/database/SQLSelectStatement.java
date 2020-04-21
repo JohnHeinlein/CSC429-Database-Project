@@ -18,6 +18,7 @@
 
 /**
  * @author $Author: pwri0503 $  @version	$Revision: 1.1.1.2 $
+ * @version $Revision: 1.1.1.2 $
  */
 /** @version $Revision: 1.1.1.2 $ */
 
@@ -65,7 +66,7 @@ public class SQLSelectStatement extends SQLStatement {
 
                 // Exclude empty strings
                 if (theFieldValue.length() > 0) {
-                    String theConjunctionClause = (theWhereString.toString().equals("")) ? " WHERE ": " AND ";
+                    String theConjunctionClause = (theWhereString.toString().equals("")) ? " WHERE " : " AND ";
 
                     if (theFieldValue.equals("NULL")) {
                         theWhereString.append(theConjunctionClause).append(theFieldName).append(" IS NULL");

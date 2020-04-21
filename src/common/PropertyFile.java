@@ -18,19 +18,21 @@
 
 /**
  * @author $Author: smitra $  @version	$Revision: 1.1 $
+ * @version $Revision: 1.1 $
  */
 /** @version $Revision: 1.1 $ */
 package common;
 
+import event.Event;
+
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
 // project imports
-import event.Event;
 
 /** Layer a file onto a Properties object */
 public class PropertyFile extends Properties {

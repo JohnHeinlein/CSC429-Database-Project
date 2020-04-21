@@ -6,8 +6,9 @@ import impresario.IView;
 import impresario.ModelRegistry;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
-import javafx.scene.control.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
@@ -20,9 +21,13 @@ import userinterface.WindowPosition;
 import utilities.Alerts;
 import utilities.Debug;
 
-
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.Vector;
 
 
 public class Controller implements IView, IModel {
@@ -69,10 +74,10 @@ public class Controller implements IView, IModel {
 //            myViews.put(viewName, currentScene);
 //        };
 //        swapToView(currentScene);
-        View newView = ViewFactory.createView(viewName,this);
+        View newView = ViewFactory.createView(viewName, this);
         Scene newScene = new Scene(newView);
 
-        myViews.put(viewName,newScene);
+        myViews.put(viewName, newScene);
 
         swapToView(newScene);
     }
@@ -102,23 +107,23 @@ public class Controller implements IView, IModel {
 
     @Override
     public void updateState(String key, Object value) {
-        switch(key) {
+        switch (key) {
             case "ScoutList" -> scoutCollection = (ScoutCollection) value;
             case "Scout" -> scout = (Scout) value;
 
-            case "TreeList" -> treeCollection = (TreeCollection)value;
-            case "Tree" -> tree = (Tree)value;
+            case "TreeList" -> treeCollection = (TreeCollection) value;
+            case "Tree" -> tree = (Tree) value;
 
-            case "TreeTypeList" -> treeTypeCollection = (TreeTypeCollection)value;
+            case "TreeTypeList" -> treeTypeCollection = (TreeTypeCollection) value;
             case "TreeType" -> {
-                if(value instanceof String){ //Provided barcode prefix
-                    String pref = ((String) value).substring(0,1);
+                if (value instanceof String) { //Provided barcode prefix
+                    String pref = ((String) value).substring(0, 1);
                     try {
                         treeType = new TreeType("pref");
-                    }catch(InvalidPrimaryKeyException ex){
+                    } catch (InvalidPrimaryKeyException ex) {
                         treeType = null; //Invalid key
                     }
-                }else if(value instanceof TreeType) {
+                } else if (value instanceof TreeType) {
                     treeType = (TreeType) value;
                 }
             }
@@ -127,7 +132,7 @@ public class Controller implements IView, IModel {
 
     @Override
     public Object getState(String key) {
-        if(key.substring(key.length() - 3).equals("View")){
+        if (key.substring(key.length() - 3).equals("View")) {
             return myViews.get(key);
         }
 
@@ -140,7 +145,7 @@ public class Controller implements IView, IModel {
 
             case "TreeTypeList" -> treeTypeCollection;
             case "TreeType" -> {
-                if(treeType == null) treeType = new TreeType();
+                if (treeType == null) treeType = new TreeType();
                 yield treeType;
             }
 
@@ -154,12 +159,11 @@ public class Controller implements IView, IModel {
 
         switch (key) {
             case
-            /*Scout*/   "ScoutRegister", "ScoutUpdateDelete",
-            /*Tree*/    "TreeAdd",
-            /*TreeType*/"TreeTypeAdd",
-            /*Sales*/   "TreeSell",
-            /*Shifts*/  "ShiftOpen", "ShiftClose"
-                        -> createAndShowView(key + "View");
+                    /*Scout*/   "ScoutRegister", "ScoutUpdateDelete",
+                    /*Tree*/    "TreeAdd",
+                    /*TreeType*/"TreeTypeAdd",
+                    /*Sales*/   "TreeSell",
+                    /*Shifts*/  "ShiftOpen", "ShiftClose" -> createAndShowView(key + "View");
             //************************************************
             // Creation of a new session upon opening a shift
             //************************************************
@@ -179,9 +183,8 @@ public class Controller implements IView, IModel {
                     scoutCollection = new ScoutCollection();
                     scoutCollection.findAll();
                     createAndShowView("AllScoutsView");
-                }
-                else {
-                    Alerts.infoMessage("Session already in progress, please click 'Close shift' and close the open shift",this);
+                } else {
+                    Alerts.infoMessage("Session already in progress, please click 'Close shift' and close the open shift", this);
                 }
 
             }
@@ -195,58 +198,58 @@ public class Controller implements IView, IModel {
                 Debug.logMsg("Requesting to open shifts for " + scoutCollection.size() + " scouts");
 
                 int completed = 0;
-                 while ( completed < scoutCollection.size() ) {
-                     Dialog<Vector<String>> dialog = new Dialog<>();
-                     dialog.setTitle("Enter Shift Data for " + scoutCollection.retrieve(0).getState("firstName") + " " + scoutCollection.retrieve(0).getState("lastName"));
-                     dialog.setHeaderText("Please Enter Shift Data");
-                     ButtonType nextButtonType = new ButtonType("Open Shift", ButtonBar.ButtonData.OK_DONE);
-                     dialog.getDialogPane().getButtonTypes().addAll(nextButtonType, ButtonType.CANCEL);
+                while (completed < scoutCollection.size()) {
+                    Dialog<Vector<String>> dialog = new Dialog<>();
+                    dialog.setTitle("Enter Shift Data for " + scoutCollection.retrieve(0).getState("firstName") + " " + scoutCollection.retrieve(0).getState("lastName"));
+                    dialog.setHeaderText("Please Enter Shift Data");
+                    ButtonType nextButtonType = new ButtonType("Open Shift", ButtonBar.ButtonData.OK_DONE);
+                    dialog.getDialogPane().getButtonTypes().addAll(nextButtonType, ButtonType.CANCEL);
 
-                     GridPane grid = new GridPane();
-                     grid.setHgap(10);
-                     grid.setVgap(10);
-                     grid.setPadding(new Insets(20, 150, 10, 10));
+                    GridPane grid = new GridPane();
+                    grid.setHgap(10);
+                    grid.setVgap(10);
+                    grid.setPadding(new Insets(20, 150, 10, 10));
 
-                     TextField companionName = new TextField();
-                     companionName.setPromptText("Enter Scout Companion Name");
-                     TextField companionHours = new TextField();
-                     companionHours.setPromptText("Enter Scout Companion Hours");
-                     TextField endtime = new TextField();
-                     endtime.setPromptText("Ending Time");
+                    TextField companionName = new TextField();
+                    companionName.setPromptText("Enter Scout Companion Name");
+                    TextField companionHours = new TextField();
+                    companionHours.setPromptText("Enter Scout Companion Hours");
+                    TextField endtime = new TextField();
+                    endtime.setPromptText("Ending Time");
 
-                     grid.add(new Label("Companion Name:"), 0, 0);
-                     grid.add(companionName, 1, 0);
-                     grid.add(new Label("Companion Hours:"), 0, 1);
-                     grid.add(companionHours, 1, 1);
-                     grid.add(new Label("Ending Time:"), 0, 2);
-                     grid.add(endtime, 1, 2);
+                    grid.add(new Label("Companion Name:"), 0, 0);
+                    grid.add(companionName, 1, 0);
+                    grid.add(new Label("Companion Hours:"), 0, 1);
+                    grid.add(companionHours, 1, 1);
+                    grid.add(new Label("Ending Time:"), 0, 2);
+                    grid.add(endtime, 1, 2);
 
-                     dialog.getDialogPane().setContent(grid);
+                    dialog.getDialogPane().setContent(grid);
 
-                     dialog.setResultConverter(dialogButton -> {
-                         if (dialogButton == nextButtonType) {
-                             Vector<String> v = new Vector<String>();
-                             v.add(companionName.getText());
-                             v.add(companionHours.getText());
-                             v.add(endtime.getText());
-                             return v;
-                         }
-                         return null;
-                     });
+                    dialog.setResultConverter(dialogButton -> {
+                        if (dialogButton == nextButtonType) {
+                            Vector<String> v = new Vector<String>();
+                            v.add(companionName.getText());
+                            v.add(companionHours.getText());
+                            v.add(endtime.getText());
+                            return v;
+                        }
+                        return null;
+                    });
 
-                     Optional<Vector<String>> result = dialog.showAndWait();
-                     System.out.println(result.get().toString());
-                     shift = new Shift();
-                     shift.persistentState.setProperty("sessionId" , (String)session.getState("id"));
-                     shift.persistentState.setProperty("scoutId" , (String)scoutCollection.retrieve(completed).getState("id"));
-                     shift.persistentState.setProperty("startTime" , (String)session.getState("startTime"));
-                     shift.persistentState.setProperty("companionName" , result.get().elementAt(0));
-                     shift.persistentState.setProperty("companionHours", result.get().elementAt(1));
-                     shift.persistentState.setProperty("endTime", result.get().elementAt(2));
-                     shift.update();
-                     completed++;
-                 }
-                Alerts.infoMessage("All Shift Openings Completed!",this);
+                    Optional<Vector<String>> result = dialog.showAndWait();
+                    System.out.println(result.get().toString());
+                    shift = new Shift();
+                    shift.persistentState.setProperty("sessionId", (String) session.getState("id"));
+                    shift.persistentState.setProperty("scoutId", (String) scoutCollection.retrieve(completed).getState("id"));
+                    shift.persistentState.setProperty("startTime", (String) session.getState("startTime"));
+                    shift.persistentState.setProperty("companionName", result.get().elementAt(0));
+                    shift.persistentState.setProperty("companionHours", result.get().elementAt(1));
+                    shift.persistentState.setProperty("endTime", result.get().elementAt(2));
+                    shift.update();
+                    completed++;
+                }
+                Alerts.infoMessage("All Shift Openings Completed!", this);
             }
             //***************
             // Insertions
@@ -254,28 +257,28 @@ public class Controller implements IView, IModel {
             case "ScoutRegisterSubmit" -> {
                 Debug.logMsg("Processing scout registration");
                 props = (Properties) value;
-                props.setProperty("status","Active");
+                props.setProperty("status", "Active");
 
                 scout = new Scout();
                 scout.persistentState = props;
 
                 scout.updateState("dateStatusUpdated", java.time.LocalDate.now().toString());
-                scout.updateState("insert",null);
+                scout.updateState("insert", null);
                 //scout.persistentState.clear(); //Not totally sure if this is kosher
 
-                Alerts.infoMessage("Scout registered successfully!",this);
+                Alerts.infoMessage("Scout registered successfully!", this);
             }
 
             //***************
             // Scout
             //***************
             case "ScoutSearch" -> {
-                Pair<String,String> pair = (Pair<String,String>) value;
+                Pair<String, String> pair = (Pair<String, String>) value;
                 Vector<Scout> scouts;
 
                 scoutCollection = new ScoutCollection();
 
-                scouts = switch(pair.getKey()){
+                scouts = switch (pair.getKey()) {
                     case "firstName" -> scoutCollection.findScoutsWithFirstName(pair.getValue());
                     case "lastName" -> scoutCollection.findScoutsWithLastName(pair.getValue());
                     case "email" -> scoutCollection.findScoutsWithEmail(pair.getValue());
@@ -309,9 +312,9 @@ public class Controller implements IView, IModel {
                             (String) props.get(field));
                 }
                 scout.updateState("dateStatusUpdated", java.time.LocalDate.now().toString()); //Internally calls update()
-                scout.updateState("insert",null);
+                scout.updateState("insert", null);
 
-                Alerts.infoMessage("Scout updated!",this);
+                Alerts.infoMessage("Scout updated!", this);
             }
 
             case "ScoutDelete" -> {
@@ -322,19 +325,19 @@ public class Controller implements IView, IModel {
                 }
                 scout.updateState("status", "Inactive");
                 scout.updateState("dateStatusUpdated", LocalDate.now().toString());
-                scout.updateState("insert",null);
+                scout.updateState("insert", null);
 
-                Alerts.infoMessage("Scout deleted!",this);
+                Alerts.infoMessage("Scout deleted!", this);
             }
             //***************
             // Tree
             //***************
-            case "TreeUpdateDelete" ->{
+            case "TreeUpdateDelete" -> {
                 createAndShowView("TreeUpdateDeleteView");
             }
 
-            case "TreeUpdate" ->{
-                tree = (Tree)value;
+            case "TreeUpdate" -> {
+                tree = (Tree) value;
                 createAndShowView("TreeUpdateView");
             }
 
@@ -381,7 +384,7 @@ public class Controller implements IView, IModel {
                     treeType.persistentState.clear();
                 }
 
-                Alerts.infoMessage("Tree type added!",this);
+                Alerts.infoMessage("Tree type added!", this);
             }
 
             //***********************************
@@ -416,7 +419,7 @@ public class Controller implements IView, IModel {
                 }
 
                 treeType.update();
-                Alerts.infoMessage("Tree Type updated!",this);
+                Alerts.infoMessage("Tree Type updated!", this);
             }
 
             //****************************
@@ -436,7 +439,7 @@ public class Controller implements IView, IModel {
                     tree.persistentState.clear();
                 }
 
-                Alerts.infoMessage("Tree added!",this);
+                Alerts.infoMessage("Tree added!", this);
             }
 
             case "Cancel" -> createAndShowView("ControllerView");

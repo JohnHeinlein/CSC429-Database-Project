@@ -24,7 +24,7 @@ public class WindowPosition {
     /**
      * Used to place the stage in the center of the screen
      *
-     * @param    s    Stage to place at the center of the screen
+     * @param s Stage to place at the center of the screen
      */
     public static void placeCenter(Stage s) {
         if (s != null) {
@@ -35,7 +35,7 @@ public class WindowPosition {
     /**
      * Used to place a stage at the top left corner of te screen
      *
-     * @param    s    Stage to place at the top left corner of the screen
+     * @param s Stage to place at the top left corner of the screen
      */
     public static void placeTopLeft(Stage s) {
         if (s != null) {
@@ -47,7 +47,7 @@ public class WindowPosition {
     /**
      * Used to place a stage at the top right corner of the screen
      *
-     * @param    s    Stage to place at the top right corner of the screen
+     * @param s Stage to place at the top right corner of the screen
      */
     public static void placeTopRight(Stage s) {
         if (s != null) {
@@ -59,7 +59,7 @@ public class WindowPosition {
     /**
      * Used to place a stage at the bottom left corner of te screen
      *
-     * @param    s    Stage to place at the bottom left corner of the screen
+     * @param s Stage to place at the bottom left corner of the screen
      */
     public static void placeBottomLeft(Stage s) {
         if (s != null) {
@@ -72,7 +72,7 @@ public class WindowPosition {
     /**
      * Used to place a stage at the bottom right corner of the screen
      *
-     * @param    s    Stage to place at the bottom right corner of the screen
+     * @param s Stage to place at the bottom right corner of the screen
      */
     public static void placeBottomRight(Stage s) {
         if (s != null) {

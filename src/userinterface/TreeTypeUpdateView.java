@@ -12,9 +12,9 @@ import utilities.Debug;
 public class TreeTypeUpdateView extends View {
     private final TreeType treeType;
 
-    public TreeTypeUpdateView (IModel myModel) {
+    public TreeTypeUpdateView(IModel myModel) {
         super(myModel, "TreeTypeAddView");
-        treeType = (TreeType)myModel.getState("TreeType");
+        treeType = (TreeType) myModel.getState("TreeType");
 
         setTitle("Update a Tree Type");
 
@@ -30,27 +30,26 @@ public class TreeTypeUpdateView extends View {
         submitButton();
         cancelButton();
 
-        for(String field : controlList.keySet()){
-            setValue(controlList.get(field), (String)treeType.getState(field));
+        for (String field : controlList.keySet()) {
+            setValue(controlList.get(field), (String) treeType.getState(field));
         }
     }
 
     @Override
-    public void submit(){
-        if(scrapeFields()) {
+    public void submit() {
+        if (scrapeFields()) {
             try {
                 if (!treeType.getState("barcodePrefix").equals(props.getProperty("barcodePrefix"))) {
                     TreeType tType = new TreeType(props.getProperty("barcodePrefix"));
                     Debug.logMsg("Tree Type With barcode prefix: " + props.getProperty("barcodePrefix") + " Already Exists");
-                }
-                else {
+                } else {
                     myModel.stateChangeRequest("TreeTypeUpdateSubmit", props);
                 }
             } catch (InvalidPrimaryKeyException IPKE) {
                 Debug.logErr("Invalid primary key exception caught");
                 myModel.stateChangeRequest("TreeTypeUpdateSubmit", props);
             }
-        }else{
+        } else {
             Debug.logErr("Failed submission: scrapeFields failed");
         }
     }

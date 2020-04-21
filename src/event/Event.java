@@ -17,6 +17,7 @@
 
 /**
  * @author $Author: smitra $  @version	$Revision: 1.1 $
+ * @version $Revision: 1.1 $
  */
 /** @version $Revision: 1.1 $ */
 
@@ -42,7 +43,7 @@ public class Event {
     public static final int NUMBER_SEVERITY_LEVELS = 5;
 
     // String values corresponding to the various event levels
-    public static final String[] SeverityDescription ={
+    public static final String[] SeverityDescription = {
             "Debug",
             "Information",
             "Warning",
@@ -198,12 +199,12 @@ public class Event {
      */
     public String toString() {
         return "[" + myTime + "]"
-             + "|" + myClass
-             + "|" + myMethod
-             + "|" + SeverityDescription[mySeverity]
-             + "|" + myTag
-             + "|" + myParams
-             + "<" + myDescription + ">";
+                + "|" + myClass
+                + "|" + myMethod
+                + "|" + SeverityDescription[mySeverity]
+                + "|" + myTag
+                + "|" + myParams
+                + "<" + myDescription + ">";
     }
 
     /**

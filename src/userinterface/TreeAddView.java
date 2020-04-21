@@ -5,29 +5,29 @@ import impresario.IModel;
 import model.TreeType;
 
 public class TreeAddView extends View {
-    TreeType type = (TreeType)myModel.getState("TreeType");
+    TreeType type = (TreeType) myModel.getState("TreeType");
 
     public TreeAddView(IModel model) {
-        super (model, "TreeAddView");
+        super(model, "TreeAddView");
 
         setTitle("Add a Tree");
 
-        TextFieldWrapper barcodeField = makeField("Barcode",6, 6,"numeric");
-        TextFieldWrapper typeField = makeField("Tree Type","barcode");
+        TextFieldWrapper barcodeField = makeField("Barcode", 6, 6, "numeric");
+        TextFieldWrapper typeField = makeField("Tree Type", "barcode");
         typeField.setText("Enter a barcode"); //initial value
         typeField.getField().setEditable(false);
         typeField.getField().setDisable(true);
 
 
         barcodeField.setListener(((observableValue, oldVal, newVal) -> {
-            if(newVal.length() == 2){
+            if (newVal.length() == 2) {
                 try {
                     type = new TreeType(newVal);
-                    typeField.setText((String)type.getState("typeDescription"));
+                    typeField.setText((String) type.getState("typeDescription"));
                 } catch (InvalidPrimaryKeyException e) {
                     typeField.setText("Invalid barcode");
                 }
-            }else if(newVal.length() < 2){
+            } else if (newVal.length() < 2) {
                 typeField.setText("Enter a barcode");
             }
         }));
@@ -58,7 +58,7 @@ public class TreeAddView extends View {
         cancelButton();
     }
 
-//    @Override
+    //    @Override
 //    public void submit(){
 //        if(scrapeFields()) {
 //            try {
@@ -71,10 +71,10 @@ public class TreeAddView extends View {
 //        }
 //    }
     @Override
-    public void submit(){
+    public void submit() {
         if (scrapeFields()) {
-            props.setProperty("treeType",(String)type.getState("id"));
-            props.setProperty("status","Available");
+            props.setProperty("treeType", (String) type.getState("id"));
+            props.setProperty("status", "Available");
             myModel.stateChangeRequest("TreeAddSubmit", props);
         }
     }

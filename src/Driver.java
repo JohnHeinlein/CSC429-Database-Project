@@ -4,7 +4,7 @@ import model.Controller;
 import userinterface.MainStageContainer;
 import utilities.Debug;
 
-public class Driver{
+public class Driver {
     public static void main(String[] args) {
         Application.launch(App.class);
     }
@@ -12,7 +12,7 @@ public class Driver{
     public static class App extends Application {
         public void start(Stage primaryStage) {
             System.out.println("CSC429 Project 1.00");
-            if(Debug.setDebug(true)){
+            if (Debug.setDebug(true)) {
                 Debug.logErr("Debugging enabled");
             }
 

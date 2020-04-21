@@ -12,19 +12,18 @@
 // specify the package
 package model;
 
-import java.util.Hashtable;
-import java.util.Properties;
-
-import javafx.scene.Scene;
-import javafx.stage.Stage;
-
 import database.Persistable;
-import impresario.ModelRegistry;
+import event.Event;
 import impresario.IModel;
 import impresario.IView;
-import event.Event;
+import impresario.ModelRegistry;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 import userinterface.MainStageContainer;
 import userinterface.WindowPosition;
+
+import java.util.Hashtable;
+import java.util.Properties;
 
 /**
  * The superclass for all Fast Trax Model Entities that are also

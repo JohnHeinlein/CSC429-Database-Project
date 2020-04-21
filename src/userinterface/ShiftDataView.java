@@ -1,9 +1,6 @@
 package userinterface;
 
 import impresario.IModel;
-import model.Session;
-import model.Shift;
-import userinterface.View;
 import utilities.Debug;
 
 public class ShiftDataView extends View {
@@ -22,14 +19,16 @@ public class ShiftDataView extends View {
         submitButton();
         cancelButton();
     }
+
     @Override
-    public void submit () {
-        if(scrapeFields()) {
+    public void submit() {
+        if (scrapeFields()) {
             myModel.stateChangeRequest("abc", props);
-        }else{
+        } else {
             Debug.logErr("Failed submission: scrapeFields failed");
         }
     }
+
     @Override
     public void updateState(String key, Object value) {
 

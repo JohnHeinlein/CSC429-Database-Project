@@ -1,8 +1,6 @@
 package userinterface;
 
 import impresario.IModel;
-import model.Session;
-import model.Shift;
 import utilities.Debug;
 
 public class ShiftOpenView extends View {
@@ -21,14 +19,16 @@ public class ShiftOpenView extends View {
         submitButton();
         cancelButton();
     }
+
     @Override
-    public void submit () {
-        if(scrapeFields()) {
+    public void submit() {
+        if (scrapeFields()) {
             myModel.stateChangeRequest("SessionCreate", props);
-        }else{
+        } else {
             Debug.logErr("Failed submission: scrapeFields failed");
         }
     }
+
     @Override
     public void updateState(String key, Object value) {
 

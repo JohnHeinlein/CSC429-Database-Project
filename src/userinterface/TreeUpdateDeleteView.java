@@ -22,7 +22,7 @@ public class TreeUpdateDeleteView extends View {
         addContent("Barcode",
                 makeField("Barcode"));
 
-        footButt(makeButt("Update",e->{
+        footButt(makeButt("Update", e -> {
             Tree tree = getTree();
 
             if (tree != null) {
@@ -31,7 +31,7 @@ public class TreeUpdateDeleteView extends View {
         }));
 
         // TODO: Currently says it deletes the tree, but doesn't actually.
-        footButt(makeButt("Delete",e->{
+        footButt(makeButt("Delete", e -> {
             Tree tree = getTree();
 
             if (tree != null) {
@@ -46,18 +46,18 @@ public class TreeUpdateDeleteView extends View {
         cancelButton();
     }
 
-    public Tree getTree(){
+    public Tree getTree() {
         scrapeFields();
 
-        String barcode = (String)props.get("barcode");
+        String barcode = (String) props.get("barcode");
 
-        if(barcode == null){
+        if (barcode == null) {
             Debug.logErr("No barcode retrieved");
             return null;
         }
         try {
             return new Tree(barcode);
-        }catch(InvalidPrimaryKeyException ex){
+        } catch (InvalidPrimaryKeyException ex) {
             Debug.logErr(String.format("(%s) Invalid barcode", barcode));
         }
         return null;

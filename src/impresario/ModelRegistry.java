@@ -22,6 +22,7 @@
  * @version $Revision: 1.6 $
  * @version $Revision: 1.6 $
  * @version $Revision: 1.6 $
+ * @version $Revision: 1.6 $
  */
 /** @version $Revision: 1.6 $ */
 
@@ -53,7 +54,7 @@ public class ModelRegistry extends Registry {
      * @param classname the name of the class that contains this Registry, debug only
      * @param dependencies the dependency information for keys
      */
-    public ModelRegistry(String classname,Properties dependencies){
+    public ModelRegistry(String classname, Properties dependencies) {
         super(classname);    // build our base class
 
         // save our dependencies
@@ -64,7 +65,7 @@ public class ModelRegistry extends Registry {
      * @param classname the name of the class that contains this Registry, debug only
      * @param dependencyFile filename that contains the dependency information for keys
      */
-    public ModelRegistry(String classname,String dependencyFile) {
+    public ModelRegistry(String classname, String dependencyFile) {
         super(classname);    // build our base class
 
         // save our dependencies
@@ -74,7 +75,7 @@ public class ModelRegistry extends Registry {
     /**
      * @param classname filename that contains the dependency information for keys
      */
-    public ModelRegistry(String classname){
+    public ModelRegistry(String classname) {
         super(classname);
         myDependencies = new Properties();  // may be replaced later
     }
@@ -82,7 +83,7 @@ public class ModelRegistry extends Registry {
     /**
      * @param dependencies filename that contains the dependency information for keys
      */
-    public void setDependencies(Properties dependencies){
+    public void setDependencies(Properties dependencies) {
         myDependencies = dependencies;
     }
 

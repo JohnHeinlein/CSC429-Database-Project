@@ -3,7 +3,7 @@ package userinterface;
 import impresario.IModel;
 import utilities.Debug;
 
-public class TreeTypeAddView extends View{
+public class TreeTypeAddView extends View {
 
     public TreeTypeAddView(IModel model) {
         super(model, "TreeTypeAddView");
@@ -25,10 +25,10 @@ public class TreeTypeAddView extends View{
     }
 
     @Override
-    public void submit(){
-        if(scrapeFields()) {
+    public void submit() {
+        if (scrapeFields()) {
             myModel.stateChangeRequest("TreeTypeAddSubmit", props);
-        }else{
+        } else {
             Debug.logErr("Failed submission: scrapeFields failed");
         }
     }
@@ -37,7 +37,6 @@ public class TreeTypeAddView extends View{
     public void updateState(String key, Object value) {
 
     }
-
 
 
 }

@@ -56,21 +56,20 @@ public class Session extends EntityBase implements IModel, IView {
     }
 
     //-- NEW CONSTRUCTOR EMPTY PROPERTIES
-    public Session () {
+    public Session() {
         super(myTableName);
 
         setDependencies();
         persistentState = new Properties();
     }
 
-    public boolean checkIfActiveSession () {
+    public boolean checkIfActiveSession() {
         String query = "SELECT  * FROM " + myTableName + " WHERE (endingCash = 0)";
         Vector<Properties> allDataRetrieved = getSelectQueryResult(query);
 
-        if(allDataRetrieved.size() == 0) {
+        if (allDataRetrieved.size() == 0) {
             return false;
-        }
-        else {
+        } else {
             return true;
         }
     }
@@ -79,14 +78,14 @@ public class Session extends EntityBase implements IModel, IView {
     // Can also be used to create a NEW Session (if the system it is part of
     // allows for a new Session to be set up)
     //----------------------------------------------------------
-    public Session (Properties props) {
+    public Session(Properties props) {
         super(myTableName);
 
         setDependencies();
         persistentState = new Properties();
         Enumeration allKeys = props.propertyNames();
         while (allKeys.hasMoreElements()) {
-            String nextKey = (String)allKeys.nextElement();
+            String nextKey = (String) allKeys.nextElement();
             String nextValue = props.getProperty(nextKey);
 
             if (nextValue != null) {
@@ -108,10 +107,10 @@ public class Session extends EntityBase implements IModel, IView {
 
     @Override
     public Object getState(String key) {
-        return switch(key){
+        return switch (key) {
             case "UpdateStatusMessage" -> updateStatusMessage;
             case "schema" -> {
-                if(mySchema == null) initializeSchema(myTableName);
+                if (mySchema == null) initializeSchema(myTableName);
                 yield mySchema;
             }
             default -> persistentState.getProperty(key);
@@ -119,18 +118,18 @@ public class Session extends EntityBase implements IModel, IView {
     }
 
     @Override
-    public void stateChangeRequest(String key, Object value){
+    public void stateChangeRequest(String key, Object value) {
         if (key.equals("InsertSession")) {
             Properties data = (Properties) value;
-            for(String s : new String[] {"startDate","startTime","endTime", "startingCash", "endingCash", "totalCheckTransactionsAmount", "notes"}){
-                persistentState.setProperty(s,data.getProperty(s));
+            for (String s : new String[]{"startDate", "startTime", "endTime", "startingCash", "endingCash", "totalCheckTransactionsAmount", "notes"}) {
+                persistentState.setProperty(s, data.getProperty(s));
             }
-        }else if(key.equals("insert")){
+        } else if (key.equals("insert")) {
             this.updateStateInDatabase();
             persistentState.clear();
-        }else if(value instanceof String val){
+        } else if (value instanceof String val) {
             persistentState.setProperty(key, val);
-            Debug.logMsg(String.format("Updating state \"%s\" to value \"%s  \"", key,val));
+            Debug.logMsg(String.format("Updating state \"%s\" to value \"%s  \"", key, val));
         }
         myRegistry.updateSubscribers(key, this);
     }
@@ -142,6 +141,7 @@ public class Session extends EntityBase implements IModel, IView {
             Debug.logMsg("Schema initialized");
         }
     }
+
     //
     // End Of Methods Compiler Screams about
     //
@@ -149,8 +149,9 @@ public class Session extends EntityBase implements IModel, IView {
     public void update() {
         this.updateStateInDatabase();
     }
+
     //Updating Database State
-    private void updateStateInDatabase(){
+    private void updateStateInDatabase() {
         Debug.logMsg("Updating Session ID " + persistentState.getProperty("id"));
         try {
             if (persistentState.getProperty("id") != null) {

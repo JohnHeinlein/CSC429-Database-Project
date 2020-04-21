@@ -17,13 +17,14 @@
 
 /**
  * @author $Author: smitra $  @version	$Revision: 1.1 $
+ * @version $Revision: 1.1 $
  */
 /** @version $Revision: 1.1 $ */
 package event;
 
 import common.StringList;
 
-import javax.swing.*;
+import javax.swing.JOptionPane;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;

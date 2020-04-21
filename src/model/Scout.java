@@ -66,14 +66,14 @@ public class Scout extends EntityBase implements IView, IModel {
     // Can also be used to create a NEW Scout (if the system it is part of
     // allows for a new Scout to be set up)
     //----------------------------------------------------------
-    public Scout (Properties props) {
+    public Scout(Properties props) {
         super(myTableName);
 
         setDependencies();
         persistentState = new Properties();
         Enumeration allKeys = props.propertyNames();
         while (allKeys.hasMoreElements()) {
-            String nextKey = (String)allKeys.nextElement();
+            String nextKey = (String) allKeys.nextElement();
             String nextValue = props.getProperty(nextKey);
 
             if (nextValue != null) {
@@ -95,10 +95,10 @@ public class Scout extends EntityBase implements IView, IModel {
 
     @Override
     public Object getState(String key) {
-        return switch(key){
+        return switch (key) {
             case "UpdateStatusMessage" -> updateStatusMessage;
             case "schema" -> {
-                if(mySchema == null) initializeSchema(myTableName);
+                if (mySchema == null) initializeSchema(myTableName);
                 yield mySchema;
             }
             default -> persistentState.getProperty(key);
@@ -106,18 +106,18 @@ public class Scout extends EntityBase implements IView, IModel {
     }
 
     @Override
-    public void stateChangeRequest(String key, Object value){
+    public void stateChangeRequest(String key, Object value) {
         if (key.equals("InsertScout")) {
             Properties data = (Properties) value;
-            for(String s : new String[] {"firstName","middleName","lastName", "dateOfBirth", "phoneNumber", "email", "troopId", "status", "dateStatusUpdated"}){
-                persistentState.setProperty(s,data.getProperty(s));
+            for (String s : new String[]{"firstName", "middleName", "lastName", "dateOfBirth", "phoneNumber", "email", "troopId", "status", "dateStatusUpdated"}) {
+                persistentState.setProperty(s, data.getProperty(s));
             }
-        }else if(key.equals("insert")){
+        } else if (key.equals("insert")) {
             this.updateStateInDatabase();
             persistentState.clear();
-        }else if(value instanceof String val){
+        } else if (value instanceof String val) {
             persistentState.setProperty(key, val);
-            Debug.logMsg(String.format("Updating state \"%s\" to value \"%s  \"", key,val));
+            Debug.logMsg(String.format("Updating state \"%s\" to value \"%s  \"", key, val));
         }
         myRegistry.updateSubscribers(key, this);
     }
@@ -135,7 +135,7 @@ public class Scout extends EntityBase implements IView, IModel {
     //////////////////////////////////////////////////////////////////////////////////
 
     //Updating Database State
-    private void updateStateInDatabase(){
+    private void updateStateInDatabase() {
         Debug.logMsg("Updating scout ID " + persistentState.getProperty("id"));
         try {
             if (persistentState.getProperty("id") != null) {

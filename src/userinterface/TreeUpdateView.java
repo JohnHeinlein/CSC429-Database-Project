@@ -5,10 +5,9 @@ import javafx.scene.control.ComboBox;
 import model.Tree;
 import utilities.Debug;
 
-import javax.swing.SingleSelectionModel;
 import java.util.Map;
 
-public class TreeUpdateView extends View{
+public class TreeUpdateView extends View {
 
     private Tree tree;
 
@@ -39,20 +38,21 @@ public class TreeUpdateView extends View{
         submitButton();
         cancelButton();
 
-        for(Map.Entry<String, Object> entry : controlList.entrySet()){
+        for (Map.Entry<String, Object> entry : controlList.entrySet()) {
             setValue(entry.getValue(), (String) tree.getState(entry.getKey()));
         }
         //myModel.subscribe("UpdateStatusMessage", this);
     }
 
     @Override
-    public void submit(){
-        if(scrapeFields()) {
+    public void submit() {
+        if (scrapeFields()) {
             myModel.stateChangeRequest("TreeUpdateSubmit", props);
-        }else{
+        } else {
             Debug.logErr("Failed submission: scrapeFields failed");
         }
     }
+
     public void updateState(String key, Object value) {
         // STEP 6: Be sure to finish the end of the 'perturbation'
         // by indicating how the view state gets updated.

@@ -1,6 +1,5 @@
 package model;
 
-import exception.InvalidPrimaryKeyException;
 import impresario.IView;
 import utilities.Debug;
 
@@ -9,24 +8,27 @@ import java.util.Properties;
 import java.util.Vector;
 
 public class TreeCollection extends EntityBase implements IView {
-    private static final String myTableName="tree";
+    private static final String myTableName = "tree";
     private Vector<Tree> treeList;
 
-    public TreeCollection(){this(new Vector<Tree>());}
+    public TreeCollection() {
+        this(new Vector<Tree>());
+    }
+
     public TreeCollection(Vector<Tree> trees) {
         super(myTableName);
         treeList = trees;
     }
 
-    public Vector<Tree> findTrees(String barcode){
+    public Vector<Tree> findTrees(String barcode) {
         String query = "SELECT * FROM " + myTableName + " WHERE barcode LIKE '%" + barcode + "%'";
 
         Vector<Properties> allDataRetrieved = getSelectQueryResult(query);
 
-        if(allDataRetrieved == null){
+        if (allDataRetrieved == null) {
             Debug.logErr("No data retrieved");
             return null;
-        }else{
+        } else {
             Debug.logMsg("Found trees: " + Arrays.deepToString(allDataRetrieved.toArray()));
         }
 
@@ -39,14 +41,14 @@ public class TreeCollection extends EntityBase implements IView {
 
     @Override
     public void updateState(String key, Object value) {
-        if(key.equals("Trees")){
-            treeList = (Vector<Tree>)value;
+        if (key.equals("Trees")) {
+            treeList = (Vector<Tree>) value;
         }
     }
 
     @Override
     public Object getState(String key) {
-        if(key.equals("Trees")){
+        if (key.equals("Trees")) {
             return treeList;
         }
         return null;

@@ -1,46 +1,42 @@
 package model;
 
 //System imports
+
+import impresario.IView;
+import utilities.Debug;
+
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.Vector;
+
 //import javafx.scene.Scene;
-
 //Project imports
-import exception.InvalidPrimaryKeyException;
-import event.Event;
-import database.*;
-
-import impresario.IView;
-import model.Shift;
-import model.Session;
-
-import userinterface.View;
-import userinterface.ViewFactory;
-import utilities.Debug;
 
 public class ScoutCollection extends EntityBase implements IView {
     private static final String myTableName = "scout";
     private Vector<Scout> scoutList;
 
-    public ScoutCollection(){ this(new Vector<Scout>()); }
-    public ScoutCollection(Vector<Scout> scouts){
+    public ScoutCollection() {
+        this(new Vector<Scout>());
+    }
+
+    public ScoutCollection(Vector<Scout> scouts) {
         super(myTableName);
         scoutList = scouts;
     }
 
-    public Vector<Scout> findScoutsWithFirstName(String firstName){
+    public Vector<Scout> findScoutsWithFirstName(String firstName) {
         String query = "SELECT * FROM " + myTableName + " WHERE firstName LIKE '%" + firstName + "%' AND status = 'Active'";
         return findScouts(query);
     }
 
-    public Vector<Scout> findScoutsWithLastName(String lastName){
+    public Vector<Scout> findScoutsWithLastName(String lastName) {
         String query = "SELECT * FROM " + myTableName + " WHERE lastName LIKE '%" + lastName + "%' AND status = 'Active'";
         return findScouts(query);
     }
 
-    public Vector<Scout> findScoutsWithEmail(String email){
+    public Vector<Scout> findScoutsWithEmail(String email) {
         String query = "SELECT * FROM " + myTableName + " WHERE email LIKE '%" + email + "%' AND status = 'Active'";
         return findScouts(query);
     }
@@ -53,25 +49,23 @@ public class ScoutCollection extends EntityBase implements IView {
     public boolean add(Scout s) {
         if (scoutList.contains(s)) {
             return false;
-        }
-        else {
+        } else {
             this.scoutList.add(s);
             return true;
         }
     }
 
-    public boolean isEmpty () {
-        if(scoutList.size() == 0) {
+    public boolean isEmpty() {
+        if (scoutList.size() == 0) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
-    public boolean contains (Scout isThisInList) {
+    public boolean contains(Scout isThisInList) {
         for (Scout scouts : scoutList) {
-            if(scouts.getState("id").equals(isThisInList.getState("id"))) {
+            if (scouts.getState("id").equals(isThisInList.getState("id"))) {
                 return true;
             }
         }
@@ -79,20 +73,20 @@ public class ScoutCollection extends EntityBase implements IView {
     }
 
     @Override
-    public String toString () {
+    public String toString() {
         return scoutList.toString();
     }
 
-    public int size () {
+    public int size() {
         return scoutList.size();
     }
 
     private Vector<Scout> findScouts(String query) {
         Vector<Properties> allDataRetrieved = getSelectQueryResult(query);
-        if(allDataRetrieved == null){
+        if (allDataRetrieved == null) {
             Debug.logErr("No data retrieved");
             return null;
-        }else {
+        } else {
             Debug.logMsg("Found scouts: " + Arrays.deepToString(allDataRetrieved.toArray()));
         }
         for (Properties properties : allDataRetrieved) {
@@ -136,24 +130,24 @@ public class ScoutCollection extends EntityBase implements IView {
 //        return low;
 //    }
 
-    public Object getState(String key){
-        return switch(key){
+    public Object getState(String key) {
+        return switch (key) {
             case "Scouts" -> scoutList;
             case "ScoutList" -> this;
             default -> null;
         };
     }
 
-    public void stateChangeRequest(String key, Object value){
+    public void stateChangeRequest(String key, Object value) {
         myRegistry.updateSubscribers(key, this);
     }
 
-    public Scout retrieve(String scoutId){
+    public Scout retrieve(String scoutId) {
         Scout retValue = null;
-        for(int i = 0; i < scoutList.size(); i++){
+        for (int i = 0; i < scoutList.size(); i++) {
             Scout nextScout = scoutList.elementAt(i);
-            String nextScoutNum = (String)nextScout.getState("scoutId");
-            if(nextScoutNum.equals(scoutId)){
+            String nextScoutNum = (String) nextScout.getState("scoutId");
+            if (nextScoutNum.equals(scoutId)) {
                 retValue = nextScout;
                 return nextScout;
             }
@@ -165,25 +159,26 @@ public class ScoutCollection extends EntityBase implements IView {
         return scoutList.get(index);
     }
 
-    public void updateState(String key, Object value){
-        if(key.equals("Scouts")){
-            scoutList = (Vector<Scout>)value;
+    public void updateState(String key, Object value) {
+        if (key.equals("Scouts")) {
+            scoutList = (Vector<Scout>) value;
         }
-        stateChangeRequest(key,value);
+        stateChangeRequest(key, value);
     }
 
-    protected void createAndShowView(){
+    protected void createAndShowView() {
         //javaFX stuff
     }
 
-    protected  void initializeSchema(String tableName){
-        if(mySchema == null) mySchema = getSchemaInfo((tableName));
+    protected void initializeSchema(String tableName) {
+        if (mySchema == null) mySchema = getSchemaInfo((tableName));
     }
 }
 
-/**public String toString(){
+/**
+ * public String toString(){
  * return "ID" + persistentSate.getProperty("scoutId") +
- *                                          "scoutTitle"
- *                                          "author"
- }
+ * "scoutTitle"
+ * "author"
+ * }
  **/
