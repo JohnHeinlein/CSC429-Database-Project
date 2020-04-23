@@ -4,6 +4,7 @@ import exception.InvalidPrimaryKeyException;
 import impresario.IModel;
 import impresario.IView;
 import impresario.ModelRegistry;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -205,7 +206,7 @@ public class Controller implements IView, IModel {
                     dialog.setTitle("Enter Shift Data for " + scoutCollection.retrieve(completed).getState("firstName") + " " + scoutCollection.retrieve(completed).getState("lastName"));
                     dialog.setHeaderText("Please Enter Shift Data for " + scoutCollection.retrieve(completed).getState("firstName") + " " + scoutCollection.retrieve(completed).getState("lastName"));
                     ButtonType nextButtonType = new ButtonType("Open Shift", ButtonBar.ButtonData.OK_DONE);
-                    ButtonType cancel = new ButtonType("Cancel", ButtonBar.ButtonData.OK_DONE);
+                    ButtonType cancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
                     //dialog.getDialogPane().getButtonTypes().addAll(nextButtonType, ButtonType.CANCEL);
                     dialog.getDialogPane().getButtonTypes().addAll(nextButtonType, cancel);
 
@@ -215,11 +216,29 @@ public class Controller implements IView, IModel {
                     grid.setPadding(new Insets(20, 150, 10, 10));
 
                     TextField companionName = new TextField();
-                    companionName.setPromptText("Enter Scout Companion Name");
+                    companionName.setPromptText("Scout Companion Name");
+                    companionName.textProperty().addListener((observable, oldValue, newValue) -> {
+                        if (newValue.length() > 49) {
+                            companionName.setText(oldValue);
+                            Alerts.errorMessage("This is the max length for field <Companion Name>");
+                        }
+                    });
                     TextField companionHours = new TextField();
-                    companionHours.setPromptText("Enter Scout Companion Hours");
+                    companionHours.setPromptText("Scout Companion Hours");
+                    companionHours.textProperty().addListener((observable, oldValue, newValue) -> {
+                        if(newValue.length() > 3) {
+                            companionHours.setText(oldValue);
+                            Alerts.errorMessage("This is the max length for field <Companion Hours>");
+                        }
+                    });
                     TextField endtime = new TextField();
                     endtime.setPromptText("Ending Time");
+                    endtime.textProperty().addListener((observable, oldValue, newValue) -> {
+                        if (newValue.length() > 11) {
+                            endtime.setText(oldValue);
+                            Alerts.errorMessage("This is the max length for field <End Time>");
+                        }
+                    });
 
                     grid.add(new Label("Companion Name:"), 0, 0);
                     grid.add(companionName, 1, 0);
