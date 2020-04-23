@@ -35,6 +35,7 @@ public class ScoutUpdateDeleteView extends View {
                             "ScoutSearch",
                             new Pair<String, String>("email", (String) props.get("email")));
                 }));
+        cancelButton();
     }
 
     @Override

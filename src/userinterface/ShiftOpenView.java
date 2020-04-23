@@ -10,11 +10,11 @@ public class ShiftOpenView extends View {
         setTitle("Open a Shift");
 
         addContent("Times",
-                makeField("Start Time"),
-                makeField("End Time"));
+                makeField("Start Time", 12),
+                makeField("End Time", 12));
 
         addContent("Starting Cash",
-                makeField("Starting Cash"));
+                makeField("Starting Cash", 15));
 
         submitButton();
         cancelButton();

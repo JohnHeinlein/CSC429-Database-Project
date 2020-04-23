@@ -66,15 +66,19 @@ public class AllScoutsView extends View {
             if (selection == null) {
                 Alerts.errorMessage("Must select a scout!");
             } else {
+                //If you can create a scout with the scout's selected ID
                 try {
                     Scout isWorking = new Scout(selection.getId());
+                    //If theres no scouts, add it to the collection
                     if (Bois.isEmpty()) {
                         Bois.add(isWorking);
                         Debug.logMsg(selection.getFirstName() + " " + selection.getLastName() + " added to shift ");
                     } else if (Bois.contains(isWorking) == false) {
+                        //Checking if a scout with the ID selected is already in your collection of scouts, if they are not in the collection, then add them
                         Bois.add(isWorking);
                         Debug.logMsg(selection.getFirstName() + " " + selection.getLastName() + " added to shift ");
                     } else {
+                        //You already selected this scout to work this session, are you qualified for this position?
                         Alerts.errorMessage("Error, Scout " + selection.getFirstName() + " " + selection.getLastName() + " already selected to work shift!");
                     }
                 } catch (InvalidPrimaryKeyException IPKE) {
@@ -85,8 +89,10 @@ public class AllScoutsView extends View {
 
         footButt(makeButt("Done", e -> {
             if (Bois.isEmpty()) {
+                //If no scouts are selected upon completion
                 Alerts.errorMessage("Must select scouts to work shift!");
             } else {
+                //User confirmation feedback
                 Optional<ButtonType> confirmation = Alerts.confirmMessage("Are you sure you are finished selecting scouts?");
                 if (confirmation.get() == ButtonType.OK) {
                     System.out.println(Bois.toString());

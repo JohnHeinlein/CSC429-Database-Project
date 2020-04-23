@@ -6,11 +6,7 @@ import impresario.IView;
 import impresario.ModelRegistry;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.util.Pair;
@@ -171,7 +167,10 @@ public class Controller implements IView, IModel {
                 Debug.logMsg("Processing session creation");
                 props = (Properties) value;
                 session = new Session();
+                //Only one session can be open at a time, Sessions are checked if the Endingcash is 0 (because the session hasnt ended yet)
+                //Creation of a session is not allowed if one is already active
                 if (session.checkIfActiveSession() == false) {
+                    //setting defaults
                     props.setProperty("totalCheckTransactionsAmount", "0");
                     props.setProperty("endingCash", "0");
                     props.setProperty("startDate", java.time.LocalDate.now().toString());
@@ -197,13 +196,18 @@ public class Controller implements IView, IModel {
                 scoutCollection = (ScoutCollection) value;
                 Debug.logMsg("Requesting to open shifts for " + scoutCollection.size() + " scouts");
 
-                int completed = 0;
+                int completed = 0; // How many scouts shift records we have completed
                 while (completed < scoutCollection.size()) {
+
+                    //-------------------------------------------------------------------------------------------------------------------
+                    // Dialog creation
                     Dialog<Vector<String>> dialog = new Dialog<>();
-                    dialog.setTitle("Enter Shift Data for " + scoutCollection.retrieve(0).getState("firstName") + " " + scoutCollection.retrieve(0).getState("lastName"));
-                    dialog.setHeaderText("Please Enter Shift Data");
+                    dialog.setTitle("Enter Shift Data for " + scoutCollection.retrieve(completed).getState("firstName") + " " + scoutCollection.retrieve(completed).getState("lastName"));
+                    dialog.setHeaderText("Please Enter Shift Data for " + scoutCollection.retrieve(completed).getState("firstName") + " " + scoutCollection.retrieve(completed).getState("lastName"));
                     ButtonType nextButtonType = new ButtonType("Open Shift", ButtonBar.ButtonData.OK_DONE);
-                    dialog.getDialogPane().getButtonTypes().addAll(nextButtonType, ButtonType.CANCEL);
+                    ButtonType cancel = new ButtonType("Cancel", ButtonBar.ButtonData.OK_DONE);
+                    //dialog.getDialogPane().getButtonTypes().addAll(nextButtonType, ButtonType.CANCEL);
+                    dialog.getDialogPane().getButtonTypes().addAll(nextButtonType, cancel);
 
                     GridPane grid = new GridPane();
                     grid.setHgap(10);
@@ -226,18 +230,22 @@ public class Controller implements IView, IModel {
 
                     dialog.getDialogPane().setContent(grid);
 
+                    //What is done after you click OK on the form
                     dialog.setResultConverter(dialogButton -> {
                         if (dialogButton == nextButtonType) {
-                            Vector<String> v = new Vector<String>();
-                            v.add(companionName.getText());
-                            v.add(companionHours.getText());
-                            v.add(endtime.getText());
-                            return v;
+                                Vector<String> v = new Vector<String>();
+                                v.add(companionName.getText());
+                                v.add(companionHours.getText());
+                                v.add(endtime.getText());
+                                return v;
                         }
                         return null;
                     });
 
+                    // Creation of the shift record
                     Optional<Vector<String>> result = dialog.showAndWait();
+                    //--------------------------------------------------------------
+                    //End of Dialog creation and processing
                     System.out.println(result.get().toString());
                     shift = new Shift();
                     shift.persistentState.setProperty("sessionId", (String) session.getState("id"));
@@ -247,7 +255,7 @@ public class Controller implements IView, IModel {
                     shift.persistentState.setProperty("companionHours", result.get().elementAt(1));
                     shift.persistentState.setProperty("endTime", result.get().elementAt(2));
                     shift.update();
-                    completed++;
+                    completed++; // We just finished our shift creation, onto the next.
                 }
                 Alerts.infoMessage("All Shift Openings Completed!", this);
             }
