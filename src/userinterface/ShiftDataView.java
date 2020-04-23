@@ -1,7 +1,6 @@
 package userinterface;
 
 import impresario.IModel;
-import utilities.Debug;
 
 public class ShiftDataView extends View {
     public ShiftDataView(IModel model) {
@@ -10,23 +9,11 @@ public class ShiftDataView extends View {
         setTitle("Open a Shift");
 
         addContent("Companion",
-                makeField("Companion Name"),
-                makeField("Companion Hours"));
+                makeField("Companion Name",50,"alphabetic"),
+                makeField("Companion Hours","numeric"));
 
         addContent("Ending Time",
-                makeField("Ending Time"));
-
-        submitButton();
-        cancelButton();
-    }
-
-    @Override
-    public void submit() {
-        if (scrapeFields()) {
-            myModel.stateChangeRequest("abc", props);
-        } else {
-            Debug.logErr("Failed submission: scrapeFields failed");
-        }
+                makeField("Ending Time",12));
     }
 
     @Override

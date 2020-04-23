@@ -4,17 +4,13 @@ import exception.InvalidPrimaryKeyException;
 import impresario.IModel;
 import impresario.IView;
 import impresario.ModelRegistry;
-import javafx.application.Platform;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
 import javafx.stage.Stage;
 import javafx.util.Pair;
-import userinterface.MainStageContainer;
-import userinterface.View;
-import userinterface.ViewFactory;
-import userinterface.WindowPosition;
+import userinterface.*;
 import utilities.Alerts;
 import utilities.Debug;
 
@@ -156,6 +152,7 @@ public class Controller implements IView, IModel {
                     /*TreeType*/"TreeTypeAdd",
                     /*Sales*/   "TreeSell",
                     /*Shifts*/  "ShiftOpen", "ShiftClose" -> createAndShowView(key + "View");
+
             //************************************************
             // Creation of a new session upon opening a shift
             //************************************************
@@ -165,13 +162,14 @@ public class Controller implements IView, IModel {
                 session = new Session();
                 //Only one session can be open at a time, Sessions are checked if the Endingcash is 0 (because the session hasnt ended yet)
                 //Creation of a session is not allowed if one is already active
-                if (session.checkIfActiveSession() == false) {
+                if (!session.checkIfActiveSession()) {
                     //setting defaults
                     props.setProperty("totalCheckTransactionsAmount", "0");
                     props.setProperty("endingCash", "0");
                     props.setProperty("startDate", java.time.LocalDate.now().toString());
+
                     session.persistentState = props;
-                    session.update();
+                    session.update(); //Updated state in database
 
                     //Getting List of all active scouts
                     Debug.logMsg("Showing all scouts...");
@@ -194,85 +192,46 @@ public class Controller implements IView, IModel {
 
                 int completed = 0; // How many scouts shift records we have completed
                 while (completed < scoutCollection.size()) {
+                    Dialog<Properties> dialog = new Dialog<>();
 
-                    //-------------------------------------------------------------------------------------------------------------------
-                    // Dialog creation
-                    Dialog<Vector<String>> dialog = new Dialog<>();
-                    dialog.setTitle("Enter Shift Data for " + scoutCollection.retrieve(completed).getState("firstName") + " " + scoutCollection.retrieve(completed).getState("lastName"));
-                    dialog.setHeaderText("Please Enter Shift Data for " + scoutCollection.retrieve(completed).getState("firstName") + " " + scoutCollection.retrieve(completed).getState("lastName"));
+                    View view = new ShiftDataView(this);
+                    dialog.getDialogPane().setContent(view);
+
                     ButtonType nextButtonType = new ButtonType("Open Shift", ButtonBar.ButtonData.OK_DONE);
-                    ButtonType cancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-                    //dialog.getDialogPane().getButtonTypes().addAll(nextButtonType, ButtonType.CANCEL);
-                    dialog.getDialogPane().getButtonTypes().addAll(nextButtonType, cancel);
+                    ButtonType cancelButtonType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
 
-                    GridPane grid = new GridPane();
-                    grid.setHgap(10);
-                    grid.setVgap(10);
-                    grid.setPadding(new Insets(20, 150, 10, 10));
-
-                    TextField companionName = new TextField();
-                    companionName.setPromptText("Scout Companion Name");
-                    companionName.textProperty().addListener((observable, oldValue, newValue) -> {
-                        if (newValue.length() > 49) {
-                            companionName.setText(oldValue);
-                            Alerts.errorMessage("This is the max length for field <Companion Name>");
-                        }
-                    });
-                    TextField companionHours = new TextField();
-                    companionHours.setPromptText("Scout Companion Hours");
-                    companionHours.textProperty().addListener((observable, oldValue, newValue) -> {
-                        if(newValue.length() > 3) {
-                            companionHours.setText(oldValue);
-                            Alerts.errorMessage("This is the max length for field <Companion Hours>");
-                        }
-                    });
-                    TextField endtime = new TextField();
-                    endtime.setPromptText("Ending Time");
-                    endtime.textProperty().addListener((observable, oldValue, newValue) -> {
-                        if (newValue.length() > 11) {
-                            endtime.setText(oldValue);
-                            Alerts.errorMessage("This is the max length for field <End Time>");
-                        }
-                    });
-
-                    grid.add(new Label("Companion Name:"), 0, 0);
-                    grid.add(companionName, 1, 0);
-                    grid.add(new Label("Companion Hours:"), 0, 1);
-                    grid.add(companionHours, 1, 1);
-                    grid.add(new Label("Ending Time:"), 0, 2);
-                    grid.add(endtime, 1, 2);
-
-                    dialog.getDialogPane().setContent(grid);
+                    dialog.getDialogPane().getButtonTypes().addAll(nextButtonType,cancelButtonType);
 
                     //What is done after you click OK on the form
-                    dialog.setResultConverter(dialogButton -> {
-                        if (dialogButton == nextButtonType) {
-                                Vector<String> v = new Vector<String>();
-                                v.add(companionName.getText());
-                                v.add(companionHours.getText());
-                                v.add(endtime.getText());
-                                return v;
-                        }
-                        return null;
-                    });
+                    dialog.setResultConverter(
+                            dialogButton -> {
+                                if(dialogButton == nextButtonType){
+                                    return view.getProps();
+                                }else if(dialogButton == cancelButtonType){
+                                    dialog.close();
+                                }
+                                return null;
+                            }
+                    );
 
                     // Creation of the shift record
-                    Optional<Vector<String>> result = dialog.showAndWait();
-                    //--------------------------------------------------------------
-                    //End of Dialog creation and processing
+                    Optional<Properties> result = dialog.showAndWait();
+                    if(result.isEmpty()){ continue; }
+
                     System.out.println(result.get().toString());
                     shift = new Shift();
                     shift.persistentState.setProperty("sessionId", (String) session.getState("id"));
                     shift.persistentState.setProperty("scoutId", (String) scoutCollection.retrieve(completed).getState("id"));
                     shift.persistentState.setProperty("startTime", (String) session.getState("startTime"));
-                    shift.persistentState.setProperty("companionName", result.get().elementAt(0));
-                    shift.persistentState.setProperty("companionHours", result.get().elementAt(1));
-                    shift.persistentState.setProperty("endTime", result.get().elementAt(2));
+                    shift.persistentState.setProperty("companionName", result.get().getProperty("companionName"));
+                    shift.persistentState.setProperty("companionHours", result.get().getProperty("companionHours"));
+                    shift.persistentState.setProperty("endTime", result.get().getProperty("endingTime"));
                     shift.update();
                     completed++; // We just finished our shift creation, onto the next.
                 }
                 Alerts.infoMessage("All Shift Openings Completed!", this);
             }
+
             //***************
             // Insertions
             //***************

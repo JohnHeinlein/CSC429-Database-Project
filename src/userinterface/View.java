@@ -23,23 +23,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Separator;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -63,10 +48,10 @@ public abstract class View extends Group implements IView, IControl {
     private final Font LABEL_FONT = new Font(DEFAULT_FONT, 18);
     private final Font BUTTON_FONT = new Font(DEFAULT_FONT, 14);
     private final double FIELD_WIDTH = 300.0;
-    private final BorderPane container;
+    protected final BorderPane container;
     private final VBox header;
     private final HBox footer;
-    private final GridPane content;
+    protected final GridPane content;
     protected IModel myModel;
     protected ControlRegistry myRegistry;
     protected Properties props; //Collects information from input fields for submission
@@ -504,6 +489,11 @@ public abstract class View extends Group implements IView, IControl {
 
     protected boolean sanitize(String field, String data) {
         return true;
+    }
+
+    public Properties getProps(){
+        if(scrapeFields()) return props;
+        return null;
     }
 
     protected String getValue(Object control) {
