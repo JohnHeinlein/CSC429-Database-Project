@@ -28,12 +28,7 @@ package database;
 import event.Event;
 import utilities.Debug;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Properties;
 import java.util.Vector;
 
@@ -353,8 +348,6 @@ abstract public class Persistable {
                 return null;
             }
 
-            Debug.logMsg("SQL Select statement: " + sqlSelectStatement);
-
             // Once a connection has been established we can create an instance
             // of Statement, through which we will send queries to the database.
             // Only the Global Pool connection should be used!
@@ -367,7 +360,6 @@ abstract public class Persistable {
             // return result is of type ResultSet which is one or more rows in
             // this case.
             theResultSet = theStatement.executeQuery(sqlSelectStatement);
-            Debug.logMsg("Got result set");
 
             // verify the results
             if (theResultSet == null) {
@@ -473,7 +465,6 @@ abstract public class Persistable {
             // construct a SQL statement from the passed parameters
 
             SQLInsertStatement theSQLStatement = new SQLInsertStatement(schema, insertValues);
-            Debug.logMsg("Generated statement: " + theSQLStatement.toString());
 
             // Once a connection has been established we can create an instance
             // of Statement, through which we will send queries to the database.
@@ -491,7 +482,6 @@ abstract public class Persistable {
 
             if (theResultSet.next()) {
                 autoIncKey = theResultSet.getInt(1);
-                Debug.logMsg("autoIncKey: " + autoIncKey);
             } else {
                 Debug.logErr("Can't get the auto-increment key");
             }
