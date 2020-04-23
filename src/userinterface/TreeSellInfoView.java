@@ -1,6 +1,7 @@
 package userinterface;
 
 import impresario.IModel;
+import utilities.Alerts;
 import utilities.Debug;
 
 public class TreeSellInfoView extends View{
@@ -15,17 +16,23 @@ public class TreeSellInfoView extends View{
                 makeField("Last Name"));
 
         addContent("Customer Phone",
-                makeField("Customer Phone"));
+                makeField("Customer Phone", "phone"));
 
         addContent("Customer Email",
-                makeField("Customer Email"));
+                makeField("Customer Email","email"));
 
         submitButton();
         cancelButton();
     }
 
-    public void submit(){
+    protected void submit(){
         scrapeFieldsUnsafe();
+
+        String fname = props.getProperty("firstName");
+        String lname = props.getProperty("lastName");
+        String phone = props.getProperty("customerPhone");
+        String email = props.getProperty("custoemrEmail");
+
         Debug.logMsg(
                 """
                   
@@ -34,11 +41,18 @@ public class TreeSellInfoView extends View{
                 Customer phone: %s
                 Customer email: %s
                 """,
-                props.getProperty("paymentType"),
-                props.getProperty("firstName"), props.getProperty("lastName"),
-                props.getProperty("customerPhone"),
-                props.getProperty("customerEmail")
+                props.getProperty("paymentType"), fname, lname, phone, email
         );
+
+        boolean noName  = fname.equals("") || lname.equals("");
+        boolean noPhone = phone.equals("");
+        boolean noEmail = email.equals("");
+
+        if(noName && noPhone && noEmail){
+            Alerts.errorMessage("Must provide name, phone, or email");
+        }else {
+            myModel.stateChangeRequest("TreeSellInfoViewSubmit", props);
+        }
     }
     @Override
     public void updateState(String key, Object value) {

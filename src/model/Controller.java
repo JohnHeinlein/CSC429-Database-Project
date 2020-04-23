@@ -474,6 +474,12 @@ public class Controller implements IView, IModel {
                 }
             }
 
+            case "TreeSellInfoViewSubmit" -> {
+                props = (Properties) value;
+                //TODO: Retrieve session ID, create Transaction with given information
+                // (Some info isn't present! Account for that?)
+            }
+
             case "Cancel" -> createAndShowView("ControllerView");
 
             default -> Debug.logErr("Invalid key " + key);
