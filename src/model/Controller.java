@@ -399,14 +399,15 @@ public class Controller implements IView, IModel {
                     props = (Properties) value;
                     treeType = new TreeType(props.getProperty("barcodePrefix"));
                     Debug.logMsg("Tree Type With barcode prefix: " + props.getProperty("barcodePrefix") + " Already Exists");
+                    Alerts.infoMessage("Tree Type With barcode prefix: " + props.getProperty("barcodePrefix") + " Already Exists", this);
                 } catch (InvalidPrimaryKeyException IPKE) {
                     treeType = new TreeType();
                     treeType.persistentState = (Properties) value;
                     treeType.update();
                     treeType.persistentState.clear();
+                    Alerts.infoMessage("Tree type added!", this);
                 }
 
-                Alerts.infoMessage("Tree type added!", this);
             }
 
             //***********************************

@@ -11,13 +11,13 @@ public class TreeTypeAddView extends View {
         setTitle("Add a Tree Type");
 
         addContent("Barcode Prefix",
-                makeField("Barcode Prefix"));
+                makeField("Barcode Prefix", 2));
 
         addContent("Type Description",
-                makeField("Type Description"));
+                makeField("Type Description", 25));
 
         addContent("Cost",
-                makeField("Cost"));
+                makeField("Cost", 20));
 
         submitButton();
         cancelButton();
