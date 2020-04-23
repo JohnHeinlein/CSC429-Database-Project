@@ -10,25 +10,21 @@ public class TreeSellView extends View {
         setTitle("Sell a Tree");
 
         addContent("Barcode",
-                makeField("Barcode"));
-
-        addContent("Payment Type",
-                makeComboBox("Cash", "Check"));
-
-        addContent("Customer Name",
-                makeField("First Name"),
-                makeField("Last Name"));
-
-        addContent("Customer Phone",
-                makeField("Customer Phone"));
-
-        addContent("Customer Email",
-                makeField("Customer Email"));
+                makeField("Barcode", 6, 6, "numeric"));
 
         submitButton();
         cancelButton();
     }
-
+//    public void submit(){
+//        if(scrapeFields()){
+//            try{
+//                Tree tree = new Tree(props.getProperty("barcode"));
+//                myModel.stateChangeRequest("TreeSellSubmit",tree);
+//            }catch(InvalidPrimaryKeyException IPKE){
+//                Alerts.errorMessage("Invalid barcode!");
+//            }
+//        }
+//    }
     @Override
     public void updateState(String key, Object value) {
 

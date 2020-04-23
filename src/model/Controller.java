@@ -18,12 +18,7 @@ import utilities.Alerts;
 import utilities.Debug;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.Vector;
+import java.util.*;
 
 
 public class Controller implements IView, IModel {
@@ -70,10 +65,10 @@ public class Controller implements IView, IModel {
 //            myViews.put(viewName, currentScene);
 //        };
 //        swapToView(currentScene);
-        View newView = ViewFactory.createView(viewName, this);
+        View newView = ViewFactory.createView(viewName,this);
         Scene newScene = new Scene(newView);
 
-        myViews.put(viewName, newScene);
+        myViews.put(viewName,newScene);
 
         swapToView(newScene);
     }
@@ -338,7 +333,7 @@ public class Controller implements IView, IModel {
                 Alerts.infoMessage("Scout deleted!", this);
             }
             //***************
-            // Tree
+            // Tree Update/Delete
             //***************
             case "TreeUpdateDelete" -> {
                 createAndShowView("TreeUpdateDeleteView");
@@ -448,6 +443,35 @@ public class Controller implements IView, IModel {
                 }
 
                 Alerts.infoMessage("Tree added!", this);
+            }
+
+            //****************************
+            //  Sell a tree
+            //****************************
+            case "TreeSellSubmit" -> {
+                try {
+                    String barcode = ((Properties)value).getProperty("barcode");
+                    String prefix = barcode.substring(0,2);
+
+                    tree = new Tree(barcode);
+                    treeType = new TreeType(prefix);
+
+                    String status = (String) tree.getState("status");
+                    if(!( status.equals("Available") || status.equals("Damaged") )){
+                        Alerts.errorMessage("Tree unavailable!");
+                        return;
+                    }
+
+                    String cost = (String) treeType.getState("cost");
+                    String type = (String) treeType.getState("typeDescription");
+
+                    Optional<ButtonType> confirm = Alerts.confirmMessage(String.format("Confirm %s with cost %s", type, cost));
+                    if(confirm.get() == ButtonType.OK){
+                        createAndShowView("TreeSellInfoView");
+                    }
+                }catch(InvalidPrimaryKeyException IPKE){
+                    Alerts.errorMessage("Invalid barcode!");
+                }
             }
 
             case "Cancel" -> createAndShowView("ControllerView");
