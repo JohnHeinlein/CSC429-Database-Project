@@ -25,7 +25,7 @@ public class TransactionCollection extends EntityBase implements IView {
     }
 
     public Vector<Transaction> findTransactionsWithSessionId(String sessionId) {
-        String query = "SELECT * FROM " + myTableName + " WHERE sessiondId = '" + sessionId + "'";
+        String query = "SELECT * FROM " + myTableName + " WHERE sessionId = '" + sessionId + "'";
         return findTransactions(query);
     }
 

@@ -5,6 +5,7 @@ import impresario.IModel;
 import impresario.IView;
 import impresario.ModelRegistry;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -36,6 +37,7 @@ public class Controller implements IView, IModel {
     private TreeTypeCollection treeTypeCollection;
 
     private Transaction transaction;
+    private TransactionCollection transactionCollection;
 
     private Session session;
     private Shift shift;
@@ -153,7 +155,7 @@ public class Controller implements IView, IModel {
                     /*Tree*/    "TreeAdd",
                     /*TreeType*/"TreeTypeAdd",
                     /*Sales*/   "TreeSell",
-                    /*Shifts*/  "ShiftOpen", "ShiftClose" -> createAndShowView(key + "View");
+                    /*Shifts*/  "ShiftOpen" -> createAndShowView(key + "View");
 
             //************************************************
             // Creation of a new session upon opening a shift
@@ -236,6 +238,45 @@ public class Controller implements IView, IModel {
                     cancel = false;
                 } else {
                     Alerts.infoMessage("All Shifts Opened Successfully!", this);
+                }
+            }
+
+            case"ShiftClose" -> {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Test");
+                alert.setHeaderText("Close a Shift");
+                alert.setResizable(false);
+                alert.setContentText("Are you sure you want to close the current session?");
+
+                Optional<ButtonType> result = alert.showAndWait();
+                ButtonType button = result.orElse(ButtonType.CANCEL);
+
+                if (button == ButtonType.OK) {
+                    transactionCollection = new TransactionCollection();
+                    try {
+                        session = new Session(0); //GETTING CURRENT SESSION ID
+                        Vector<Transaction> v = transactionCollection.findTransactionsWithSessionId((String)session.getState("id"));
+                        int totalCheck = 0;
+                        int totalCash = 0;
+                        for(Transaction trans : v) {
+                            if(trans.persistentState.getProperty("paymentMethod").equals("Cash")) {
+                                totalCash += Integer.parseInt(trans.persistentState.getProperty("transactionAmount"));
+                            }
+                            else if (trans.persistentState.getProperty("paymentMethod").equals("Check")) {
+                                totalCheck += Integer.parseInt(trans.persistentState.getProperty("transactionAmount"));
+                            }
+                        }
+                        session.persistentState.setProperty("endingCash", (String)("" + totalCash));
+                        session.persistentState.setProperty("totalCheckTransactionsAmount", (String)("" + totalCheck));
+                        session.update();
+                        Alerts.infoMessage("Shift Closed.", this);
+                    } catch (InvalidPrimaryKeyException IPKE) {
+                        Alerts.infoMessage("ERROR: No active Session to close", this);
+                        return;
+                    }
+                } else {
+                    Debug.logMsg("Close Shift Canceled");
+                    return;
                 }
             }
 

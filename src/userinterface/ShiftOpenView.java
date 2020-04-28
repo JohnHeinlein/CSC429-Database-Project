@@ -16,6 +16,9 @@ public class ShiftOpenView extends View {
         addContent("Starting Cash",
                 makeField("Starting Cash", 15));
 
+        addContent("Notes",
+                makeNotesField("Notes", 500));
+
         submitButton();
         cancelButton();
     }
