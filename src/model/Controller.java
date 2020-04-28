@@ -256,14 +256,14 @@ public class Controller implements IView, IModel {
                     try {
                         session = new Session(0); //GETTING CURRENT SESSION ID
                         Vector<Transaction> v = transactionCollection.findTransactionsWithSessionId((String)session.getState("id"));
-                        int totalCheck = 0;
-                        int totalCash = 0;
+                        double totalCheck = 0;
+                        double totalCash = Double.parseDouble((String)session.getState("startingCash"));
                         for(Transaction trans : v) {
                             if(trans.persistentState.getProperty("paymentMethod").equals("Cash")) {
-                                totalCash += Integer.parseInt(trans.persistentState.getProperty("transactionAmount"));
+                                totalCash += Double.parseDouble(trans.persistentState.getProperty("transactionAmount"));
                             }
                             else if (trans.persistentState.getProperty("paymentMethod").equals("Check")) {
-                                totalCheck += Integer.parseInt(trans.persistentState.getProperty("transactionAmount"));
+                                totalCheck += Double.parseDouble(trans.persistentState.getProperty("transactionAmount"));
                             }
                         }
                         session.persistentState.setProperty("endingCash", (String)("" + totalCash));
