@@ -167,6 +167,10 @@ public class Transaction extends EntityBase implements IView, IModel {
         }
     }
 
+    public void update() {
+        this.updateStateInDatabase();
+    }
+
     private void setDependencies() {
         dependencies = new Properties();
 

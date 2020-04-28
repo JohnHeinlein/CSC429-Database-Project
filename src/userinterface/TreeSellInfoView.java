@@ -31,7 +31,7 @@ public class TreeSellInfoView extends View{
         String fname = props.getProperty("firstName");
         String lname = props.getProperty("lastName");
         String phone = props.getProperty("customerPhone");
-        String email = props.getProperty("custoemrEmail");
+        String email = props.getProperty("customerEmail");
 
         Debug.logMsg(
                 """

@@ -41,7 +41,6 @@ public class Session extends EntityBase implements IModel, IView {
                 while (allKeys.hasMoreElements()) {
                     String nextKey = (String) allKeys.nextElement();
                     String nextValue = retrievedSessionData.getProperty(nextKey);
-                    // bookId = Integer.parseInt(retrievedBookData.getProperty("bookId"));
 
                     if (nextValue != null) {
                         persistentState.setProperty(nextKey, nextValue);
@@ -52,6 +51,42 @@ public class Session extends EntityBase implements IModel, IView {
         // If no Session found for this id, throw an exception
         else {
             throw new InvalidPrimaryKeyException("No session matching id : " + SessionId + " found.");
+        }
+    }
+
+    public Session (int endingCash) throws InvalidPrimaryKeyException {
+        super(myTableName);
+        setDependencies();
+
+        String query = "SELECT  * FROM " + myTableName + " WHERE (endingCash = " + 0 + ")";
+        Vector<Properties> allDataRetrieved = getSelectQueryResult(query);
+
+        // You must get one account at least
+        if (allDataRetrieved != null) {
+            int size = allDataRetrieved.size();
+
+            // There should be EXACTLY one account. More than that is an error
+            if (size != 1) {
+                throw new InvalidPrimaryKeyException("Multiple sessions matching ending cash : " + 0 + " found.");
+            } else {
+                // copy all the retrieved data into persistent state
+                Properties retrievedSessionData = allDataRetrieved.elementAt(0);
+                persistentState = new Properties();
+
+                Enumeration allKeys = retrievedSessionData.propertyNames();
+                while (allKeys.hasMoreElements()) {
+                    String nextKey = (String) allKeys.nextElement();
+                    String nextValue = retrievedSessionData.getProperty(nextKey);
+
+                    if (nextValue != null) {
+                        persistentState.setProperty(nextKey, nextValue);
+                    }
+                }
+            }
+        }
+        // If no Session found for this id, throw an exception
+        else {
+            throw new InvalidPrimaryKeyException("No session matching id : " + endingCash + " found.");
         }
     }
 
@@ -73,6 +108,7 @@ public class Session extends EntityBase implements IModel, IView {
             return true;
         }
     }
+
 
 
     // Can also be used to create a NEW Session (if the system it is part of

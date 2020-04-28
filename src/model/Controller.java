@@ -35,6 +35,8 @@ public class Controller implements IView, IModel {
     private TreeType treeType;
     private TreeTypeCollection treeTypeCollection;
 
+    private Transaction transaction;
+
     private Session session;
     private Shift shift;
 
@@ -191,6 +193,7 @@ public class Controller implements IView, IModel {
                 Debug.logMsg("Requesting to open shifts for " + scoutCollection.size() + " scouts");
 
                 int completed = 0; // How many scouts shift records we have completed
+                boolean cancel = false;
                 while (completed < scoutCollection.size()) {
                     Dialog<Properties> dialog = new Dialog<>();
 
@@ -216,7 +219,7 @@ public class Controller implements IView, IModel {
 
                     // Creation of the shift record
                     Optional<Properties> result = dialog.showAndWait();
-                    if(result.isEmpty()){ continue; }
+                    if(result.isEmpty()){  cancel = true; break; }
 
                     System.out.println(result.get().toString());
                     shift = new Shift();
@@ -229,7 +232,11 @@ public class Controller implements IView, IModel {
                     shift.update();
                     completed++; // We just finished our shift creation, onto the next.
                 }
-                Alerts.infoMessage("All Shift Openings Completed!", this);
+                if(cancel == true) {
+                    cancel = false;
+                } else {
+                    Alerts.infoMessage("All Shifts Opened Successfully!", this);
+                }
             }
 
             //***************
@@ -434,9 +441,12 @@ public class Controller implements IView, IModel {
 
                     tree = new Tree(barcode);
                     treeType = new TreeType(prefix);
+                    transaction = new Transaction();
 
+                    transaction.persistentState.setProperty("barcode", barcode);
+                    transaction.persistentState.setProperty("transactionAmount", (String)treeType.getState("cost"));
                     String status = (String) tree.getState("status");
-                    if(!( status.equals("Available") || status.equals("Damaged") )){
+                    if(!( status.equals("Available")) || status.equals("Damaged")){
                         Alerts.errorMessage("Tree unavailable!");
                         return;
                     }
@@ -455,8 +465,34 @@ public class Controller implements IView, IModel {
 
             case "TreeSellInfoViewSubmit" -> {
                 props = (Properties) value;
-                //TODO: Retrieve session ID, create Transaction with given information
-                // (Some info isn't present! Account for that?)
+                try {
+                    session = new Session(0); // THIS GETS THE CURRENT ACTIVE SESSION DATA
+                    if (session.checkIfActiveSession()) {
+                        transaction.persistentState.setProperty("sessionId", (String) session.getState("id"));
+                        transaction.persistentState.setProperty("transactionType", "Tree Sale");
+                        transaction.persistentState.setProperty("paymentMethod", props.getProperty("paymentType"));
+                        transaction.persistentState.setProperty("customerName", (props.getProperty("firstName") + " " + props.getProperty("lastName")));
+                        transaction.persistentState.setProperty("customerPhone", props.getProperty("customerPhone"));
+                        transaction.persistentState.setProperty("customerEmail", props.getProperty("customerEmail"));
+                        transaction.persistentState.setProperty("transactionDate", java.time.LocalDate.now().toString());
+                        transaction.persistentState.setProperty("transactionTime", java.time.LocalTime.now().toString().substring(0,8));
+                        transaction.persistentState.setProperty("dateStatusUpdated", java.time.LocalDate.now().toString());
+
+                        transaction.update();
+
+                        tree = new Tree(transaction.persistentState.getProperty("barcode"));
+                        tree.persistentState.setProperty("status", "Sold");
+                        tree.update("update");
+
+                        Alerts.infoMessage("Tree Sold", this);
+                    } else {
+                        Alerts.infoMessage("Error: Must sell tree under an active session, please Open a shift and try again.", this);
+                        return;
+                    }
+                } catch (InvalidPrimaryKeyException IPKE) {
+                    Alerts.infoMessage("Error: Must sell tree under an active session, please open a shift and try again.", this);
+                    return;
+                }
             }
 
             case "Cancel" -> createAndShowView("ControllerView");
