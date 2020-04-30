@@ -24,13 +24,14 @@ public class TreeUpdateView extends View {
         treeType.setText((String) tree.getState("treeType"));
         addContent("Tree Type",
                 treeType);
+        treeType.getField().setEditable(false);
 
         NotesFieldWrapper notes = makeNotesField("Notes", 200);
         treeType.setText((String) tree.getState("notes"));
         addContent("Notes",
                 notes);
 
-        ComboBox<String> status = makeComboBox("Available", "Sold", "Damaged");
+        ComboBox<String> status = makeComboBox("Available", "Damaged");
         status.getSelectionModel().select((String) tree.getState("status"));
         addContent("Status",
                 status);

@@ -5,6 +5,7 @@ package userinterface;
 import exception.InvalidPrimaryKeyException;
 import impresario.IModel;
 import model.TreeType;
+import utilities.Alerts;
 import utilities.Debug;
 
 // project imports
@@ -42,6 +43,7 @@ public class TreeTypeUpdateView extends View {
                 if (!treeType.getState("barcodePrefix").equals(props.getProperty("barcodePrefix"))) {
                     TreeType tType = new TreeType(props.getProperty("barcodePrefix"));
                     Debug.logMsg("Tree Type With barcode prefix: " + props.getProperty("barcodePrefix") + " Already Exists");
+                    Alerts.errorMessage("Tree Type with barcode prefix: " + props.getProperty("barcodePrefix") + " already exists!");
                 } else {
                     myModel.stateChangeRequest("TreeTypeUpdateSubmit", props);
                 }

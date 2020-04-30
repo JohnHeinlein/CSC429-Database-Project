@@ -389,11 +389,15 @@ public class Controller implements IView, IModel {
 
                 if (tree == null) {
                     Debug.logErr("(%s) Invalid tree barcode", key);
+                    Alerts.infoMessage("Error: No barcode matching " + tree.persistentState.getProperty("barcode")+ " found.", this);
                 } else {
                     String barcode = (String) tree.getState("barcode");
-                    tree.update("delete");
-
-                    Alerts.infoMessage("Tree " + barcode + " deleted!", this);
+                    if (tree.persistentState.getProperty("status").equals("Sold") == false) {
+                        tree.update("delete");
+                        Alerts.infoMessage("Tree " + barcode + " deleted!", this);
+                    } else {
+                        Alerts.infoMessage("Error: Cannot Delete a Sold tree", this);
+                    }
                 }
             }
 
