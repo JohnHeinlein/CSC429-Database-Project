@@ -68,6 +68,24 @@ public class TreeTypeCollection extends EntityBase implements IModel, IView {
         return retValue;
     }
 
+    public String getPrefixFromDescription(String desc){
+        for(TreeType type : treeTypeList){
+            if(type.getState("typeDescription").equals(desc)){
+                return (String) type.getState("barcodePrefix");
+            }
+        }
+        return null;
+    }
+
+    public String getIdFromDescription(String desc){
+        for(TreeType type : treeTypeList){
+            if(type.getState("typeDescription").equals(desc)){
+                return (String) type.getState("id");
+            }
+        }
+        return null;
+    }
+
     //  -- Iview, Imodel Methods
     ///////////////////////////////////////////////////////////////////////////
     public void updateState(String key, Object value) {
@@ -81,8 +99,16 @@ public class TreeTypeCollection extends EntityBase implements IModel, IView {
     public Object getState(String key) {
         return switch (key) {
             case "TreeTypes" -> treeTypeList;
-            case "TreeTypeList" -> this;
-            default -> null;
+            default -> {
+                Vector<String> vals = new Vector<>();
+                for(TreeType tree: treeTypeList){
+                    String s = (String)tree.getState(key);
+                    vals.add(s);
+                    Debug.logMsg("[%s] %s", key, s);
+                }
+                Debug.logMsg("Got list of %s: %s", key, vals.toString());
+                yield vals;
+            }
         };
     }
 

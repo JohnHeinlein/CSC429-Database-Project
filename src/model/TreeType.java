@@ -22,9 +22,6 @@ public class TreeType extends EntityBase implements IModel, IView {
 
         setDependencies();
         persistentState = new Properties();
-        // Populate table with the SQL table
-        updateTable();
-        Debug.logMsg("table = \n\t" + table.toString().replaceAll("},", "}\n\t"));
     }
 
     // Our [B]onstructor
@@ -119,38 +116,6 @@ public class TreeType extends EntityBase implements IModel, IView {
         return v;
     }
 
-    /**
-     * Update the singleton table with values from the database
-     */
-    public void updateTable() {
-        Debug.logMsg("Generating table...");
-        table = getPersistentState(getSchemaInfo(myTableName), null);
-        Debug.logMsg("Done");
-    }
-
-    /**
-     * Gets the type of tree (description from database) for given barcode prefix
-     *
-     * @param barcodeId
-     * @return
-     */ //TODO: Turn me into a getState request?
-    public String getType(String barcodeId) {
-        if (table == null) {
-            Debug.logErr("No table found, generating...");
-            new TreeType().updateTable();
-        }
-
-        Debug.logMsg("Getting type for barcodeId: " + barcodeId);
-
-        for (Properties prop : table) {
-            if (((String) prop.get("barcodePrefix")).startsWith(barcodeId)) {
-                this.persistentState = prop;
-                return (String) prop.get("typeDescription");
-            }
-        }
-        return "Invalid barcode";
-    }
-
     public void setType(String barcodeId) {
         try {
             this.persistentState = new TreeType(barcodeId).persistentState;
@@ -161,11 +126,7 @@ public class TreeType extends EntityBase implements IModel, IView {
 
     @Override
     public Object getState(String key) {
-        if (table == null) {
-            Debug.logErr("No table found, generating...");
-            this.updateTable();
-        }
-        Debug.logMsg("Got \"%s\" for key  \"s\"", persistentState.get(key), key);
+        Debug.logMsg("Got \"%s\" for key  \"%s\"", persistentState.get(key), key);
         return persistentState.get(key);
     }
 

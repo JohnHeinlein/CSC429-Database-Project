@@ -22,6 +22,7 @@ public class TreeUpdateView extends View {
         // create our GUI components, add them to this Container
         TextFieldWrapper treeType = makeField("Tree Type", 11);
         treeType.setText((String) tree.getState("treeType"));
+        treeType.getField().setEditable(false);
         addContent("Tree Type",
                 treeType);
 

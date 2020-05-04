@@ -135,7 +135,13 @@ public class Controller implements IView, IModel {
             case "TreeList" -> treeCollection;
             case "Tree" -> tree;
 
-            case "TreeTypeList" -> treeTypeCollection;
+            case "TreeTypeList" -> {
+                if(treeTypeCollection == null){
+                    treeTypeCollection = new TreeTypeCollection();
+                    treeTypeCollection.updateState("TreeTypes",treeTypeCollection.lookupAll());
+                }
+                yield treeTypeCollection;
+            }
             case "TreeType" -> {
                 if (treeType == null) treeType = new TreeType();
                 yield treeType;
@@ -187,7 +193,7 @@ public class Controller implements IView, IModel {
             }
 
             //*************************************************
-            //  After selecting scouts to work in this session
+            //  Shifts
             //*************************************************
 
             case "OpenShifts" -> {
@@ -281,8 +287,9 @@ public class Controller implements IView, IModel {
             }
 
             //***************
-            // Insertions
+            // Scout
             //***************
+
             case "ScoutRegisterSubmit" -> {
                 Debug.logMsg("Processing scout registration");
                 props = (Properties) value;
@@ -298,9 +305,6 @@ public class Controller implements IView, IModel {
                 Alerts.infoMessage("Scout registered successfully!", this);
             }
 
-            //***************
-            // Scout
-            //***************
             case "ScoutSearch" -> {
                 Pair<String, String> pair = (Pair<String, String>) value;
                 Vector<Scout> scouts;
@@ -358,8 +362,58 @@ public class Controller implements IView, IModel {
 
                 Alerts.infoMessage("Scout deleted!", this);
             }
+
             //***************
-            // Tree Update/Delete
+            // TreeType
+            //***************
+            case "TreeTypeAddSubmit" -> {
+                Debug.logMsg("Processing Tree Type Add");
+                try {
+                    props = (Properties) value;
+                    treeType = new TreeType(props.getProperty("barcodePrefix"));
+                    Debug.logMsg("Tree Type With barcode prefix: " + props.getProperty("barcodePrefix") + " Already Exists");
+                    Alerts.infoMessage("Tree Type With barcode prefix: " + props.getProperty("barcodePrefix") + " Already Exists", this);
+                } catch (InvalidPrimaryKeyException IPKE) {
+                    treeType = new TreeType();
+                    treeType.persistentState = (Properties) value;
+                    treeType.update();
+                    treeType.persistentState.clear();
+                    Alerts.infoMessage("Tree type added!", this);
+                }
+
+            }
+
+            case "TreeTypeCollection" -> {
+                treeTypeCollection = new TreeTypeCollection();
+                treeTypeCollection.lookupAll();
+
+                createAndShowView("TreeTypeCollectionView");
+            }
+
+            case "TreeTypeCollectionSubmit" -> {
+                try {
+                    treeType = new TreeType((String) value);
+                } catch (InvalidPrimaryKeyException ex) {
+                    Debug.logErr(String.format("(%s) Invalid tree type ID", key));
+                }
+                createAndShowView("TreeTypeUpdateView");
+            }
+
+            case "TreeTypeUpdateSubmit" -> {
+                Debug.logMsg("(" + key + ") Processing tree Type registration");
+                props = (Properties) value;
+                for (Object field : props.keySet()) {
+                    treeType.persistentState.setProperty(
+                            (String) field,
+                            (String) props.get(field));
+                }
+
+                treeType.update();
+                Alerts.infoMessage("Tree Type updated!", this);
+            }
+
+            //***************
+            // Tree
             //***************
             case "TreeUpdateDelete" -> {
                 createAndShowView("TreeUpdateDeleteView");
@@ -397,64 +451,6 @@ public class Controller implements IView, IModel {
                 }
             }
 
-            //***************
-            // Add Tree Type
-            //***************
-            case "TreeTypeAddSubmit" -> {
-                Debug.logMsg("Processing Tree Type Add");
-                try {
-                    props = (Properties) value;
-                    treeType = new TreeType(props.getProperty("barcodePrefix"));
-                    Debug.logMsg("Tree Type With barcode prefix: " + props.getProperty("barcodePrefix") + " Already Exists");
-                    Alerts.infoMessage("Tree Type With barcode prefix: " + props.getProperty("barcodePrefix") + " Already Exists", this);
-                } catch (InvalidPrimaryKeyException IPKE) {
-                    treeType = new TreeType();
-                    treeType.persistentState = (Properties) value;
-                    treeType.update();
-                    treeType.persistentState.clear();
-                    Alerts.infoMessage("Tree type added!", this);
-                }
-
-            }
-
-            //***********************************
-            //  Showing all Tree Types to Select
-            //***********************************
-            case "TreeTypeCollection" -> {
-                treeTypeCollection = new TreeTypeCollection();
-                treeTypeCollection.lookupAll();
-
-                createAndShowView("TreeTypeCollectionView");
-            }
-
-            //*************************************
-            //  Upon hitting submit in the table
-            //*************************************
-            case "TreeTypeCollectionSubmit" -> {
-                try {
-                    treeType = new TreeType((String) value);
-                } catch (InvalidPrimaryKeyException ex) {
-                    Debug.logErr(String.format("(%s) Invalid tree type ID", key));
-                }
-                createAndShowView("TreeTypeUpdateView");
-            }
-
-            case "TreeTypeUpdateSubmit" -> {
-                Debug.logMsg("(" + key + ") Processing tree Type registration");
-                props = (Properties) value;
-                for (Object field : props.keySet()) {
-                    treeType.persistentState.setProperty(
-                            (String) field,
-                            (String) props.get(field));
-                }
-
-                treeType.update();
-                Alerts.infoMessage("Tree Type updated!", this);
-            }
-
-            //****************************
-            //  Add A Tree
-            //****************************
             case "TreeAddSubmit" -> {
                 Debug.logMsg(String.format("(%s) Processing Tree Insertion", key));
                 props = (Properties) value;
@@ -462,9 +458,21 @@ public class Controller implements IView, IModel {
                     tree = new Tree(props.getProperty("barcode"));
                     Debug.logMsg("Tree With barcode: " + props.getProperty("barcode") + " Already Exists");
                 } catch (InvalidPrimaryKeyException IPKE) {
+                    String barcode = props.getProperty("barcode");
+                    try {
+                        treeType = new TreeType(props.getProperty("barcode").substring(0, 2));
+                    }catch(InvalidPrimaryKeyException ex){
+                        Debug.logErr("Invalid barcode prefix %s", barcode.substring(0,2));
+                    }
+
+                    Properties treeProps = new Properties();
+                    treeProps.setProperty("barcode", props.getProperty("barcode"));
+                    treeProps.setProperty("treeType",(String) treeType.getState("id"));
+                    treeProps.setProperty("notes", props.getProperty("notes"));
+                    treeProps.setProperty("status","available");
+                    treeProps.setProperty("dateStatusUpdated", java.time.LocalDate.now().toString());
                     tree = new Tree();
-                    props.setProperty("dateStatusUpdated", java.time.LocalDate.now().toString());
-                    tree.persistentState = props;
+                    tree.persistentState = treeProps;
                     tree.update("Insert");
                     tree.persistentState.clear();
                 }

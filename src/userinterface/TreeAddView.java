@@ -1,82 +1,50 @@
 package userinterface;
 
-import exception.InvalidPrimaryKeyException;
 import impresario.IModel;
-import model.TreeType;
+import javafx.scene.control.ComboBox;
+import model.TreeTypeCollection;
+
+import java.util.Vector;
 
 public class TreeAddView extends View {
-    TreeType type = (TreeType) myModel.getState("TreeType");
-
     public TreeAddView(IModel model) {
         super(model, "TreeAddView");
-
         setTitle("Add a Tree");
 
+        // Barcode input field
         TextFieldWrapper barcodeField = makeField("Barcode", 6, 6, "numeric");
-        TextFieldWrapper typeField = makeField("Tree Type", "barcode");
-        typeField.setText("Enter a barcode"); //initial value
-        typeField.getField().setEditable(false);
-        typeField.getField().setDisable(true);
-
-
         barcodeField.setListener(((observableValue, oldVal, newVal) -> {
-            if (newVal.length() == 2) {
-                try {
-                    type = new TreeType(newVal);
-                    typeField.setText((String) type.getState("typeDescription"));
-                } catch (InvalidPrimaryKeyException e) {
-                    typeField.setText("Invalid barcode");
-                }
-            } else if (newVal.length() < 2) {
-                typeField.setText("Enter a barcode");
-            }
+            if(newVal.length() < 2) barcodeField.setText(oldVal);
         }));
 
-//        typeField.setListener(((observableValue,oldVal,newVal) ->{
-//            if(newVal.equals("Invalid barcode")){
-//                typeField.styleErr();
-//            }else if(newVal.equals("")){
-//                typeField.styleClear();
-//            }else{
-//                typeField.styleAccept();
-//            }
-//        }));
+        // Get a collection of all tree types
+        TreeTypeCollection typeCollection = new TreeTypeCollection();
+        typeCollection.updateState("TreeTypes",typeCollection.lookupAll());
+
+        ComboBox<String> typeSelector = new ComboBox<>();
+        // Populate combobox with description of every tree type
+        typeSelector.getItems().addAll((Vector<String>)typeCollection.getState("typeDescription"));
+        typeSelector.getSelectionModel().selectFirst();
+
+        // Update barcode field with prefix of selected type
+        typeSelector.getSelectionModel().selectedItemProperty().addListener((options, oldVal, newVal) -> {
+                barcodeField.setText(typeCollection.getPrefixFromDescription(newVal) + barcodeField.getText().substring(2));
+                barcodeField.getField().setEditable(true);
+        });
+
+        barcodeField.setText(typeCollection.getPrefixFromDescription(typeSelector.getSelectionModel().getSelectedItem()));
 
         addContent("Barcode",
                 barcodeField);
 
-        addContent("Tree Type",
-                typeField);
+        addContent("Tree type",
+                typeSelector);
 
         addContent("Notes",
                 makeNotesField("Notes", 200));
 
-//        addContent("Status",
-//                makeComboBox("Available", "Sold", "Damaged"));
-
         submitButton();
         cancelButton();
-    }
-
-    //    @Override
-//    public void submit(){
-//        if(scrapeFields()) {
-//            try {
-//                TreeType check = new TreeType(props.getProperty("barcode").substring(0, 2));
-//                props.setProperty("treeType", (String) check.getState("getId"));
-//                myModel.stateChangeRequest("TreeAddSubmit", props.getProperty("barcode"));
-//            } catch (InvalidPrimaryKeyException IPKE) {
-//                Debug.logErr("Error Instantiating Tree Type With Barcode prefix: " + props.getProperty("barcode").substring(0, 2));
-//            }
-//        }
-//    }
-    @Override
-    public void submit() {
-        if (scrapeFields()) {
-            props.setProperty("treeType", (String) type.getState("id"));
-            props.setProperty("status", "Available");
-            myModel.stateChangeRequest("TreeAddSubmit", props);
-        }
     }
 
     @Override
