@@ -17,19 +17,22 @@
 //*************************************************************
 
 // JavaDoc information
-/**
- * @author $Author: tomb $  @version	$Revision: 1.1 $
- * @version $Revision: 1.1 $
- */
-/** @version $Revision: 1.1 $ */
+/** @author		$Author: tomb $ */
+/** @version	$Revision: 1.1 $ */
 
 // specify the package
 package impresario;
 
-public interface IView {
+// system imports
 
-    // allows a Model to update our visual state
-    void updateState(String key, Object value);
+// local includes
+
+//==============================================================
+public interface IView
+{
+	// allows a Model to update our visual state
+	public void updateState(String key, Object value);
+
 }
 
 //**************************************************************

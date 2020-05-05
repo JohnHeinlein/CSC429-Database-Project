@@ -15,74 +15,123 @@
 //
 //*************************************************************
 
-/**
- * @author $Author: pwri0503 $  @version	$Revision: 1.1.1.2 $
- * @version $Revision: 1.1.1.2 $
- */
-/** @version $Revision: 1.1.1.2 $ */
+/** @author		$Author: pwri0503 $ */
+/** @version	$Revision: 1.1.1.2 $ */
 
 
 // specify the package
 package database;
 
-import event.Event;
-import utilities.Debug;
-
-import java.sql.*;
+// system imports
+import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Vector;
 
-abstract public class Persistable {
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.DatabaseMetaData;
+
+
+// project imports
+import event.Event;
+
+
+// Beginning of DatabaseManipulator class
+//---------------------------------------------------------------------------------------------------------
+abstract public class Persistable
+{
 
     // local state variables
-    private JDBCBroker myBroker;        // database connection broker
+    private JDBCBroker myBroker = null;		// database connection broker
 
-    protected boolean available;        // whether or not we're available
+    protected boolean available = false;		// whether or not we're available
     private static final int MAX_ROWS = 20000;
 
     private Statement theStatement = null;
     private Connection theDBConnection = null;
 
-    protected Persistable() {
-        // initialize our state
-        myBroker = JDBCBroker.getInstance();
-        available = true;
+//    protected String persistableStatus;
+
+   // class constructor
+   //------------------------------------------------------------
+    protected Persistable()
+    {
+
+		// DEBUG System.out.println("Persistable.");
+
+		// initialize our state
+		myBroker = JDBCBroker.getInstance();
+				
+		available = true;
+	
+	
+		// DEBUG System.out.println("Leaving Persistable constructor.");
     }
 
-    protected Properties getSchemaInfo(String tableName) {
-        try {
-            // Create a connection to the database
-            Connection theDBConnection = myBroker.getConnection();
+   /**
+     * Create a Properties object representing aspects of the
+     * 'schema' of a table - namely, the column names and the types
+     * of the columns
+     *
+     * @param  String Table name to get schema information for
+     *
+     * @return Properties object indicating column names as keys and column
+     *         types as values
+     */
+    //------------------------------------------------------------
+    protected Properties getSchemaInfo(String tableName)
+    {	
+    	// DEBUG System.out.println("Persistable.getSchemaInfo for table " + tableName);
+    	try
+		{
+		// Create a connection to the database
+		Connection theDBConnection = myBroker.getConnection();
+			
+		/* System.out.println("Persistable.getSchemaInfo(..) connection = " + theDBConnection); */
 
-            // extract the metadata from the database
-            DatabaseMetaData dbMetaData = theDBConnection.getMetaData();
+		// extract the metadata from the database
+		DatabaseMetaData dbMetaData = theDBConnection.getMetaData();
 
-            // create a place to hold our return information
-            Properties valToReturn = new Properties();
-            // add the name of our table to the return props
-            valToReturn.setProperty("TableName", tableName);
+    	// create a place to hold our return information
+    	Properties valToReturn = new Properties();
+    	// add the name of our table to the return props
+    	valToReturn.setProperty("TableName", tableName);
 
-            // get the names of the columns from the database
-            ResultSet columnInfo = dbMetaData.getColumns(null, null, tableName, null);
-            while (columnInfo.next()) {
-                String typeValue = columnInfo.getString(6).toLowerCase();
+    	// get the names of the columns from the database
+    	ResultSet columnInfo = dbMetaData.getColumns(null, null, tableName, null);
+    	while (columnInfo.next())
+    	{
+    		// DEBUG System.out.println("Column Name = " + columnInfo.getString(4) + ", Column Type = " + columnInfo.getString(6));
+    		String typeValue = columnInfo.getString(6);
 
-                typeValue = (typeValue.startsWith("smallint") || typeValue.startsWith("mediumint") || typeValue.startsWith("int")) ? "numeric" : "text";
+			typeValue = typeValue.toLowerCase();
+    		if ((typeValue.startsWith("smallint") == true) || (typeValue.startsWith("mediumint") == true) ||
+    			(typeValue.startsWith("int") == true))
+    		{
+    			typeValue = "numeric";
+   			}
+    		else
+			{
+    				typeValue = "text";
+    		}
 
-                // add the column / field name and type to the return props
-                valToReturn.setProperty(columnInfo.getString(4), typeValue);
-            }
+    		// add the column / field name and type to the return props
+    		valToReturn.setProperty(columnInfo.getString(4), typeValue);
+    	}   		
 
-            columnInfo.close();
+		columnInfo.close();
 
-            return valToReturn;
-        } catch (SQLException sqle) {
-            new Event(Event.getLeafLevelClassName(this), "getSchemaInfo", "SQL Exception: " + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
-            return null;
-        } catch (NullPointerException npe) {
-            Debug.logErr("No connection to database");
-            return null;
-        }
+    	return valToReturn;
+		}	
+		catch (SQLException sqle)
+		{
+//			DEBUG: System.err.println( "An SQL Error Occured:" + sqle + "\n" + sqle.getErrorCode() + "\n" + sqle.getMessage() + "\n" + sqle);
+			new Event(Event.getLeafLevelClassName(this), "getSchemaInfo", "SQL Exception: " + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
+			return null;
+		}
     }
 
 
@@ -92,157 +141,110 @@ abstract public class Persistable {
      * Returns a Vector with each element being a Properties object
      * containing the columnName=columnValue mappings
      */
-    protected Vector<Properties> getPersistentState(Properties schema, Properties where) {
-        int numRSColumns;            // number of columns in ResultSet
-        Vector<String> namesRSColumns;    // names of columns in ResultSet
-        ResultSet theResultSet;            // the resultset from the SQLStatement execution
-        try {
-            // connect to the database
-            theDBConnection = myBroker.getConnection();
-            // verify the connection
-            if (theDBConnection == null) {
-                Debug.logErr("Could not connect to database!");
-                return null;
-            }
+    //------------------------------------------------------------
+    protected Vector getPersistentState(Properties schema,
+					Properties where)
+    {
+		int numRSColumns = 0; 			// number of columns in ResultSet
+		Vector namesRSColumns = null;	// names of columns in ResultSet
+		ResultSet theResultSet = null;			// the resultset from the SQLStatement execution
 
-            // construct a SQL statement from the passed parameters
-            SQLSelectStatement theSQLStatement = new SQLSelectStatement(schema, where);
+		try
+		{
+			// connect to the database
+			//new Event(Event.getLeafLevelClassName(this), "getPersistentState", "Attempting to get database connection", Event.DEBUG);
 
-            // Once a connection has been established we can create an instance
-            // of Statement, through which we will send queries to the database.
-            // Only the Global Pool connection should be used!
-            Statement theStatement = theDBConnection.createStatement();
+			theDBConnection = myBroker.getConnection();
 
-            // Stop Runaway Queries
-            //theStatement.setMaxRows(MAX_ROWS);
+			//new Event(Event.getLeafLevelClassName(this), "getPersistentState", "Return from database connection attempt call",
+			//	Event.DEBUG);
 
-            // The method executeQuery executes a query on the database. The
-            // return result is of type ResultSet which is one or more rows in
-            // this case.
-            theResultSet = theStatement.executeQuery(theSQLStatement.toString());
-            // verify the results
-            if (theResultSet == null) {
-                System.err.println("Persistable.getPersistentState - Invalid result set from SQL statement!");
-                return null;
-            }
+			// verify the connection
+			if (theDBConnection == null)
+			{
+				System.err.println("Persistable.getPersistentState - Could not connect to database!");
+				return null;
+			}
 
-            // get the column information from the ResultSet
-            ResultSetMetaData rsMetaData = theResultSet.getMetaData();
+	    	// construct a SQL statement from the passed parameters
+			SQLSelectStatement theSQLStatement = new SQLSelectStatement(schema, where);
 
-            numRSColumns = rsMetaData.getColumnCount();
-            namesRSColumns = new Vector<>();
-            for (int cnt = 1; cnt <= numRSColumns; cnt++) {
-                String thisColumnName = rsMetaData.getColumnName(cnt);
-                namesRSColumns.addElement(thisColumnName);
-            }
+			// DEBUG System.out.println("SQL Statement: " + theSQLStatement.toString());
 
-            Vector<Properties> resultSetToReturn = new Vector<>();
+			// verify the construction (should be exception?)
+			if(theSQLStatement == null)
+			{
+				System.err.println("Persistable.getPersistentState - Could not create SQL Statement!");
+				return null;
+			}
 
-            while (theResultSet.next()) {
-                Properties thisRow = new Properties();
-                for (int cnt = 1; cnt <= numRSColumns; cnt++) {
-                    String theColumnName = namesRSColumns.elementAt(cnt - 1);
-                    String theColumnValue = theResultSet.getString(cnt);
+			// Once a connection has been established we can create an instance
+			// of Statement, through which we will send queries to the database.
+			// Only the Global Pool connection should be used!
+			Statement theStatement = theDBConnection.createStatement();
 
-                    // The value of the column might be NULL. In that case, we DON'T
-                    // put it into the Properties object
-                    if (theColumnValue != null) {
-                        thisRow.setProperty(theColumnName, theColumnValue);
-                    }
-                }
-                resultSetToReturn.addElement(thisRow);
-            }
+			// Stop Runaway Queries
+			theStatement.setMaxRows(MAX_ROWS);
 
-            theResultSet.close();
-            return resultSetToReturn;
-        } catch (SQLException sqle) {
-            sqle.printStackTrace();
-            return null;
-        } finally {
-            closeStatement();
-        }
-    }
+			// The method executeQuery executes a query on the database. The
+			// return result is of type ResultSet which is one or more rows in
+			// this case.
+			theResultSet = theStatement.executeQuery(theSQLStatement.toString());
+			// verify the results
+			if (theResultSet == null)
+			{
+				System.err.println("Persistable.getPersistentState - Invalid result set from SQL statement!");
+				return null;
+			}
 
+			// get the column information from the ResultSet
+			ResultSetMetaData rsMetaData = theResultSet.getMetaData();
 
-    /**
-     * Create and execute a SQL statement to extract the required
-     * fields from the database.
-     * Returns a Vector with each element being a Properties object
-     * containing the columnName=columnValue mappings
-     */
-    protected Vector getQueriedState(Properties selSchema, Properties projectionSchema, Properties where) {
-        int numRSColumns;            // number of columns in ResultSet
-        Vector namesRSColumns;    // names of columns in ResultSet
-        ResultSet theResultSet;            // the resultset from the SQLStatement execution
+			numRSColumns = rsMetaData.getColumnCount();
+			namesRSColumns = new Vector();
+			for (int cnt = 1; cnt <= numRSColumns; cnt++)
+			{
+				String thisColumnName = rsMetaData.getColumnName(cnt);
+				namesRSColumns.addElement(thisColumnName);
+			}
 
-        try {
-            // connect to the database
-            theDBConnection = myBroker.getConnection();
-            // verify the connection
-            if (theDBConnection == null) {
-                System.err.println("Persistable.getQueriedState - Could not connect to database!");
-                return null;
-            }
+			Vector resultSetToReturn = new Vector();
 
-            // construct a SQL statement from the passed parameters
-            SQLQueryStatement theSQLStatement = new SQLQueryStatement(selSchema, projectionSchema, where);
+			while (theResultSet.next() == true)
+			{
+				Properties thisRow = new Properties();
+				for (int cnt = 1; cnt <= numRSColumns; cnt++)
+				{
+					String theColumnName = (String)namesRSColumns.elementAt(cnt-1);
+					String theColumnValue = theResultSet.getString(cnt);
 
-            // Once a connection has been established we can create an instance
-            // of Statement, through which we will send queries to the database.
-            // Only the Global Pool connection should be used!
-            Statement theStatement = theDBConnection.createStatement();
+					// The value of the column might be NULL. In that case, we DON'T
+					// put it into the Properties object
+					if (theColumnValue != null)
+					{
+						thisRow.setProperty(theColumnName, theColumnValue);
+					}
+				}
+				resultSetToReturn.addElement(thisRow);
+			}			
 
-            // Stop Runaway Queries
-            //theStatement.setMaxRows(MAX_ROWS);
+			if (theResultSet != null)
+				theResultSet.close();	
+			return resultSetToReturn;
+		}
+		catch (SQLException sqle)
+		{
+//			DEBUG: System.err.println( "An SQL Error Occurred:" + sqle + "\n" + sqle.getErrorCode() + "\n" + sqle.getMessage() + "\n" + sqle);
+			
+			new Event(Event.getLeafLevelClassName(this), "getPersistentState", "SQL Exception: " + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
+			return null;
+		}
+		finally
+		{
+			closeStatement();
+		}
+	}
 
-            // The method executeQuery executes a query on the database. The
-            // return result is of type ResultSet which is one or more rows in
-            // this case.
-            theResultSet = theStatement.executeQuery(theSQLStatement.toString());
-            // verify the results
-            if (theResultSet == null) {
-                System.err.println("Persistable.getQueriedState - Invalid result set from SQL statement!");
-                return null;
-            }
-
-            // get the column information from the ResultSet
-            ResultSetMetaData rsMetaData = theResultSet.getMetaData();
-            numRSColumns = rsMetaData.getColumnCount();
-            namesRSColumns = new Vector();
-
-            for (int cnt = 1; cnt <= numRSColumns; cnt++) {
-                String thisColumnName = rsMetaData.getColumnName(cnt);
-                namesRSColumns.addElement(thisColumnName);
-            }
-
-            Vector resultSetToReturn = new Vector();
-
-            while (theResultSet.next()) {
-                Properties thisRow = new Properties();
-                for (int cnt = 1; cnt <= numRSColumns; cnt++) {
-                    String theColumnName = (String) namesRSColumns.elementAt(cnt - 1);
-                    String theColumnValue = theResultSet.getString(cnt);
-
-                    // The value of the column might be NULL. In that case, we DON'T
-                    // put it into the Properties object
-                    if (theColumnValue != null) {
-                        thisRow.setProperty(theColumnName, theColumnValue);
-                    }
-                }
-                resultSetToReturn.addElement(thisRow);
-            }
-
-            theResultSet.close();
-            return resultSetToReturn;
-        } catch (SQLException sqle) {
-            System.err.println("Persistable.getQueriedState: An SQL Error Occurred:" + sqle + "\n" + sqle.getErrorCode() + "\n" + sqle.getMessage() + "\n" + sqle);
-            new Event(Event.getLeafLevelClassName(this), "getQueriedState", "SQL Exception: " + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
-            return null;
-        } finally {
-
-            closeStatement();
-        }
-    }
 
     /**
      * Create and execute a SQL statement to extract the required
@@ -250,159 +252,317 @@ abstract public class Persistable {
      * Returns a Vector with each element being a Properties object
      * containing the columnName=columnValue mappings
      */
-    protected Vector getQueriedStateWithExactMatches(Properties selSchema, Properties projectionSchema, Properties where) {
-        int numRSColumns;            // number of columns in ResultSet
-        Vector namesRSColumns;    // names of columns in ResultSet
-        ResultSet theResultSet;            // the resultset from the SQLStatement execution
+    //------------------------------------------------------------
+    protected Vector getQueriedState(Properties selSchema,
+    								 Properties projectionSchema,
+									 Properties where)
+    {
+		int numRSColumns = 0; 			// number of columns in ResultSet
+		Vector namesRSColumns = null;	// names of columns in ResultSet
+		ResultSet theResultSet;			// the resultset from the SQLStatement execution
 
-        try {
-            // connect to the database
-            theDBConnection = myBroker.getConnection();
-            // verify the connection
-            if (theDBConnection == null) {
-                System.err.println("Persistable.getQueriedState - Could not connect to database!");
-                return null;
-            }
+		try
+		{
+			// connect to the database
+			theDBConnection = myBroker.getConnection();
+			// verify the connection
+			if (theDBConnection == null)
+			{
+				System.err.println("Persistable.getQueriedState - Could not connect to database!");
+				return null;
+			}
 
-            // construct a SQL statement from the passed parameters
-            SQLQueryStatementWithExactMatches theSQLStatement =
-                    new SQLQueryStatementWithExactMatches(selSchema, projectionSchema, where);
+	    	// construct a SQL statement from the passed parameters
+			SQLQueryStatement theSQLStatement = new SQLQueryStatement(selSchema, projectionSchema, where);
 
-            // Once a connection has been established we can create an instance
-            // of Statement, through which we will send queries to the database.
-            // Only the Global Pool connection should be used!
-            Statement theStatement = theDBConnection.createStatement();
+			// DEBUG: System.out.println("SQLQueryStatement: " + theSQLStatement.toString());
 
-            // Stop Runaway Queries
-            //theStatement.setMaxRows(MAX_ROWS);
+			// verify the construction (should be exception?)
+			if(theSQLStatement == null)
+			{
+				System.err.println("Persistable.getQueriedState - Could not create SQL Statement!");
+				return null;
+			}
 
-            // The method executeQuery executes a query on the database. The
-            // return result is of type ResultSet which is one or more rows in
-            // this case.
-            theResultSet = theStatement.executeQuery(theSQLStatement.toString());
-            // verify the results
-            if (theResultSet == null) {
-                System.err.println("Persistable.getQueriedState - Invalid result set from SQL statement!");
-                return null;
-            }
+			// Once a connection has been established we can create an instance
+			// of Statement, through which we will send queries to the database.
+			// Only the Global Pool connection should be used!
+			Statement theStatement = theDBConnection.createStatement();
 
-            // get the column information from the ResultSet
-            ResultSetMetaData rsMetaData = theResultSet.getMetaData();
+			// Stop Runaway Queries
+			theStatement.setMaxRows(20000);
 
-            numRSColumns = rsMetaData.getColumnCount();
-            namesRSColumns = new Vector();
-            for (int cnt = 1; cnt <= numRSColumns; cnt++) {
-                String thisColumnName = rsMetaData.getColumnName(cnt);
-                namesRSColumns.addElement(thisColumnName);
-            }
+			// The method executeQuery executes a query on the database. The
+			// return result is of type ResultSet which is one or more rows in
+			// this case.
+			theResultSet = theStatement.executeQuery(theSQLStatement.toString());
+			// verify the results
+			if (theResultSet == null)
+			{
+				System.err.println("Persistable.getQueriedState - Invalid result set from SQL statement!");
+				return null;
+			}
 
-            Vector resultSetToReturn = new Vector();
+			// get the column information from the ResultSet
+			ResultSetMetaData rsMetaData = theResultSet.getMetaData();
 
-            while (theResultSet.next()) {
-                Properties thisRow = new Properties();
-                for (int cnt = 1; cnt <= numRSColumns; cnt++) {
-                    String theColumnName = (String) namesRSColumns.elementAt(cnt - 1);
-                    String theColumnValue = theResultSet.getString(cnt);
+			numRSColumns = rsMetaData.getColumnCount();
+			// DEBUG: System.out.println("Persistable.getColumnCount is " + numRSColumns);
+			namesRSColumns = new Vector();
+			for (int cnt = 1; cnt <= numRSColumns; cnt++)
+			{
+				String thisColumnName = rsMetaData.getColumnName(cnt);
+				namesRSColumns.addElement(thisColumnName);
+			}
 
-                    // The value of the column might be NULL. In that case, we DON'T
-                    // put it into the Properties object
-                    if (theColumnValue != null) {
-                        thisRow.setProperty(theColumnName, theColumnValue);
-                    }
-                }
-                resultSetToReturn.addElement(thisRow);
-            }
+			Vector resultSetToReturn = new Vector();
 
-            theResultSet.close();
-            return resultSetToReturn;
-        } catch (SQLException sqle) {
-            System.err.println("An SQL Error Occured:" + sqle + "\n" + sqle.getErrorCode() + "\n" + sqle.getMessage() + "\n" + sqle);
-            new Event(Event.getLeafLevelClassName(this), "getQueriedState", "SQL Exception: " + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
-            return null;
-        } finally {
-            closeStatement();
-        }
-    }
+			while (theResultSet.next() == true)
+			{
+				Properties thisRow = new Properties();
+				for (int cnt = 1; cnt <= numRSColumns; cnt++)
+				{
+					String theColumnName = (String)namesRSColumns.elementAt(cnt-1);
+					String theColumnValue = theResultSet.getString(cnt);
 
-    /**
+					// The value of the column might be NULL. In that case, we DON'T
+					// put it into the Properties object
+					if (theColumnValue != null)
+					{
+						thisRow.setProperty(theColumnName, theColumnValue);
+					}
+				}
+				resultSetToReturn.addElement(thisRow);
+			}
+			
+			if (theResultSet != null)
+				theResultSet.close();
+			return resultSetToReturn;
+		}
+		catch (SQLException sqle)
+		{
+//			DEBUG: 
+			System.err.println( "Persistable.getQueriedState: An SQL Error Occurred:" + sqle + "\n" + sqle.getErrorCode() + "\n" + sqle.getMessage() + "\n" + sqle);
+			new Event(Event.getLeafLevelClassName(this), "getQueriedState", "SQL Exception: " + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
+			return null;
+		}
+		finally
+		{
+				
+			closeStatement();
+		}
+	}
+
+ 	/**
+     * Create and execute a SQL statement to extract the required
+     * fields from the database.
+     * Returns a Vector with each element being a Properties object
+     * containing the columnName=columnValue mappings
+     */
+    //------------------------------------------------------------
+    protected Vector getQueriedStateWithExactMatches(Properties selSchema,
+    								 Properties projectionSchema,
+									 Properties where)
+    {
+		int numRSColumns = 0; 			// number of columns in ResultSet
+		Vector namesRSColumns = null;	// names of columns in ResultSet
+		ResultSet theResultSet;			// the resultset from the SQLStatement execution
+
+		try
+		{
+			// connect to the database
+			theDBConnection = myBroker.getConnection();
+			// verify the connection
+			if (theDBConnection == null)
+			{
+				System.err.println("Persistable.getQueriedState - Could not connect to database!");
+				return null;
+			}
+
+	    	// construct a SQL statement from the passed parameters
+			SQLQueryStatementWithExactMatches theSQLStatement = 
+				new SQLQueryStatementWithExactMatches(selSchema, projectionSchema, where);
+
+			// DEBUG: System.out.println("SQLQueryStatement: " + theSQLStatement.toString());
+
+			// verify the construction (should be exception?)
+			if(theSQLStatement == null)
+			{
+				System.err.println("Persistable.getQueriedState - Could not create SQL Statement!");
+				return null;
+			}
+
+			// Once a connection has been established we can create an instance
+			// of Statement, through which we will send queries to the database.
+			// Only the Global Pool connection should be used!
+			Statement theStatement = theDBConnection.createStatement();
+
+			// Stop Runaway Queries
+			theStatement.setMaxRows(20000);
+
+			// The method executeQuery executes a query on the database. The
+			// return result is of type ResultSet which is one or more rows in
+			// this case.
+			theResultSet = theStatement.executeQuery(theSQLStatement.toString());
+			// verify the results
+			if (theResultSet == null)
+			{
+				System.err.println("Persistable.getQueriedState - Invalid result set from SQL statement!");
+				return null;
+			}
+
+			// get the column information from the ResultSet
+			ResultSetMetaData rsMetaData = theResultSet.getMetaData();
+
+			numRSColumns = rsMetaData.getColumnCount();
+			namesRSColumns = new Vector();
+			for (int cnt = 1; cnt <= numRSColumns; cnt++)
+			{
+				String thisColumnName = rsMetaData.getColumnName(cnt);
+				namesRSColumns.addElement(thisColumnName);
+			}
+
+			Vector resultSetToReturn = new Vector();
+
+			while (theResultSet.next() == true)
+			{
+				Properties thisRow = new Properties();
+				for (int cnt = 1; cnt <= numRSColumns; cnt++)
+				{
+					String theColumnName = (String)namesRSColumns.elementAt(cnt-1);
+					String theColumnValue = theResultSet.getString(cnt);
+
+					// The value of the column might be NULL. In that case, we DON'T
+					// put it into the Properties object
+					if (theColumnValue != null)
+					{
+						thisRow.setProperty(theColumnName, theColumnValue);
+					}
+				}
+				resultSetToReturn.addElement(thisRow);
+			}
+
+			if (theResultSet != null)
+				theResultSet.close();	
+			return resultSetToReturn;
+		}
+		catch (SQLException sqle)
+		{
+//			DEBUG: 
+			System.err.println( "An SQL Error Occured:" + sqle + "\n" + sqle.getErrorCode() + "\n" + sqle.getMessage() + "\n" + sqle);
+			new Event(Event.getLeafLevelClassName(this), "getQueriedState", "SQL Exception: " + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
+			return null;
+		}
+		finally
+		{
+			
+			closeStatement();
+		}
+	}
+
+ 	/**
      * Execute the SQL SELECT statement specified by the String parameter to extract 
      * the required fields from the database.
      * Returns a Vector with each element being a Properties object
      * containing the columnName=columnValue mappings
      */
-    protected Vector getSelectQueryResult(String sqlSelectStatement) {
-        int numRSColumns;            // number of columns in ResultSet
-        Vector namesRSColumns;    // names of columns in ResultSet
-        ResultSet theResultSet;            // the resultset from the SQLStatement execution
+    //------------------------------------------------------------
+    protected Vector getSelectQueryResult(String sqlSelectStatement)
+    {
+		int numRSColumns = 0; 			// number of columns in ResultSet
+		Vector namesRSColumns = null;	// names of columns in ResultSet
+		ResultSet theResultSet = null;			// the resultset from the SQLStatement execution
 
-        try {
-            theDBConnection = myBroker.getConnection();
-            if (theDBConnection == null) {
-                Debug.logErr("Could not connect to database!");
-                return null;
-            }
+		try
+		{
+			// connect to the database
+			//new Event(Event.getLeafLevelClassName(this), "getPersistentState", "Attempting to get database connection", Event.DEBUG);
 
-            // verify the construction (should be exception?)
-            if ((sqlSelectStatement == null) || (sqlSelectStatement.length() == 0)) {
-                Debug.logErr("input SQL Select Statement Missing!");
-                return null;
-            }
+			theDBConnection = myBroker.getConnection();
 
-            // Once a connection has been established we can create an instance
-            // of Statement, through which we will send queries to the database.
-            // Only the Global Pool connection should be used!
-            Statement theStatement = theDBConnection.createStatement();
+			//new Event(Event.getLeafLevelClassName(this), "getPersistentState", "Return from database connection attempt call",
+			//	Event.DEBUG);
 
-            // Stop Runaway Queries
-            //theStatement.setMaxRows(MAX_ROWS);
+			// verify the connection
+			if (theDBConnection == null)
+			{
+				System.err.println("Persistable.getSelectQueryResult - Could not connect to database!");
+				return null;
+			}
 
-            // The method executeQuery executes a query on the database. The
-            // return result is of type ResultSet which is one or more rows in
-            // this case.
-            theResultSet = theStatement.executeQuery(sqlSelectStatement);
+			// verify the construction (should be exception?)
+			if ((sqlSelectStatement == null) || (sqlSelectStatement.length() == 0))
+			{
+				System.err.println("Persistable.getSelectQueryResult - input SQL Select Statement Missing!");
+				return null;
+			}
 
-            // verify the results
-            if (theResultSet == null) {
-                Debug.logErr("Invalid result set from SQL statement!");
-                return null;
-            }
+			// Once a connection has been established we can create an instance
+			// of Statement, through which we will send queries to the database.
+			// Only the Global Pool connection should be used!
+			Statement theStatement = theDBConnection.createStatement();
 
-            // get the column information from the ResultSet
-            ResultSetMetaData rsMetaData = theResultSet.getMetaData();
+			// Stop Runaway Queries
+			theStatement.setMaxRows(MAX_ROWS);
 
-            numRSColumns = rsMetaData.getColumnCount();
-            namesRSColumns = new Vector();
-            for (int cnt = 1; cnt <= numRSColumns; cnt++) {
-                String thisColumnName = rsMetaData.getColumnName(cnt);
-                namesRSColumns.addElement(thisColumnName);
-            }
+			// The method executeQuery executes a query on the database. The
+			// return result is of type ResultSet which is one or more rows in
+			// this case.
+			theResultSet = theStatement.executeQuery(sqlSelectStatement);
+			// verify the results
+			if (theResultSet == null)
+			{
+				System.err.println("Persistable.getSelectQueryResult - Invalid result set from SQL statement!");
+				return null;
+			}
 
-            Vector resultSetToReturn = new Vector();
+			// get the column information from the ResultSet
+			ResultSetMetaData rsMetaData = theResultSet.getMetaData();
 
-            while (theResultSet.next()) {
-                Properties thisRow = new Properties();
-                for (int cnt = 1; cnt <= numRSColumns; cnt++) {
-                    String theColumnName = (String) namesRSColumns.elementAt(cnt - 1);
-                    String theColumnValue = theResultSet.getString(cnt);
+			numRSColumns = rsMetaData.getColumnCount();
+			namesRSColumns = new Vector();
+			for (int cnt = 1; cnt <= numRSColumns; cnt++)
+			{
+				String thisColumnName = rsMetaData.getColumnName(cnt);
+				namesRSColumns.addElement(thisColumnName);
+			}
 
-                    // The value of the column might be NULL. In that case, we DON'T
-                    // put it into the Properties object
-                    if (theColumnValue != null) {
-                        thisRow.setProperty(theColumnName, theColumnValue);
-                    }
-                }
-                resultSetToReturn.addElement(thisRow);
-            }
+			Vector resultSetToReturn = new Vector();
 
-            theResultSet.close();
-            return resultSetToReturn;
-        } catch (SQLException sqle) {
-            new Event(Event.getLeafLevelClassName(this), "getSelectQueryResult", "SQL Exception: " + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
-            return null;
-        } finally {
-            closeStatement();
-        }
-    }
+			while (theResultSet.next() == true)
+			{
+				Properties thisRow = new Properties();
+				for (int cnt = 1; cnt <= numRSColumns; cnt++)
+				{
+					String theColumnName = (String)namesRSColumns.elementAt(cnt-1);
+					String theColumnValue = theResultSet.getString(cnt);
+
+					// The value of the column might be NULL. In that case, we DON'T
+					// put it into the Properties object
+					if (theColumnValue != null)
+					{
+						thisRow.setProperty(theColumnName, theColumnValue);
+					}
+				}
+				resultSetToReturn.addElement(thisRow);
+			}			
+
+			if (theResultSet != null)
+				theResultSet.close();	
+			return resultSetToReturn;
+		}
+		catch (SQLException sqle)
+		{
+//			DEBUG: System.err.println( "An SQL Error Occurred:" + sqle + "\n" + sqle.getErrorCode() + "\n" + sqle.getMessage() + "\n" + sqle);
+			
+			new Event(Event.getLeafLevelClassName(this), "getSelectQueryResult", "SQL Exception: " + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
+			return null;
+		}
+		finally
+		{
+			closeStatement();
+		}
+	}
 
 
     /**
@@ -410,183 +570,302 @@ abstract public class Persistable {
      * fields from the database.
      * Returns an int indicating the return code from SQL UPDATE statement
      */
-    protected Integer updatePersistentState(Properties schema, Properties updateValues, Properties whereValues) throws SQLException {
-        try {
-            // connect to the database
-            theDBConnection = myBroker.getConnection();
-            // verify the connection
-            if (theDBConnection == null) {
-                Debug.logErr("Could not connect to database!");
-                return null;
-            }
+    //------------------------------------------------------------
+    protected Integer updatePersistentState(Properties schema, 			// the table schema
+    						  			    Properties updateValues,	// the values to update
+							  			    Properties whereValues) 	// the where values
+			throws SQLException
+    {
 
-            // construct a SQL statement from the passed parameters
-            SQLUpdateStatement theSQLStatement = new SQLUpdateStatement(schema, updateValues, whereValues);
+		int numRSColumns = 0; 			// number of columns in ResultSet
+		Vector namesRSColumns = null;	// names of columns in ResultSet
 
-            // Once a connection has been established we can create an instance of Statement, through which we will send
-            // queries to the database. Only the Global Pool connection should be used!
-            Statement theStatement = theDBConnection.createStatement();
+		try
+		{
+			// connect to the database
+			theDBConnection = myBroker.getConnection();
+			// verify the connection
+			if (theDBConnection == null)
+			{
+				System.err.println("Persistable.updatePersistentState - Could not connect to database!");
+				return null;
+			}
 
-            // Stop Runaway Queries
-            //theStatement.setMaxRows(MAX_ROWS);
+	    	// construct a SQL statement from the passed parameters
+			SQLUpdateStatement theSQLStatement = new SQLUpdateStatement(schema, updateValues, whereValues);
+			// DEBUG System.out.println("SQL Statement: " + theSQLStatement.toString());
 
-            // The method executeUpdate executes a query on the database. The return result is of type integer which
-            // indicates the number of rows updated
-            return theStatement.executeUpdate(theSQLStatement.toString());
-        } catch (SQLException sqle) {
-            Debug.logErr("An SQL Error Occurred:" + sqle + "\n" + sqle.getErrorCode() + "\n" + sqle.getMessage() + "\n" + sqle);
-            new Event(Event.getLeafLevelClassName(this), "updatePersistentState", "SQL Exception: " + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
-            throw sqle;
-        } finally {
-            closeStatement();
-        }
-    }
+			// verify the construction (should be exception?)
+			if(theSQLStatement == null)
+			{
+				System.err.println("Persistable.updatePersistentState - Could not create SQL Statement!");
+				return null;
+			}
 
-    /**
+			// Once a connection has been established we can create an instance
+			// of Statement, through which we will send queries to the database.
+			// Only the Global Pool connection should be used!
+			Statement theStatement = theDBConnection.createStatement();
+
+			// Stop Runaway Queries
+			theStatement.setMaxRows(20000);
+
+
+			// The method executeUpdate executes a query on the database. The
+			// return result is of type integer which indicates the number of rows updated
+			int returnCode = theStatement.executeUpdate(theSQLStatement.toString());
+
+			// DEBUG: throw new SQLException("Testing only");
+
+			
+
+			return new Integer(returnCode);
+		}
+		catch (SQLException sqle)
+		{
+//			DEBUG: 
+			System.err.println( "An SQL Error Occured:" + sqle + "\n" + sqle.getErrorCode() + "\n" + sqle.getMessage() + "\n" + sqle);
+			new Event(Event.getLeafLevelClassName(this), "updatePersistentState", "SQL Exception: " + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
+			throw sqle;
+		}
+		finally
+		{
+			closeStatement();
+		}
+	}
+
+
+   /**
      * Create and execute a SQL statement to insert the required
      * fields into the database.
      * Returns an int indicating the auto-incremental id from SQL INSERT statement
      */
-    protected Integer insertAutoIncrementalPersistentState(
-            Properties schema,        // the table schema
-            Properties insertValues)// the values to update
-            throws SQLException {
+ //------------------------------------------------------------
+	protected Integer insertAutoIncrementalPersistentState(Properties schema, 		// the table schema
+														   Properties insertValues)	// the values to update
+				throws SQLException
+    {
+		int autoIncKey = -1; 			// auto-increment key extracted from ResultSet
+		ResultSet theResultSet = null;	// auto-increment key in ResultSet
 
-        int autoIncKey = -1;            // auto-increment key extracted from ResultSet
-        ResultSet theResultSet = null;    // auto-increment key in ResultSet
+		try
+		{
+			// connect to the database
+			theDBConnection = myBroker.getConnection();
+			// verify the connection
+			if (theDBConnection == null)
+			{
+				System.err.println("Persistable.insertPersistentState - Could not connect to database!");
+				return null;
+			}
 
-        try {
-            theDBConnection = myBroker.getConnection();
-            if (theDBConnection == null) {
-                Debug.logErr("Could not connect to database!");
-                return null;
-            }
+			// construct a SQL statement from the passed parameters
+			SQLInsertStatement theSQLStatement = new SQLInsertStatement(schema, insertValues);
+			// DEBUG System.out.println("Persistable.insertPersistentState - SQL Statement: " + theSQLStatement.toString());
 
-            // construct a SQL statement from the passed parameters
+			// verify the construction (should be exception?)
+			if(theSQLStatement == null)
+			{
+				System.err.println("Persistable.insertPersistentState - Could not create SQL Statement!");
+				return null;
+			}
 
-            SQLInsertStatement theSQLStatement = new SQLInsertStatement(schema, insertValues);
+			// Once a connection has been established we can create an instance
+			// of Statement, through which we will send queries to the database.
+			// Only the Global Pool connection should be used!
+			Statement theStatement = theDBConnection.createStatement();
 
-            // Once a connection has been established we can create an instance
-            // of Statement, through which we will send queries to the database.
-            // Only the Global Pool connection should be used!
-            Statement theStatement = theDBConnection.createStatement();
+			// Stop Runaway Queries
+			theStatement.setMaxRows(20000);
 
-            // This hangs on my database for no good reason
-            //theStatement.setMaxRows(20000);
+			// The method executeUpdate executes a query on the database. The
+			// return result is of type integer which indicates the number of rows updated
+			int numRows = theStatement.executeUpdate(theSQLStatement.toString(), Statement.RETURN_GENERATED_KEYS);
 
-            // The method executeUpdate executes a query on the database. The
-            // return result is of type integer which indicates the number of rows updated
-            int numRows = theStatement.executeUpdate(theSQLStatement.toString(), Statement.RETURN_GENERATED_KEYS);
-
-            theResultSet = theStatement.getGeneratedKeys();
-
-            if (theResultSet.next()) {
-                autoIncKey = theResultSet.getInt(1);
-            } else {
-                Debug.logErr("Can't get the auto-increment key");
-            }
-
-            return autoIncKey;
-        } catch (SQLException sqle) {
-            Debug.logErr("An SQL Error Occurred: SQL State: " + sqle.getSQLState() + "; Error Code = " + sqle.getErrorCode() + "; Message: " + sqle.getMessage() + "\n" + sqle);
-            new Event(Event.getLeafLevelClassName(this), "insertAutoIncrementalPersistentState", "SQL Exception: "
-                    + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
-            throw sqle;
-
-        } finally {
-            if (theResultSet != null)
-                theResultSet.close();
-            closeStatement();
-        }
-    }
-
+			// DEBUG: throw new SQLException("Testing only");
+			
+			// DEBUG: System.out.println("Testing only");
+			
+			theResultSet = theStatement.getGeneratedKeys();
+			
+			if (theResultSet.next()) 
+			{
+        			autoIncKey = theResultSet.getInt(1);
+    		} 
+    		else 
+    		{
+				System.out.println("Persistable.insertAutoIncrementalPersistentState - can't get the auto-increment key");
+			}
+			
+			return new Integer(autoIncKey);
+		}
+		catch (SQLException sqle)
+		{
+//			DEBUG: System.err.println( "Persistable.insertAutoIncrementalPersistentState: An SQL Error Occurred: SQL State: " + sqle.getSQLState() + "; Error Code = " + sqle.getErrorCode() + "; Message: " + sqle.getMessage() + "\n" + sqle);
+			new Event(Event.getLeafLevelClassName(this), "insertAutoIncrementalPersistentState", "SQL Exception: " 
+			+ sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR); 
+			//return new Integer(28);
+			throw sqle;
+			
+		}
+		finally
+		{
+			if (theResultSet != null)
+				theResultSet.close();	
+			closeStatement();
+		}
+	}				
+				
+				
     /**
      * Create and execute a SQL statement to insert the required
      * fields into the database.
      * Returns an int indicating the return code from SQL INSERT statement
      */
-    protected Integer insertPersistentState(Properties schema, Properties insertValues) throws SQLException {
-        try {
-            // connect to the database
-            theDBConnection = myBroker.getConnection();
-            // verify the connection
-            if (theDBConnection == null) {
-                System.err.println("Persistable.insertPersistentState - Could not connect to database!");
-                return null;
-            }
+    //------------------------------------------------------------
+    protected Integer insertPersistentState(Properties schema, 			// the table schema
+    						  			    Properties insertValues)	// the values to update
+    			throws SQLException
 
-            // construct a SQL statement from the passed parameters
-            SQLInsertStatement theSQLStatement = new SQLInsertStatement(schema, insertValues);
+    {
+		int numRSColumns = 0; 			// number of columns in ResultSet
+		Vector namesRSColumns = null;	// names of columns in ResultSet
 
-            // Once a connection has been established we can create an instance
-            // of Statement, through which we will send queries to the database.
-            // Only the Global Pool connection should be used!
-            Statement theStatement = theDBConnection.createStatement();
+		try
+		{
+			// connect to the database
+			theDBConnection = myBroker.getConnection();
+			// verify the connection
+			if (theDBConnection == null)
+			{
+				System.err.println("Persistable.insertPersistentState - Could not connect to database!");
+				return null;
+			}
 
-            // Stop Runaway Queries
-            //theStatement.setMaxRows(MAX_ROWS);
+	    	// construct a SQL statement from the passed parameters
+			SQLInsertStatement theSQLStatement = new SQLInsertStatement(schema, insertValues);
+			// DEBUG System.out.println("Persistable.insertPersistentState - SQL Statement: " + theSQLStatement.toString());
+		
+			// verify the construction (should be exception?)
+			if(theSQLStatement == null)
+			{
+				System.err.println("Persistable.insertPersistentState - Could not create SQL Statement!");
+				return null;
+			}
 
-            // The method executeUpdate executes a query on the database. The
-            // return result is of type integer which indicates the number of rows updated
-            return theStatement.executeUpdate(theSQLStatement.toString());
-        } catch (SQLException sqle) {
-            System.err.println("An SQL Error Occurred:" + sqle + "\n" + sqle.getErrorCode() + "\n" + sqle.getMessage() + "\n" + sqle);
-            new Event(Event.getLeafLevelClassName(this), "insertPersistentState", "SQL Exception: " + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
-            throw sqle;
-        } finally {
-            closeStatement();
-        }
-    }
+			// Once a connection has been established we can create an instance
+			// of Statement, through which we will send queries to the database.
+			// Only the Global Pool connection should be used!
+			Statement theStatement = theDBConnection.createStatement();
 
-    /**
+			// Stop Runaway Queries
+			theStatement.setMaxRows(20000);
+
+			// The method executeUpdate executes a query on the database. The
+			// return result is of type integer which indicates the number of rows updated
+			int returnCode = theStatement.executeUpdate(theSQLStatement.toString());
+
+			// DEBUG: throw new SQLException("Testing only");
+
+			 return new Integer(returnCode);
+		}
+		catch (SQLException sqle)
+		{
+//			DEBUG: 
+			System.err.println( "An SQL Error Occurred:" + sqle + "\n" + sqle.getErrorCode() + "\n" + sqle.getMessage() + "\n" + sqle);
+			new Event(Event.getLeafLevelClassName(this), "insertPersistentState", "SQL Exception: " + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
+			throw sqle;
+		}
+		finally
+		{
+			closeStatement();
+		}
+	}
+
+
+ 	/**
      * Create and execture a SQL statement to delete the required
      * fields from the database.
      * Returns an integer indicating the return code from SQL DELETE statement
      */
-    protected Integer deletePersistentState(Properties schema, Properties whereValues) throws SQLException {
-        try {
-            // connect to the database
-            theDBConnection = myBroker.getConnection();
-            // verify the connection
-            if (theDBConnection == null) {
-                System.err.println("Persistable.deletePersistentState - Could not connect to database!");
-                return null;
-            }
+    //------------------------------------------------------------
+    protected Integer deletePersistentState(Properties schema,			// the table schema
+    										Properties whereValues)		// the values to use to identify the delete row
+    			throws SQLException
+    {
+    	int numRSColumns = 0; 			// number of columns in ResultSet
+		Vector namesRSColumns = null;	// names of columns in ResultSet
 
-            // construct a SQL statement from the passed parameters
-            SQLDeleteStatement theSQLStatement = new SQLDeleteStatement(schema, whereValues);
+		try
+		{
+			// connect to the database
+			theDBConnection = myBroker.getConnection();
+			// verify the connection
+			if (theDBConnection == null)
+			{
+				System.err.println("Persistable.deletePersistentState - Could not connect to database!");
+				return null;
+			}
 
-            // Once a connection has been established we can create an instance
-            // of Statement, through which we will send queries to the database.
-            // Only the Global Pool connection should be used!
-            Statement theStatement = theDBConnection.createStatement();
+	    	// construct a SQL statement from the passed parameters
+			SQLDeleteStatement theSQLStatement = new SQLDeleteStatement(schema, whereValues);
+			// DEBUG System.out.println("Persistable.deletePersistentState - SQL Statement: " + theSQLStatement.toString());
 
-            // Stop Runaway Queries
-            //theStatement.setMaxRows(MAX_ROWS);
+			// verify the construction (should be exception?)
+			if(theSQLStatement == null)
+			{
+				System.err.println("Persistable.deletePersistentState - Could not create SQL Statement!");
+				return null;
+			}
 
-            // The method executeQuery executes a query on the database. The
-            // return result is of type integer which indicates the number of rows updated
-            return theStatement.executeUpdate(theSQLStatement.toString());
-        } catch (SQLException sqle) {
-            System.err.println("An SQL Error Occured:" + sqle + "\n" + sqle.getErrorCode() + "\n" + sqle.getMessage() + "\n" + sqle);
-            new Event(Event.getLeafLevelClassName(this), "deletePersistentState", "SQL Exception: " + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
-            throw sqle;
-        } finally {
-            closeStatement();
-        }
+			// Once a connection has been established we can create an instance
+			// of Statement, through which we will send queries to the database.
+			// Only the Global Pool connection should be used!
+			Statement theStatement = theDBConnection.createStatement();
+
+			// Stop Runaway Queries
+			theStatement.setMaxRows(20000);
+
+			// The method executeQuery executes a query on the database. The
+			// return result is of type integer which indicates the number of rows updated
+			int returnCode = theStatement.executeUpdate(theSQLStatement.toString());
+
+			// DEBUG: throw new SQLException("Testing only");
+
+			 
+			 return new Integer(returnCode);
+		}
+		catch (SQLException sqle)
+		{
+//			DEBUG: 
+			System.err.println( "An SQL Error Occured:" + sqle + "\n" + sqle.getErrorCode() + "\n" + sqle.getMessage() + "\n" + sqle);
+			new Event(Event.getLeafLevelClassName(this), "deletePersistentState", "SQL Exception: " + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
+			throw sqle;
+		}
+		finally
+		{
+			closeStatement();
+		}
     }
 
-    // close the opened statement on the database
-    private void closeStatement() {
-        try {
-            if (theStatement != null) {
-                theStatement.close();
-                theStatement = null;
-            }
-        } catch (SQLException sqle) {
-            new Event(Event.getLeafLevelClassName(this), "closeStatement", "SQL Exception: " + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
-        }
+	// close the opened statement on the database
+    //------------------------------------------------------------
+    private void closeStatement()
+    {
+		try
+		{
+			if (theStatement != null)
+			{
+				theStatement.close();
+				theStatement = null;
+			}
+		}
+		catch (SQLException sqle)
+		{
+			new Event(Event.getLeafLevelClassName(this), "closeStatement", "SQL Exception: " + sqle.getErrorCode() + ": " + sqle.getMessage(), Event.ERROR);
+		}
     }
+
 }
 
 

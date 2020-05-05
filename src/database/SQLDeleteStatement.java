@@ -16,20 +16,25 @@
 //
 //*************************************************************
 
-/**
- * @author $Author: pwri0503 $  @version	$Revision: 1.1.1.2 $
- * @version $Revision: 1.1.1.2 $
- */
-/** @version $Revision: 1.1.1.2 $ */
+/** @author		$Author: pwri0503 $ */
+/** @version	$Revision: 1.1.1.2 $ */
 
 
 // specify the package
 package database;
 
+// system imports
 import java.util.Enumeration;
 import java.util.Properties;
 
-public class SQLDeleteStatement extends SQLStatement {
+
+// project imports
+
+
+// Beginning of DatabaseManipulator class
+//---------------------------------------------------------------------------------------------------------
+public class SQLDeleteStatement extends SQLStatement
+{
     /**
      *
      * This handles only equality in the WHERE clause. This also
@@ -38,48 +43,72 @@ public class SQLDeleteStatement extends SQLStatement {
      * indicator will be provided. For text types, no entry in this
      * Properties object is necessary.
      */
-    public SQLDeleteStatement(Properties schema, Properties whereValues) {
-        theSQLStatement = "DELETE FROM " + schema.getProperty("TableName");
+    //------------------------------------------------------------
+    public SQLDeleteStatement(Properties schema, 		// the table schema
+    						  Properties whereValues	// the values to delete
+							 )
+	{
+    	super();	// implicit, doesn't do anything, but what the hell
 
-        StringBuilder theWhereString = new StringBuilder();
+		// Begin construction of the actual SQL statement
+		theSQLStatement = "DELETE FROM " + schema.getProperty("TableName");
 
-        // Now, traverse the WHERE clause Properties object
-        if (whereValues != null) {
-            Enumeration theWhereColumns = whereValues.propertyNames();
-            while (theWhereColumns.hasMoreElements()) {
-                if (theWhereString.toString().equals("")) {
-                    theWhereString.append(" WHERE ");
-                } else {
-                    theWhereString.append(" AND ");
-                }
+		// Construct the WHERE part of the SQL statement
+		String theWhereString = "";
 
-                String theColumnName = (String) theWhereColumns.nextElement();
-                String theColumnValue = insertEscapes(whereValues.getProperty(theColumnName));
+		// Now, traverse the WHERE clause Properties object
+		if (whereValues != null)
+		{
+			Enumeration theWhereColumns = whereValues.propertyNames();
+			while (theWhereColumns.hasMoreElements() == true)
+			{
+				if (theWhereString.equals(""))
+				{
+					theWhereString += " WHERE ";
+				}
+				else
+				{
+					theWhereString += " AND ";
+				}
 
-                if (theColumnValue.equals("NULL")) {
-                    theWhereString.append(theColumnName).append(" IS NULL");
-                } else {
-                    String actualType = "Text";
-                    String whereTypeValue = schema.getProperty(theColumnName);
+				String theColumnName = (String)theWhereColumns.nextElement();
+				String theColumnValue = insertEscapes(whereValues.getProperty(theColumnName));
 
-                    if (whereTypeValue != null) {
-                        actualType = whereTypeValue;
-                    }
+				if (theColumnValue.equals("NULL"))
+				{
+					theWhereString += theColumnName + " IS NULL";
+				}
+				else
+				{
+					String actualType = "Text";
 
-                    actualType = actualType.toLowerCase();
+					String whereTypeValue = schema.getProperty(theColumnName);
+					if (whereTypeValue != null)
+					{
+						actualType = whereTypeValue;
+					}
 
-                    if (actualType.equals("numeric")) {
-                        theWhereString.append(theColumnName).append(" = ").append(theColumnValue);
-                    } else {
-                        theWhereString.append(theColumnName).append(" = '").append(theColumnValue).append("'");
-                    }
-                }
-            }
-        }
+					actualType = actualType.toLowerCase();
 
-        theSQLStatement += theWhereString.append(";");
-    }
+					if (actualType.equals("numeric") == true)
+					{
+						theWhereString += theColumnName + " = " + theColumnValue;
+					}
+					else
+					{
+						theWhereString += theColumnName + " = '" + theColumnValue + "'";
+
+					}
+				}
+			}
+		}
+
+		theSQLStatement += theWhereString;
+
+		theSQLStatement += ";";
+	}
 }
+
 
 //---------------------------------------------------------------
 //	Revision History:

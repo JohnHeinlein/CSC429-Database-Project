@@ -16,89 +16,129 @@
 //
 //*************************************************************
 
-/**
- * @author $Author: pwri0503 $  @version	$Revision: 1.1.1.2 $
- * @version $Revision: 1.1.1.2 $
- */
-/** @version $Revision: 1.1.1.2 $ */
+/** @author		$Author: pwri0503 $ */
+/** @version	$Revision: 1.1.1.2 $ */
 
 
 // specify the package
 package database;
 
+// system imports
 import java.util.Enumeration;
 import java.util.Properties;
 
-public class SQLUpdateStatement extends SQLStatement {
 
+// project imports
+
+
+// Beginning of DatabaseManipulator class
+//---------------------------------------------------------------------------------------------------------
+public class SQLUpdateStatement extends SQLStatement
+{  
     /**
+     *
      * This handles only equality in the WHERE clause. This also 
      * expects that for numeric types in the WHERE clause, a separate
      * Properties object containing the column name and numeric type
      * indicator will be provided. For text types, no entry in this
      * Properties object is necessary.
      */
-    public SQLUpdateStatement(Properties schema, Properties updateValues, Properties whereValues) {
-        // Begin construction of the actual SQL statement
-        theSQLStatement = "UPDATE " + schema.getProperty("TableName");
+    //------------------------------------------------------------
+    public SQLUpdateStatement(Properties schema,		// the table's schema
+    						Properties updateValues,	// the values to update
+							Properties whereValues) 	// condition update values
+    {
+    	super();	// implicit, doesn't do anything, but what the hell
+    	
+		// Begin construction of the actual SQL statement
+		theSQLStatement = "UPDATE " + schema.getProperty("TableName");
+		
+		// Construct the SET part of the SQL statement
+		String theSetString = "";
+		
+		// Now, traverse the update Properties object (used for creating
+		// the SET part of this statement)
+		Enumeration theSetColumns = updateValues.propertyNames();
+		while (theSetColumns.hasMoreElements() == true)
+		{
+			if (theSetString.equals(""))
+			{
+				theSetString += " SET ";
+			}
+			else
+			{
+				theSetString += " , ";
+			}
 
-        // Construct the SET part of the SQL statement
-        StringBuilder theSetString = new StringBuilder();
+			String theColumnName = (String)theSetColumns.nextElement();
+			/* DEBUG
+			System.out.println("SQLUpdateStatement.<init> : Column Name = " +
+				theColumnName + ". Length = " + theColumnName.length()); */
+			String theColumnValue = insertEscapes(updateValues.getProperty(theColumnName));
+					
+			String updateType = schema.getProperty(theColumnName);
+			
+			// if the type is numeric, do NOT include quotes
+			if (updateType.equals("numeric") == true)
+			{
+				theSetString += theColumnName + " = " + theColumnValue;
+			}
+			else
+			{
+				// must the a text type, include the quotes
+				theSetString += theColumnName + " = '" + theColumnValue + "'";
+			}
+		}
+	  
+		theSQLStatement += theSetString;
 
-        // Now, traverse the update Properties object (used for creating the SET part of this statement)
-        Enumeration theSetColumns = updateValues.propertyNames();
-        while (theSetColumns.hasMoreElements()) {
-            if (theSetString.toString().equals("")) {
-                theSetString.append(" SET ");
-            } else {
-                theSetString.append(" , ");
-            }
+		// Now, construct the WHERE part of the SQL statement
+		String theWhereString = "";
 
-            String theColumnName = (String) theSetColumns.nextElement();
-            String theColumnValue = insertEscapes(updateValues.getProperty(theColumnName));
-            String updateType = schema.getProperty(theColumnName);
+		// Now, traverse the WHERE clause Properties object
+		if (whereValues != null)
+		{
+			Enumeration theWhereColumns = whereValues.propertyNames();
+			while (theWhereColumns.hasMoreElements() == true)
+			{
+				if (theWhereString.equals(""))
+				{
+		  			theWhereString += " WHERE ";
+				}
+				else
+				{
+					theWhereString += " AND ";
+				}
 
-            // if the type is numeric, do NOT include quotes
-            if (updateType.equals("numeric")) {
-                theSetString.append(theColumnName).append(" = ").append(theColumnValue);
-            } else {
-                // must the a text type, include the quotes
-                theSetString.append(theColumnName).append(" = '").append(theColumnValue).append("'");
-            }
-        }
-
-        theSQLStatement += theSetString;
-
-        // Now, construct the WHERE part of the SQL statement
-        StringBuilder theWhereString = new StringBuilder();
-
-        // Now, traverse the WHERE clause Properties object
-        if (whereValues != null) {
-            Enumeration theWhereColumns = whereValues.propertyNames();
-            while (theWhereColumns.hasMoreElements()) {
-                if (theWhereString.toString().equals("")) {
-                    theWhereString.append(" WHERE ");
-                } else {
-                    theWhereString.append(" AND ");
-                }
-
-                String theColumnName = (String) theWhereColumns.nextElement();
-                String theColumnValue = insertEscapes(whereValues.getProperty(theColumnName));
-                String whereType = schema.getProperty(theColumnName);
-
-                // if the type is numeric, do NOT include quotes
-                if (whereType.equals("numeric")) {
-                    theWhereString.append(theColumnName).append(" = ").append(theColumnValue);
-                } else {
-                    // must the a text type, include the quotes
-                    theWhereString.append(theColumnName).append(" = '").append(theColumnValue).append("'");
-                }
-            }
-        }
-
-        theSQLStatement += theWhereString.append(";");
-    }
+				String theColumnName = (String)theWhereColumns.nextElement();
+				// DEBUG System.out.println("The column name is " + theColumnName);
+				String theColumnValue = insertEscapes(whereValues.getProperty(theColumnName));
+	
+				String whereType = schema.getProperty(theColumnName);
+						
+				// if the type is numeric, do NOT include quotes
+				if (whereType.equals("numeric") == true)
+				{
+					theWhereString += theColumnName + " = " + theColumnValue;
+				}
+				else
+				{
+					// must the a text type, include the quotes
+					theWhereString += theColumnName + " = '" + theColumnValue + "'";
+	
+				}	
+			}
+		}
+	  
+		theSQLStatement += theWhereString;
+		
+		theSQLStatement += ";";
+		
+		// DEBUG System.out.println("SQL Query Statement = " + theSQLStatement);
+		
+	}
 }
+
 
 //---------------------------------------------------------------
 //	Revision History:

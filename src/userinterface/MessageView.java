@@ -12,15 +12,36 @@
 // specify the package
 package userinterface;
 
+// system imports
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.TextAlignment;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
+import javafx.stage.Stage;
 
-public class MessageView extends Text {
+// project imports
 
-    public MessageView(String initialMessage) {
+//==============================================================
+public class MessageView extends Text
+{
+
+    // Class constructor
+    //----------------------------------------------------------
+    public MessageView(String initialMessage)
+    {
         super(initialMessage);
         setFont(Font.font("Helvetica", FontWeight.BOLD, 16));
         setFill(Color.BLUE);
@@ -30,7 +51,9 @@ public class MessageView extends Text {
     /**
      * Display ordinary message
      */
-    public void displayMessage(String message) {
+    //----------------------------------------------------------
+    public void displayMessage(String message)
+    {
         // display the passed text in red
         setFill(Color.BLUE);
         setText(message);
@@ -39,7 +62,9 @@ public class MessageView extends Text {
     /**
      * Display error message
      */
-    public void displayErrorMessage(String message) {
+    //----------------------------------------------------------
+    public void displayErrorMessage(String message)
+    {
         // display the passed text in red
         setFill(Color.RED);
         setText(message);
@@ -48,7 +73,14 @@ public class MessageView extends Text {
     /**
      * Clear error message
      */
-    public void clearErrorMessage() {
+    //----------------------------------------------------------
+    public void clearErrorMessage()
+    {
         setText("                           ");
     }
+
+
 }
+
+
+
