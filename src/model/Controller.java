@@ -289,7 +289,6 @@ public class Controller implements IView, IModel {
             //***************
             // Scout
             //***************
-
             case "ScoutRegisterSubmit" -> {
                 Debug.logMsg("Processing scout registration");
                 props = (Properties) value;
@@ -305,6 +304,9 @@ public class Controller implements IView, IModel {
                 Alerts.infoMessage("Scout registered successfully!", this);
             }
 
+            //***************
+            // Scout
+            //***************
             case "ScoutSearch" -> {
                 Pair<String, String> pair = (Pair<String, String>) value;
                 Vector<Scout> scouts;

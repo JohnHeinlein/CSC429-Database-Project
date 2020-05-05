@@ -31,6 +31,7 @@ public class TreeUpdateDeleteView extends View {
         }));
 
         // TODO: Currently says it deletes the tree, but doesn't actually.
+        // TODO: THIS IS A LIE IM 95% POSITIVE
         footButt(makeButt("Delete", e -> {
             Tree tree = getTree();
 
@@ -59,6 +60,7 @@ public class TreeUpdateDeleteView extends View {
             return new Tree(barcode);
         } catch (InvalidPrimaryKeyException ex) {
             Debug.logErr(String.format("(%s) Invalid barcode", barcode));
+            Alerts.errorMessage("No barcode matching " + barcode + " found.");
         }
         return null;
     }
