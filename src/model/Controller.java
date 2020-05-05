@@ -206,6 +206,7 @@ public class Controller implements IView, IModel {
                     Dialog<Properties> dialog = new Dialog<>();
 
                     View view = new ShiftDataView(this);
+                    view.setTitle("Open Shift for " + (String)scoutCollection.retrieve(completed).getState("firstName") + " " + (String)scoutCollection.retrieve(completed).getState("lastName") );
                     dialog.getDialogPane().setContent(view);
 
                     ButtonType nextButtonType = new ButtonType("Open Shift", ButtonBar.ButtonData.OK_DONE);
@@ -423,7 +424,11 @@ public class Controller implements IView, IModel {
 
             case "TreeUpdate" -> {
                 tree = (Tree) value;
-                createAndShowView("TreeUpdateView");
+                if (tree.getState("status").equals("Sold")) {
+                    Alerts.infoMessage("ERROR: Cannot update a Sold Tree",this);
+                } else {
+                    createAndShowView("TreeUpdateView");
+                }
             }
 
             case "TreeUpdateSubmit" -> {

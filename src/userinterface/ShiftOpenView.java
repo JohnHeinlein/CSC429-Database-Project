@@ -1,6 +1,7 @@
 package userinterface;
 
 import impresario.IModel;
+import utilities.Alerts;
 import utilities.Debug;
 
 public class ShiftOpenView extends View {
@@ -26,7 +27,11 @@ public class ShiftOpenView extends View {
     @Override
     public void submit() {
         if (scrapeFields()) {
-            myModel.stateChangeRequest("SessionCreate", props);
+            if (Double.parseDouble(props.getProperty("startingCash")) <= 0) {
+                Alerts.errorMessage("Starting cash must be > 0");
+            } else {
+                myModel.stateChangeRequest("SessionCreate", props);
+            }
         } else {
             Debug.logErr("Failed submission: scrapeFields failed");
         }

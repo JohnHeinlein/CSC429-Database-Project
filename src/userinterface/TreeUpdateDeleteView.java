@@ -20,7 +20,7 @@ public class TreeUpdateDeleteView extends View {
         setTitle("Update or Delete a Tree");
 
         addContent("Barcode",
-                makeField("Barcode"));
+                makeField("Barcode", 6, 6));
 
         footButt(makeButt("Update", e -> {
             Tree tree = getTree();
@@ -30,8 +30,6 @@ public class TreeUpdateDeleteView extends View {
             }
         }));
 
-        // TODO: Currently says it deletes the tree, but doesn't actually.
-        // TODO: THIS IS A LIE IM 95% POSITIVE
         footButt(makeButt("Delete", e -> {
             Tree tree = getTree();
 
