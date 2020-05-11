@@ -35,10 +35,10 @@ public class ScoutUpdateView extends View {
                 makeField("Email", 30, "email"));
 
         addContent("Troop ID",
-                makeField("Troop ID", 10, "numeric"));
+                makeField("Troop ID", 9, 9, "numeric"));
 
-        addContent("Status",
-                makeComboBox("Active", "Inactive"));
+        //addContent("Status",
+                //makeComboBox("Active", "Inactive"));
 
         submitButton();
         cancelButton();

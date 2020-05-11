@@ -452,9 +452,12 @@ public class Controller implements IView, IModel {
                     Debug.logErr("(%s) Invalid tree barcode", key);
                 } else {
                     String barcode = (String) tree.getState("barcode");
-                    tree.update("delete");
-
-                    Alerts.infoMessage("Tree " + barcode + " deleted!", this);
+                    if (tree.persistentState.getProperty("status").equals("Sold")) {
+                        Alerts.errorMessage("Cannot delete a sold tree from the database.");
+                    } else {
+                        tree.update("delete");
+                        Alerts.infoMessage("Tree " + barcode + " deleted!", this);
+                    }
                 }
             }
 
@@ -464,6 +467,7 @@ public class Controller implements IView, IModel {
                 try {
                     tree = new Tree(props.getProperty("barcode"));
                     Debug.logMsg("Tree With barcode: " + props.getProperty("barcode") + " Already Exists");
+                    Alerts.errorMessage("Tree With barcode: " + props.getProperty("barcode") + " Already Exists");
                 } catch (InvalidPrimaryKeyException IPKE) {
                     String barcode = props.getProperty("barcode");
                     try {
@@ -482,9 +486,9 @@ public class Controller implements IView, IModel {
                     tree.persistentState = treeProps;
                     tree.update("Insert");
                     tree.persistentState.clear();
+                    Alerts.infoMessage("Tree added!", this);
                 }
 
-                Alerts.infoMessage("Tree added!", this);
             }
 
             //****************************
